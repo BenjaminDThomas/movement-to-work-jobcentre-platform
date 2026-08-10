@@ -223,3 +223,48 @@ https://thelaunchgroup.co.uk/movement-to-work/
 
 Competitor 5: The King’s Trust – Help Getting a Job
 https://www.princes-trust.org.uk/help-for-young-people/get-job
+
+**Strengths
+* Clearly targets young people looking for support getting into employment
+* Clearly communicates that employment support is available for people aged 16–30
+* Strong hero section quickly establishes who the support is for and its overall purpose
+* Transferable and employability skills are positioned as an important part of becoming work-ready
+* Uses engaging imagery and varied layouts to make content easier to scan
+* Strong spacing between sections prevents information from feeling overly compressed
+* Clear typography makes headings and important information easy to distinguish
+* Information is divided into individual programmes and support options rather than being presented as one large block of content
+* Programme pages clearly explain eligibility and what participants can gain
+* Real participant stories provide social proof and demonstrate potential outcomes
+* Clear contact routes make it easy for users to access additional support
+* Contact information includes opening times, helping users understand when support is available
+* FAQs answer common concerns before users commit to a programme
+* Information about practical concerns such as expenses reduces uncertainty for participants
+* Responsive layouts ensure content remains accessible on smaller screens
+* Search is prominent and provides suggestions to help users locate information
+* Related programmes provide clear routes for users who need different types of employment support
+* The wider employment section provides multiple options rather than assuming every user needs the same intervention
+* Employability resources include videos, worksheets and quizzes, providing more engaging ways to learn than text alone
+* Clear footer navigation gives users another route towards important pages and support
+
+**Weaknesses
+* The search experience can make returning to the previous context less obvious once users enter the dedicated search interface
+* Some button/background combinations have relatively low visual distinction and should be checked against WCAG contrast requirements
+* The strongest visual identity appears on major landing pages, while some secondary pages become more conventional and text-heavy
+* Some content cards use similar colours to the surrounding background, reducing visual separation between individual elements
+* Navigation contains a large amount of information and several categories, which may overwhelm users with lower digital confidence
+* Navigation behaviour can change as users move between different sections, reducing predictability
+* Some secondary pages contain large quantities of text with fewer visual landmarks
+* Programme information is distributed across several individual pages, requiring users to move backwards and forwards to compare options
+* Users may need to understand the differences between several programmes before knowing which one is most suitable
+* There is no single visual journey showing the complete process from needing employment support through to gaining experience and employment
+* The site contains many different forms of support, which can create decision-making friction for users who do not already know what they need
+* Programme cards could provide stronger visual comparison between duration, eligibility, skills and outcomes
+* Important information can sometimes compete with other navigation routes and related content
+* Search, menus, programmes and support options provide many possible routes, potentially creating choice overload
+* Secondary pages do not always maintain the same level of visual engagement as the main landing experience
+* Long-form information could be broken into additional visual summaries for users who primarily scan content
+* Transferable skills are discussed, but there is an opportunity to demonstrate more clearly how individual activities develop specific workplace skills
+* There is limited personalisation showing users which employment programme may suit their individual circumstances
+* Local employer and travel information is not central to the main employment-support journey
+* Users looking specifically for nearby work experience may still need to move through several areas before finding something locally relevant
+* There is an opportunity for stronger progress indicators showing users what to do first, next and after completing support
