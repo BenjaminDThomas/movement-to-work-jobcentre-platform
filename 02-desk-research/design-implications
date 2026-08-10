@@ -1,1 +1,164 @@
+**Design Implications
+
+* **Finding:** Users may not understand what happens during the programme.
+  **Design implication:** Include a visual two-week programme timeline showing each day, what happens and what participants will learn.
+
+* **Finding:** Users may be unsure what the website or programme offers when they first arrive.
+  **Design implication:** Create a clear hero section explaining the two-week work experience, key benefits, approximate hours and a strong call to action.
+
+* **Finding:** Users may find large amounts of employment information confusing.
+  **Design implication:** Break content into short sections, cards and clearly labelled stages instead of long blocks of text.
+
+* **Finding:** Users may struggle to recognise their transferable skills.
+  **Design implication:** Add a dedicated transferable-skills section showing everyday activities and how they translate into workplace skills.
+
+* **Finding:** Users may not understand how transferable skills can be used when applying for jobs.
+  **Design implication:** Provide examples such as teamwork, communication and time management alongside examples of how to describe them to employers.
+
+* **Finding:** Participants may not know which skills they will develop during the programme.
+  **Design implication:** Include a clear skills section showing what participants can gain and how each skill is developed.
+
+* **Finding:** Confidence is an important part of becoming work-ready.
+  **Design implication:** Make confidence building one of the main benefits of the programme instead of focusing only on work experience.
+
+* **Finding:** Users may have difficulty staying engaged with large amounts of written information.
+  **Design implication:** Introduce short quizzes and interactive activities to make learning more engaging.
+
+* **Finding:** Users may be unsure whether they have understood important information.
+  **Design implication:** Use optional quizzes or knowledge checks at the end of key sections to reinforce learning.
+
+* **Finding:** Users may have limited interview experience.
+  **Design implication:** Include an interview-preparation section covering common questions, preparation tips and mock-interview guidance.
+
+* **Finding:** Interview preparation may feel overwhelming to inexperienced users.
+  **Design implication:** Break interview preparation into simple stages such as before the interview, during the interview and after the interview.
+
+* **Finding:** Users may be unsure how to create a professional CV.
+  **Design implication:** Add a dedicated CV section explaining structure, key information and common mistakes.
+
+* **Finding:** Users may not understand how to tailor their CV towards different roles.
+  **Design implication:** Show examples of how the same experience or skill can be described differently depending on the job being applied for.
+
+* **Finding:** Users may struggle with cover letters and personal statements.
+  **Design implication:** Include clear guidance, examples and step-by-step structures for creating them.
+
+* **Finding:** Users may have limited understanding of how AI can assist with job applications.
+  **Design implication:** Include an AI guidance section showing appropriate ways to use AI for CV feedback, application preparation and interview practice.
+
+* **Finding:** Users may rely too heavily on AI-generated application content.
+  **Design implication:** Explain that AI should support rather than replace the user's own experiences, skills and personal answers.
+
+* **Finding:** Users may not understand job descriptions or required skills.
+  **Design implication:** Include guidance on breaking down job descriptions into essential skills, desirable skills and responsibilities.
+
+* **Finding:** Job advertisements containing many requirements may discourage users from applying.
+  **Design implication:** Explain the difference between essential and desirable requirements and encourage users to identify skills they already possess.
+
+* **Finding:** Users may find it difficult to locate relevant work-experience opportunities.
+  **Design implication:** Provide a clear opportunities section that can be filtered or organised by sector and type of work.
+
+* **Finding:** Users may have limited awareness of employers in the Skelmersdale area.
+  **Design implication:** Include a local employers and sectors section highlighting nearby industries and example opportunities.
+
+* **Finding:** Users may not know which sectors could suit their interests or skills.
+  **Design implication:** Add a simple career or sector quiz that suggests areas users could explore based on their interests.
+
+* **Finding:** Travel can determine whether an employment opportunity is realistic.
+  **Design implication:** Show location and travel information alongside local opportunities rather than separating it into an unrelated section.
+
+* **Finding:** Public transport availability may limit where users can work.
+  **Design implication:** Include travel guidance and links to transport information for nearby employment areas.
+
+* **Finding:** Travel costs may discourage users from considering opportunities further away.
+  **Design implication:** Clearly display approximate travel considerations and signpost users towards available Jobcentre travel support where appropriate.
+
+* **Finding:** Some users may primarily access the website through a mobile phone.
+  **Design implication:** Design the website mobile-first and ensure all key features work effectively on smaller screens.
+
+* **Finding:** Some users may not have regular access to a desktop or laptop.
+  **Design implication:** Avoid features that depend on large screens, mouse interactions or desktop-only functionality.
+
+* **Finding:** Users may have different levels of digital confidence.
+  **Design implication:** Use simple navigation, familiar interface patterns, large buttons and clearly labelled actions.
+
+* **Finding:** Complex navigation may cause users to lose track of where they are.
+  **Design implication:** Keep the main navigation minimal and provide clear page titles, breadcrumbs or progress indicators where necessary.
+
+* **Finding:** Users may not know which section of the website they should visit first.
+  **Design implication:** Provide a clear recommended journey from learning about the programme through to preparation and next steps.
+
+* **Finding:** Users may benefit from seeing their progress.
+  **Design implication:** Consider a progress indicator showing which programme or preparation stages they have explored or completed.
+
+* **Finding:** Users may be uncertain about the time commitment required.
+  **Design implication:** Make the two-week duration, six attendance days and approximate 10:00am–3:00pm hours visible near the top of the website.
+
+* **Finding:** Users may be hesitant to join if they do not understand what is expected of them.
+  **Design implication:** Include a simple "What to Expect" section explaining attendance, activities and participant expectations.
+
+* **Finding:** Users may not immediately recognise the value of completing the programme.
+  **Design implication:** Clearly highlight benefits such as experience, confidence, transferable skills, CV development and the certificate of participation.
+
+* **Finding:** A certificate may provide users with tangible evidence of completing the programme.
+  **Design implication:** Highlight the certificate of participation and explain how it can be referenced on a CV or during interviews.
+
+* **Finding:** Users may lack recent experience to discuss during interviews.
+  **Design implication:** Explain how activities completed during Movement to Work can become examples for CVs and interview answers.
+
+* **Finding:** Users may feel anxious about entering an unfamiliar workplace.
+  **Design implication:** Use reassuring programme information, clear expectations and imagery that makes the environment feel approachable.
+
+* **Finding:** Users may not know what different Jobcentre roles involve.
+  **Design implication:** Include a section introducing the different roles participants may experience during their placement.
+
+* **Finding:** Users may not know where to access additional help.
+  **Design implication:** Keep support options clearly visible throughout the website and provide an obvious way to speak with a work coach.
+
+* **Finding:** Users may have questions before committing to the programme.
+  **Design implication:** Add a concise FAQ covering eligibility, hours, dress expectations, travel, activities and what happens after completion.
+
+* **Finding:** Employment terminology may be confusing to some users.
+  **Design implication:** Use plain English and explain unavoidable terminology rather than assuming users already understand it.
+
+* **Finding:** Accessibility needs will vary between participants.
+  **Design implication:** Follow WCAG guidance with readable text, sufficient colour contrast, keyboard accessibility and clear focus states.
+
+* **Finding:** Visual content may make programme information easier to understand.
+  **Design implication:** Use relevant imagery, icons, timelines and diagrams to support written content without relying on visuals alone.
+
+* **Finding:** Too many visual elements could make the website overwhelming.
+  **Design implication:** Maintain clear visual hierarchy and use interactive elements only where they improve understanding or engagement.
+
+* **Finding:** Users may want to quickly revisit important information.
+  **Design implication:** Make key sections easy to access directly through navigation rather than forcing users through the entire website again.
+
+* **Finding:** Users may need information while speaking with a work coach.
+  **Design implication:** Ensure important programme information can be quickly scanned and shown on either desktop, tablet or mobile.
+
+* **Finding:** Jobcentre staff may also use the website when explaining the programme.
+  **Design implication:** Structure information so staff can quickly show participants benefits, schedules, activities and next steps.
+
+* **Finding:** Users may want reassurance that the programme is legitimate.
+  **Design implication:** Clearly associate the website with Movement to Work and Skelmersdale Jobcentre and use professional, trustworthy visual design.
+
+* **Finding:** Users may be unsure what happens after completing the programme.
+  **Design implication:** Include a clear "What Happens Next?" section showing possible routes into applications, employment, further training or continued Jobcentre support.
+
+* **Finding:** Users need a clear next action after learning about the programme.
+  **Design implication:** Use prominent calls to action such as "Register Your Interest", "Speak to Your Work Coach" or "Explore the Programme".
+
+* **Finding:** Different users may visit the site at different stages of their employment journey.
+  **Design implication:** Allow users to access individual areas such as CV help, interview preparation, skills and opportunities without requiring them to follow a fixed route.
+
+* **Finding:** Users may be unsure whether Movement to Work is suitable for them.
+  **Design implication:** Include a short "Is Movement to Work for Me?" section or optional eligibility/readiness quiz.
+
+* **Finding:** Users may struggle to connect programme activities with future employment.
+  **Design implication:** For each programme activity, explain what skill it develops and how that skill could be useful in a real job.
+
+* **Finding:** Users may become discouraged if employment feels like a distant final goal.
+  **Design implication:** Present the journey as smaller achievable stages such as learn about the programme → build skills → gain experience → improve applications → explore opportunities.
+
+* **Finding:** Users may not know how the programme differs from simply applying for jobs independently.
+  **Design implication:** Clearly communicate the additional value of supported work experience, one-to-one guidance, interview practice and skills development.
 
