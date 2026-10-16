@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<!--
+  =========================================================================
+  MOVEMENT TO WORK: SKELMERSDALE JOBCENTRE PLUS
+  Hero · menu · "Movement to Work" mask transition · About · Journey scenes
+  =========================================================================
+  Stage 13: Platform implementation
+
+  Scroll story (desktop and mobile)
+    1. Hero          split classroom / office photograph, pinned
+    2. Transition    the photograph is masked down into the letters
+                     MOVEMENT TO WORK, then the words lift away as About
+                     slides up over them
+    3. About         "From education to employment" and the six-step path
+    4. Journey       four full-screen scenes that pin and stack:
+                     Discover · Develop · Prepare · Employment
+    5. Get to know   crossword of the three key words, with a panel that
+                     explains whichever word is chosen
+    6. Skills        twelve puzzle pieces to click or drag onto a round
+                     board, each opening a sheet on why it matters
+    (The programme timeline follows in the next build stage.)
+
+  Accessibility notes for this document
+    - Landmarks: banner (fixed logo and Join corner) + main (hero, about,
+      journey, get to know, skills)
+      + modal menu dialog + skill sheet (native <dialog>)
+    - One <h1>; About and Journey use <h2>, each scene an <h3>
+    - The mask transition and every brush, leaf and spark are decorative
+      and hidden from assistive technology
+    - Text baked into supplied artwork carries the same words as alt text
+    - The menu is a modal dialog: focus moves in, is trapped, Esc closes,
+      and focus returns to the toggle
+    - Without JavaScript, or with reduced motion, nothing is pinned and the
+      page reads top to bottom as ordinary sections
+
+  File map
+    css/grid.css   reset, scale unit, layout and breakpoints
+    css/style.css  tokens, typography, components, motion
+    js/main.js     menu, scroll choreography, reveals
+    ../images/     photography, brand artwork, decoration (WebP)
+  =========================================================================
+-->
+<html lang="en-GB">
+
+<head>
+
+  <!-- ===================================================================
+       1. DOCUMENT META
+       =================================================================== -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <title>Movement to Work | Skelmersdale Jobcentre Plus</title>
+  <meta name="description"
+    content="Movement to Work is a free two-week programme from Skelmersdale Jobcentre Plus for young people aged 18-30, with real work experience, CV and interview preparation, and a local team supporting you every step.">
+  <meta name="theme-color" content="#033D23">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Movement to Work | Skelmersdale Jobcentre Plus">
+  <meta property="og:description" content="Your first step from education into a real job.">
+  <meta property="og:image" content="../images/hero-bg-desktop.webp">
+  <meta property="og:locale" content="en_GB">
+
+  <!-- ===================================================================
+       2. FONTS
+       Inter         body, navigation and UI text (matches the Figma file)
+       Caveat        handwritten notes, numbers and labels
+       Caveat Brush  bold brush headings ("to Work", menu titles, steps)
+       =================================================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Caveat+Brush&family=Inter:wght@400..900&display=swap">
+
+  <!-- ===================================================================
+       3. PRELOAD  (first paint artwork)
+       =================================================================== -->
+  <link rel="preload" as="image" href="../images/hero-bg-desktop.webp"
+    media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
+  <link rel="preload" as="image" href="../images/hero-bg-mobile.webp"
+    media="not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
+  <link rel="preload" as="image" href="../images/hero-figure-desktop.webp"
+    media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
+  <link rel="preload" as="image" href="../images/hero-figure-mobile.webp"
+    media="not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
+
+  <!-- ===================================================================
+       4. STYLESHEETS  (layout first, then skin)
+       =================================================================== -->
+  <link rel="stylesheet" href="../css/grid.css">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- ===================================================================
+       5. SCRIPTING FLAG  (before first paint, so CSS can stage motion only
+          when JavaScript is there to finish it)
+       =================================================================== -->
+  <script>document.documentElement.classList.add('js');</script>
+
+</head>
+
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+
+  <!-- ===================================================================
+       SVG SPRITE
+       Interface glyphs drawn once and referenced with <use>. All of them
+       sit beside a text label, so they are hidden from assistive tech.
+       =================================================================== -->
+  <svg class="svg-sprite" aria-hidden="true" focusable="false" width="0" height="0">
+    <defs>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m0 0-6-6m6 6-6 6" /></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m6.5 12.5 3.6 3.6 7.4-8.2" /></symbol>
+
+      <!-- Hero "What you'll get" -->
+      <symbol id="i-briefcase" viewBox="0 0 24 24">
+        <rect x="3.5" y="7.5" width="17" height="12" rx="2.2" />
+        <path d="M9 7.5V6a1.6 1.6 0 0 1 1.6-1.6h2.8A1.6 1.6 0 0 1 15 6v1.5M3.5 12.4c5.4 2.4 11.6 2.4 17 0M12 12.6v1.6" />
+      </symbol>
+      <symbol id="i-doc" viewBox="0 0 24 24">
+        <path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z" />
+        <path d="M14 3.5V8h4.5M9 12.5h6M9 16h6" />
+      </symbol>
+      <symbol id="i-star" viewBox="0 0 24 24">
+        <path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z" />
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
+        <circle cx="12" cy="10" r="2.4" />
+      </symbol>
+
+      <!-- Menu -->
+      <symbol id="i-home" viewBox="0 0 24 24">
+        <path d="M4 10.4 12 4l8 6.4V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z" />
+        <path d="M9.6 20.5v-5.4a2.4 2.4 0 0 1 4.8 0v5.4" />
+      </symbol>
+      <symbol id="i-about" viewBox="0 0 24 24">
+        <circle cx="9.5" cy="7" r="3.4" />
+        <path d="M3.4 19.6c0-3 2.2-5.4 5.6-5.6M11.8 20.1H6a2.6 2.6 0 0 1 0-5.2" />
+        <circle cx="16.6" cy="16.6" r="4.2" />
+        <path d="M16.6 15.8v3M16.6 13.9v.1" />
+      </symbol>
+      <symbol id="i-skills" viewBox="0 0 24 24">
+        <path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4z" />
+        <circle cx="12" cy="8.6" r="1.9" />
+        <circle cx="8.6" cy="14.6" r="1.9" />
+        <circle cx="15.4" cy="14.6" r="1.9" />
+        <path d="m11 10.3-1.4 2.6M13 10.3l1.4 2.6M10.5 14.6h3" />
+      </symbol>
+      <symbol id="i-programme" viewBox="0 0 24 24">
+        <path d="M4 3.5h9.5v15H4z" />
+        <path d="M13.5 7.5H20v13H8.5v-2M6.8 7.2h4M6.8 10.2h4M6.8 13.2h2.6M15.8 11h1.8M15.8 14h1.8M11.4 17.2h6.2" />
+      </symbol>
+      <symbol id="i-jobready" viewBox="0 0 24 24">
+        <rect x="3" y="7" width="18" height="12.5" rx="1.6" />
+        <path d="M9 7V5.2A1.2 1.2 0 0 1 10.2 4h3.6A1.2 1.2 0 0 1 15 5.2V7M3 12h18" />
+      </symbol>
+      <symbol id="i-user" viewBox="0 0 24 24">
+        <circle cx="12" cy="7.6" r="4.6" />
+        <path d="M3.2 22c0-5.2 3.9-8.4 8.8-8.4s8.8 3.2 8.8 8.4z" />
+      </symbol>
+
+      <!-- About: the six-step path (solid glyphs) -->
+      <symbol id="i-step-cap" viewBox="0 0 24 24">
+        <path d="M12 4 1.8 8.8 12 13.6l10.2-4.8z" />
+        <path d="M5.6 11.4v4.2c0 1.8 2.9 3.4 6.4 3.4s6.4-1.6 6.4-3.4v-4.2L12 14.4z" />
+        <path d="M21 9.6v5.2" />
+      </symbol>
+      <symbol id="i-step-bulb" viewBox="0 0 24 24">
+        <path d="M9.2 17.4h5.6M9.8 20.4h4.4M12 3.8a5.6 5.6 0 0 0-3.4 10.1c.6.5.9 1.1.9 1.8v.2h5v-.2c0-.7.3-1.3.9-1.8A5.6 5.6 0 0 0 12 3.8z" />
+        <path d="M12 .6v1.2M4.2 3.8l.9.9M19.8 3.8l-.9.9M1.6 10h1.2M21.2 10h1.2" />
+      </symbol>
+      <symbol id="i-step-gear" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3.2" />
+        <path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M5.4 18.6l1.8-1.8M16.8 7.2l1.8-1.8" />
+        <circle cx="12" cy="12" r="6.6" />
+      </symbol>
+      <symbol id="i-step-doc" viewBox="0 0 24 24">
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+        <path d="M14 3v5h5M9 12.4h6M9 16h6" />
+      </symbol>
+      <symbol id="i-step-bag" viewBox="0 0 24 24">
+        <rect x="2.6" y="7" width="18.8" height="13" rx="2.4" />
+        <path d="M8.8 7V5.4A1.6 1.6 0 0 1 10.4 3.8h3.2a1.6 1.6 0 0 1 1.6 1.6V7M2.6 12.6c6 2.6 12.8 2.6 18.8 0" />
+      </symbol>
+      <symbol id="i-step-rocket" viewBox="0 0 24 24">
+        <path class="solid" style="fill: currentColor; stroke: none" d="M20.6 3.4c-4.6-.3-8.6 1.7-11.4 5.6l-2.6.2-3 3.2 3.6.9 3.6 3.6.9 3.6 3.2-3 .2-2.6c3.9-2.8 5.9-6.8 5.5-11.5zM15.2 10.6a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z" />
+        <path class="solid" style="fill: currentColor; stroke: none" d="M6.4 15.4c-1.6.4-2.6 2-2.8 5.2 3.2-.2 4.8-1.2 5.2-2.8z" />
+      </symbol>
+
+      <!-- Get to know: words and notes -->
+      <symbol id="i-target-arrow" viewBox="0 0 24 24">
+        <path d="M20.2 10.4A8.4 8.4 0 1 1 13.6 3.8" />
+        <path d="M16.3 11.2a4.4 4.4 0 1 1-3.5-3.5" />
+        <path d="M12 12l7.4-7.4M16.6 4.2l2.8.4.4 2.8M19.4 4.6l1.8-1.8" />
+      </symbol>
+      <symbol id="i-group" viewBox="0 0 24 24">
+        <circle cx="12" cy="7.2" r="2.8" />
+        <circle cx="5.2" cy="9.4" r="2.2" />
+        <circle cx="18.8" cy="9.4" r="2.2" />
+        <path d="M7.4 19.6v-1.4a4.6 4.6 0 0 1 9.2 0v1.4zM2 18.6v-.8a3.2 3.2 0 0 1 4.6-2.9M22 18.6v-.8a3.2 3.2 0 0 0-4.6-2.9" />
+      </symbol>
+      <symbol id="i-person-check" viewBox="0 0 24 24">
+        <circle cx="10" cy="7.4" r="3.8" />
+        <path d="M3 20.4c0-4 3.1-6.6 7-6.6 1.2 0 2.3.2 3.2.7" />
+        <path d="m14.6 18 2.3 2.3 4.6-4.8" />
+      </symbol>
+      <symbol id="i-check-circle" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="m7.8 12.3 2.8 2.8 5.6-6" />
+      </symbol>
+      <symbol id="i-walk" viewBox="0 0 24 24">
+        <circle cx="13.6" cy="3.8" r="1.9" class="solid" style="fill: currentColor; stroke: none" />
+        <path d="m10.4 21 2.2-6.4 2.6 2.4V21M8.4 11.4l2.8-3.2c.8-.9 2.2-1 3-.2l1.4 1.4 2.6 1.4M12.6 14.6l1-4.6M8.6 15.4l1.6-3" />
+      </symbol>
+
+      <!-- Skills -->
+      <symbol id="i-sk-confidence" viewBox="0 0 24 24">
+        <circle cx="12" cy="10.4" r="3.2" />
+        <path d="M6.4 21.4c0-3.4 2.5-5.8 5.6-5.8s5.6 2.4 5.6 5.8M12 2.2v2.2M5.6 4.6l1.5 1.6M18.4 4.6l-1.5 1.6M3.4 10.4h2.2M18.4 10.4h2.2" />
+      </symbol>
+      <symbol id="i-sk-gear" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3.2" />
+        <path d="M10.3 2.8h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9-2.6-.5v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8z" />
+      </symbol>
+      <symbol id="i-sk-target" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9.2" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="1.6" class="solid" style="fill: currentColor; stroke: none" />
+      </symbol>
+      <symbol id="i-sk-team" viewBox="0 0 24 24">
+        <circle cx="7.4" cy="7" r="2.3" />
+        <circle cx="16.6" cy="7" r="2.3" />
+        <path d="M3.6 21v-6.2c0-1.8 1.5-3.2 3.3-3.2h.6L10 8.4l1.4-4.8M20.4 21v-6.2c0-1.8-1.5-3.2-3.3-3.2h-.6L14 8.4l-1.4-4.8M12 1.4v1M8.8 2.2l.6.8M15.2 2.2l-.6.8" />
+      </symbol>
+      <symbol id="i-sk-adapt" viewBox="0 0 24 24">
+        <circle cx="9" cy="6.6" r="3" />
+        <circle cx="16.4" cy="9" r="2.4" />
+        <path d="M2.6 18.4c0-3.4 2.8-6 6.4-6 1.6 0 3 .5 4.1 1.4M14.4 17.6a3.6 3.6 0 0 1 6.4-1.6m.6-2v2.2h-2.2M21.4 19.4a3.6 3.6 0 0 1-6.4 1.6m-.6 2v-2.2h2.2" />
+      </symbol>
+      <symbol id="i-sk-interview" viewBox="0 0 24 24">
+        <path d="M12 2.2 20.6 7v10L12 21.8 3.4 17V7z" />
+        <circle cx="12" cy="9" r="1.7" />
+        <circle cx="8.6" cy="14.6" r="1.7" />
+        <circle cx="15.4" cy="14.6" r="1.7" />
+        <path d="m11.1 10.5-1.6 2.6M12.9 10.5l1.6 2.6M10.3 14.6h3.4" />
+      </symbol>
+      <symbol id="i-sk-personal" viewBox="0 0 24 24">
+        <circle cx="9.4" cy="5.4" r="3" />
+        <path d="M3 21.4c0-6 2.8-10 6.4-10 1.2 0 2.3.4 3.2 1.1" />
+        <path d="M17.2 21.2s-4.6-2.6-4.6-5.6a2.4 2.4 0 0 1 4.6-1 2.4 2.4 0 0 1 4.6 1c0 3-4.6 5.6-4.6 5.6z" />
+      </symbol>
+      <symbol id="i-sk-employ" viewBox="0 0 24 24">
+        <rect x="9" y="5.4" width="12.6" height="9" rx="1.4" />
+        <path d="M12.8 5.4V4a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1.4M9 9.4h12.6" />
+        <path d="M2.4 17.4h5.2l2.6-1.6c.8-.5 1.8-.4 2.4.3l.4.4-3.8 2.4h5.4l3.6-2.2c.6-.4 1.4-.2 1.8.4.3.6.2 1.3-.4 1.7L14 22H2.4z" />
+      </symbol>
+      <symbol id="i-sk-digital" viewBox="0 0 24 24">
+        <rect x="4" y="4.6" width="16" height="11" rx="1.4" />
+        <path d="M1.6 19.4h20.8" />
+      </symbol>
+      <symbol id="i-sk-cv" viewBox="0 0 24 24">
+        <path d="M14.2 2.6H6.4a1.8 1.8 0 0 0-1.8 1.8v15.2a1.8 1.8 0 0 0 1.8 1.8h11.2a1.8 1.8 0 0 0 1.8-1.8V7.8z" />
+        <path d="M14.2 2.6v5.2h5.2M8 15.2h8M8 18h8" />
+        <circle cx="9.8" cy="9.2" r="1.7" class="solid" style="fill: currentColor; stroke: none" />
+        <path d="M7.4 13.2c.3-1.2 1.2-1.9 2.4-1.9s2.1.7 2.4 1.9" />
+      </symbol>
+      <symbol id="i-sk-comm" viewBox="0 0 24 24">
+        <path class="solid" style="fill: currentColor; stroke: none" d="M12 2.6C6.4 2.6 2 6.4 2 11c0 2.5 1.3 4.7 3.3 6.2l-.8 4.2 4.4-2.6c1 .3 2 .4 3.1.4 5.6 0 10-3.8 10-8.4S17.6 2.6 12 2.6z" />
+        <path class="cut" style="stroke: var(--piece, #fff); stroke-width: 2.2" d="M7.4 9h9.2M7.4 13h6" />
+      </symbol>
+      <symbol id="i-sk-time" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9.4" />
+        <path d="M12 6.4V12l3.6 3.6" />
+      </symbol>
+
+      <!-- Illustrated foliage for the section corners -->
+      <symbol id="foliage" viewBox="0 0 240 224" overflow="visible"><path fill='none' stroke='#0B5E35' stroke-width='2.4' stroke-linecap='round' d='M30.0 224.0Q100.7 160.5 119.2 56.2'/><path fill='#0F6B3C' fill-opacity='0.95' d='M58.6 194.1C79.5 175.9 70.4 147.7 57.4 135.0C47.0 148.2 40.1 176.7 58.6 194.1Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M58.5 190.5Q60.1 164.5 57.6 145.6'/><path fill='#16743F' fill-opacity='0.95' d='M73.1 174.6C94.8 191.9 120.9 177.8 131.1 162.6C116.2 154.8 86.8 153.2 73.1 174.6Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M76.6 173.8Q102.5 170.7 120.7 164.8'/><path fill='#0F6B3C' fill-opacity='0.95' d='M85.8 153.6C98.7 130.8 81.6 108.5 65.9 101.3C60.9 116.4 63.8 144.0 85.8 153.6Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M84.6 150.5Q77.8 126.7 69.5 110.7'/><path fill='#16743F' fill-opacity='0.95' d='M96.8 131.4C116.0 144.1 136.6 130.7 143.9 117.4C131.0 112.0 106.7 112.8 96.8 131.4Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M99.6 130.5Q120.9 126.1 135.4 119.9'/><path fill='#16743F' fill-opacity='0.95' d='M106.0 107.7C113.4 87.6 96.7 72.0 83.1 68.2C81.0 81.1 87.1 102.9 106.0 107.7Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M104.7 105.3Q96.0 87.1 87.2 75.4'/><path fill='#0F6B3C' fill-opacity='0.95' d='M113.5 82.7C133.6 91.3 150.5 75.2 155.0 61.6C142.1 58.7 119.5 63.6 113.5 82.7Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M116.0 81.4Q135.0 73.6 147.6 65.4'/><path fill='#16743F' fill-opacity='0.95' d='M119.2 56.2C123.6 36.7 106.3 24.2 93.2 22.3C92.8 34.5 101.0 54.0 119.2 56.2Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M117.6 54.2Q107.4 38.4 97.9 28.4'/><path fill='#16743F' fill-opacity='0.95' d='M119.2 56.2C135.2 54.4 139.9 38.0 137.8 27.6C128.5 30.6 115.9 41.9 119.2 56.2Z'/><path fill='none' stroke='#CFE8C6' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M120.3 54.5Q129.5 42.6 134.4 32.8'/><path fill='none' stroke='#1E7A45' stroke-width='2.4' stroke-linecap='round' d='M8.0 224.0Q27.5 151.6 -5.1 74.6'/><path fill='#3F9A55' fill-opacity='1' d='M14.1 191.9C17.3 167.4 -5.5 153.9 -21.8 153.1C-20.9 168.1 -8.6 191.2 14.1 191.9Z'/><path fill='none' stroke='#E3F2DA' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M11.9 189.6Q-2.5 171.2 -15.4 160.1'/><path fill='#3F9A55' fill-opacity='1' d='M15.3 168.9C37.7 173.6 51.7 153.5 53.5 138.6C39.7 138.4 17.5 148.1 15.3 168.9Z'/><path fill='none' stroke='#E3F2DA' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M17.6 167.1Q35.5 155.1 46.7 144.1'/><path fill='#3F9A55' fill-opacity='1' d='M14.0 145.6C15.2 125.5 -4.1 115.9 -17.3 116.2C-15.7 128.3 -4.4 146.4 14.0 145.6Z'/><path fill='none' stroke='#E3F2DA' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M12.1 143.9Q-0.6 129.8 -11.7 121.5'/><path fill='#2E8B4A' fill-opacity='1' d='M10.2 122.2C30.6 120.0 37.1 98.9 34.5 85.6C22.6 89.3 6.3 103.8 10.2 122.2Z'/><path fill='none' stroke='#E3F2DA' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M11.6 120.0Q23.7 104.8 30.1 92.2'/><path fill='#2E8B4A' fill-opacity='1' d='M3.8 98.5C-1.6 80.1 -22.0 77.7 -33.8 82.3C-28.4 92.6 -12.4 105.1 3.8 98.5Z'/><path fill='none' stroke='#E3F2DA' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M1.6 97.5Q-14.4 89.0 -27.0 85.2'/><path fill='#2E8B4A' fill-opacity='1' d='M-5.1 74.6C11.1 69.1 12.5 50.8 8.0 40.5C-1.0 45.6 -11.6 60.3 -5.1 74.6Z'/><path fill='none' stroke='#E3F2DA' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M-4.3 72.5Q2.7 58.0 5.7 46.6'/><path fill='#3F9A55' fill-opacity='1' d='M-5.1 74.6C5.3 66.0 1.2 52.3 -5.1 46.0C-10.3 52.3 -13.9 66.0 -5.1 74.6Z'/><path fill='none' stroke='#E3F2DA' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M-5.1 72.9Q-4.0 60.3 -5.1 51.1'/><path fill='none' stroke='#3F8F4F' stroke-width='2.4' stroke-linecap='round' d='M60.0 224.0Q134.3 213.6 192.4 153.6'/><path fill='#86BD74' fill-opacity='1' d='M91.9 217.0C112.8 212.5 117.2 190.1 113.1 176.6C101.2 181.7 85.9 198.4 91.9 217.0Z'/><path fill='none' stroke='#2E6B36' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M93.2 214.6Q104.0 197.6 109.3 183.9'/><path fill='#86BD74' fill-opacity='1' d='M113.6 209.2C118.7 230.8 142.1 234.9 156.0 230.4C150.5 218.1 132.8 202.6 113.6 209.2Z'/><path fill='none' stroke='#2E6B36' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M116.1 210.5Q134.0 221.3 148.4 226.6'/><path fill='#86BD74' fill-opacity='1' d='M134.5 198.9C153.4 189.9 152.4 167.5 145.5 155.6C135.3 163.1 124.5 182.5 134.5 198.9Z'/><path fill='none' stroke='#2E6B36' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M135.1 196.3Q141.5 177.6 143.5 163.4'/><path fill='#6DAE63' fill-opacity='1' d='M154.6 186.2C164.6 202.1 184.4 198.9 194.3 191.5C186.5 183.2 168.1 175.7 154.6 186.2Z'/><path fill='none' stroke='#2E6B36' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M157.0 186.5Q174.2 190.3 187.1 190.6'/><path fill='#86BD74' fill-opacity='1' d='M173.9 171.1C187.8 161.5 184.1 143.7 177.1 135.1C169.9 142.5 163.8 159.3 173.9 171.1Z'/><path fill='none' stroke='#2E6B36' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M174.1 168.9Q176.8 153.2 176.5 141.6'/><path fill='#86BD74' fill-opacity='1' d='M192.4 153.6C201.3 163.5 214.8 158.9 220.9 152.5C214.4 147.6 200.7 144.6 192.4 153.6Z'/><path fill='none' stroke='#2E6B36' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M194.1 153.5Q206.7 154.1 215.8 152.7'/><path fill='#86BD74' fill-opacity='1' d='M192.4 153.6C203.5 159.3 213.6 150.8 216.7 143.3C209.5 141.1 196.5 143.0 192.4 153.6Z'/><path fill='none' stroke='#2E6B36' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M193.9 153.0Q205.0 149.3 212.4 145.1'/><path fill='none' stroke='#5A9E5B' stroke-width='2.4' stroke-linecap='round' d='M16.0 224.0Q62.4 199.4 86.3 146.0'/><path fill='#9CCB84' fill-opacity='1' d='M35.3 211.8C50.0 202.3 46.9 183.9 39.9 174.8C32.3 182.1 25.4 199.3 35.3 211.8Z'/><path fill='none' stroke='#3A7A44' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M35.6 209.6Q39.0 193.4 39.1 181.4'/><path fill='#9CCB84' fill-opacity='1' d='M50.6 198.6C61.8 211.6 79.2 206.1 87.1 198.0C79.0 191.6 61.4 187.3 50.6 198.6Z'/><path fill='none' stroke='#3A7A44' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M52.8 198.6Q68.9 199.6 80.6 198.1'/><path fill='#9CCB84' fill-opacity='1' d='M64.2 183.3C75.6 172.0 69.3 156.1 61.3 149.2C55.8 157.2 52.9 173.9 64.2 183.3Z'/><path fill='none' stroke='#3A7A44' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M64.0 181.2Q64.0 166.1 61.9 155.3'/><path fill='#B5D99B' fill-opacity='1' d='M76.1 165.7C85.5 173.2 96.8 167.1 101.2 160.5C94.8 157.1 82.0 156.5 76.1 165.7Z'/><path fill='none' stroke='#3A7A44' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M77.6 165.4Q88.8 164.0 96.7 161.4'/><path fill='#B5D99B' fill-opacity='1' d='M86.3 146.0C91.1 136.7 84.0 128.1 77.6 125.4C75.8 131.5 77.4 142.5 86.3 146.0Z'/><path fill='none' stroke='#3A7A44' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M85.7 144.7Q82.7 135.4 79.2 129.1'/><path fill='#B5D99B' fill-opacity='1' d='M86.3 146.0C96.0 147.3 101.3 138.2 101.5 131.7C95.6 132.1 86.4 137.0 86.3 146.0Z'/><path fill='none' stroke='#3A7A44' stroke-width='1.2' stroke-linecap='round' stroke-opacity='.5' d='M87.2 145.1Q94.4 139.4 98.8 134.3'/><ellipse cx='150' cy='96' rx='4.5' ry='7.5' transform='rotate(-20 150 96)' fill='#FDD114'/><ellipse cx='120' cy='60' rx='4.5' ry='7.5' transform='rotate(10 120 60)' fill='#FDD114'/><ellipse cx='186' cy='150' rx='4.5' ry='7.5' transform='rotate(-35 186 150)' fill='#FDD114'/></symbol>
+    </defs>
+  </svg>
+
+
+  <!-- ===================================================================
+       MENU TOGGLE
+       Fixed to the bottom-right corner on every screen. Stretches on
+       hover, and its three bars fold into an X while the menu is open.
+       Hidden until main.js is running, because the menu needs it.
+       =================================================================== -->
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
+    <span class="visually-hidden" data-menu-toggle-label>Open menu</span>
+    <img class="menu-toggle__cap" src="../images/menu-cap.webp" alt="" width="68" height="34">
+    <span class="menu-toggle__box" aria-hidden="true">
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+    </span>
+  </button>
+
+
+  <!-- ===================================================================
+       MENU  (modal dialog)
+       Cream panel with the vertical journey list on the left and the
+       brush-masked photograph on the right (top on phones).
+       =================================================================== -->
+  <div class="menu" id="site-menu" role="dialog" aria-modal="true" aria-labelledby="menu-title" data-menu>
+
+    <div class="menu__art" aria-hidden="true">
+      <picture>
+        <source media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)"
+          srcset="../images/nav-photo-desktop.webp" width="1921" height="1085">
+        <img class="menu__photo" src="../images/nav-photo-mobile.webp" alt="" width="410" height="564"
+          loading="lazy" decoding="async">
+      </picture>
+
+      <p class="menu__slogan">
+        <img class="menu__slogan-sparks" src="../images/tagline-sparks-start.webp" alt="" width="96" height="146">
+        <span>Real skills</span>
+        <span>Better futures</span>
+        <svg class="menu__slogan-line" viewBox="0 0 220 14" preserveAspectRatio="none">
+          <path d="M3 10.5C60 5.5 140 3 217 4" />
+        </svg>
+      </p>
+
+      <p class="menu__blob">
+        <span>From education to employment</span>
+        <svg class="menu__blob-arrow" viewBox="0 0 60 30">
+          <path d="M56 3c-6 14-22 22-46 20m0 0 7-6m-7 6 8 5" />
+        </svg>
+      </p>
+    </div>
+
+    <div class="menu__panel">
+
+      <p class="menu__brand" id="menu-title">
+        <span class="menu__brand-main">Movement</span>
+        <span class="menu__brand-script">to Work</span>
+        <svg class="menu__brand-line" viewBox="0 0 400 40" aria-hidden="true">
+          <path d="M6 34C120 18 260 8 394 6" />
+        </svg>
+        <img class="menu__brand-sparks" src="../images/tagline-sparks-end.webp" alt="" width="96" height="143">
+      </p>
+
+      <p class="menu__guide">Your step by step guide to getting job ready.</p>
+
+      <nav class="menu__nav" aria-label="Main" data-menu-nav>
+        <ol class="menu__list">
+          <li class="menu__item" style="--i: 0">
+            <a class="menu__link" href="#home" data-menu-link="home">
+              <span class="menu__num">01</span>
+              <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-home" /></svg>
+              <span class="menu__text"><span class="menu__title">Home</span><span class="menu__sub">Start your journey.</span></span>
+              <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+            </a>
+          </li>
+          <li class="menu__item" style="--i: 1">
+            <a class="menu__link" href="#about" data-menu-link="about">
+              <span class="menu__num">02</span>
+              <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-about" /></svg>
+              <span class="menu__text"><span class="menu__title">About</span><span class="menu__sub">Learn what MtW is.</span></span>
+              <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+            </a>
+          </li>
+          <li class="menu__item" style="--i: 2">
+            <a class="menu__link" href="#skills" data-menu-link="skills">
+              <span class="menu__num">03</span>
+              <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-skills" /></svg>
+              <span class="menu__text"><span class="menu__title">Skills</span><span class="menu__sub">Build skills and confidence.</span></span>
+              <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+            </a>
+          </li>
+          <li class="menu__item" style="--i: 3">
+            <a class="menu__link" href="#programme" data-menu-link="programme">
+              <span class="menu__num">04</span>
+              <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-programme" /></svg>
+              <span class="menu__text"><span class="menu__title">Programme</span><span class="menu__sub">Learn about the programme.</span></span>
+              <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+            </a>
+          </li>
+          <li class="menu__item" style="--i: 4">
+            <a class="menu__link" href="#job-ready" data-menu-link="job-ready">
+              <span class="menu__num">05</span>
+              <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-jobready" /></svg>
+              <span class="menu__text"><span class="menu__title">Get Job Ready</span><span class="menu__sub">Prepare your CV &amp; interviews.</span></span>
+              <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+            </a>
+          </li>
+        </ol>
+
+        <a class="menu__link menu__link--faq" href="#faq" style="--i: 5">
+          <span class="menu__num menu__num--faq" aria-hidden="true">?</span>
+          <span class="menu__text"><span class="menu__title">FAQ</span><span class="menu__sub">Quick answers, helpful info.</span></span>
+          <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+        </a>
+
+        <a class="menu__join" href="#join" style="--i: 6">
+          <svg class="menu__join-icon" aria-hidden="true" focusable="false"><use href="#i-user" /></svg>
+          <span class="menu__join-title">Join Now</span>
+          <span class="menu__join-sub">Be part of the journey</span>
+          <svg class="menu__join-arrow" aria-hidden="true" focusable="false"><use href="#i-arrow" /></svg>
+        </a>
+      </nav>
+    </div>
+
+    <img class="menu__leaves" src="../images/nav-leaves.webp" alt="" width="170" height="138">
+
+    <button class="menu__close" type="button" data-menu-close>
+      <svg class="menu__close-x" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+        <path class="menu__close-a" d="M11.5 10.5c5.6 6.4 11.4 13 17.4 19.6" />
+        <path class="menu__close-b" d="M28.6 10.2c-5.8 6.2-11.2 12.8-17 19.8" />
+      </svg>
+      <span class="visually-hidden">Close menu</span>
+    </button>
+
+  </div>
+
+
+  <!-- ===================================================================
+       SITE HEADER
+       One logo and one "Join the programme" corner for the whole page,
+       fixed to the top corners so they stay with you as you scroll. They
+       tuck in slightly once you leave the hero (main.js adds .is-scrolled).
+       =================================================================== -->
+  <header class="site-header" data-site-header>
+    <!-- Both corners are drawn in SVG with live text, so they stay sharp at
+         any size, and they run past the screen edge so nothing opens up
+         behind them when they move. -->
+    <a class="brand" href="#home" aria-label="Jobcentre Plus, Movement to Work home">
+      <svg class="brand__shape" viewBox="-40 -40 300 160" aria-hidden="true" focusable="false">
+        <path class="brand__under" d="M-40 -40H262C246 34 196 92 118 106C70 114 20 116 -40 116Z" />
+        <path class="brand__plate" d="M-40 -40H246C230 28 184 80 112 94C66 102 18 104 -40 104Z" />
+      </svg>
+      <span class="brand__word" aria-hidden="true">jobcentre<span>plus</span></span>
+    </a>
+    <a class="corner-cta" href="#join">
+      <svg class="corner-cta__shape" viewBox="-40 -40 300 160" aria-hidden="true" focusable="false">
+        <path class="corner-cta__under" d="M-6 -40H260V118C214 118 168 116 134 108C64 92 18 46 -6 -40Z" />
+        <path class="corner-cta__plate" d="M8 -40H260V106C216 106 172 104 140 97C76 82 30 40 8 -40Z" />
+      </svg>
+      <span class="corner-cta__text">Join The <span>Programme</span></span>
+      <svg class="corner-cta__arrow" viewBox="0 0 120 22" aria-hidden="true" focusable="false">
+        <path d="M3 17C38 13 76 9 112 5m0 0-11-3m11 3-8 8" />
+      </svg>
+    </a>
+  </header>
+
+
+  <!-- ===================================================================
+       MAIN
+       =================================================================== -->
+  <main id="main" class="main" tabindex="-1">
+
+    <!-- =================================================================
+         INTRO TRACK
+         Tall scroll track with a sticky stage. The stage holds the hero
+         photograph, the hero content above it, and the mask overlay that
+         turns the photograph into the words MOVEMENT TO WORK.
+         ================================================================= -->
+    <div class="intro" id="home" data-intro>
+      <div class="intro__stage">
+
+        <!-- Two layers rather than one flattened photo: the classroom /
+             office background, and the student as her own cut-out, so she
+             stays sharp and can move a touch independently (main.js). -->
+        <picture class="intro__photo">
+          <source media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)"
+            srcset="../images/hero-bg-desktop.webp" width="2400" height="1352">
+          <img src="../images/hero-bg-mobile.webp" alt="" width="694" height="1352" fetchpriority="high"
+            decoding="async">
+        </picture>
+        <picture class="intro__photo intro__figure" data-figure>
+          <source media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)"
+            srcset="../images/hero-figure-desktop.webp" width="2400" height="1352">
+          <img src="../images/hero-figure-mobile.webp" alt="" width="694" height="1352" fetchpriority="high"
+            decoding="async">
+        </picture>
+
+        <!-- ============================================================
+             HERO
+             ============================================================ -->
+        <section class="hero" aria-labelledby="hero-title" data-hero>
+
+          <div class="hero__shade" aria-hidden="true"></div>
+
+          <div class="hero__frame">
+
+            <p class="hero__tagline" data-enter style="--d: 2">
+              <img src="../images/tagline-education-employment.webp" alt="From education to employment" width="540"
+                height="78">
+            </p>
+
+            <div class="hero__intro">
+
+              <h1 class="hero__title" id="hero-title">
+                <span class="hero__title-main" data-enter style="--d: 0">Movement</span>
+                <span class="hero__title-script" data-enter style="--d: 1">to Work</span>
+                <svg class="hero__title-line" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true"
+                  focusable="false">
+                  <path d="M10 31C120 22 260 12 420 8C480 6 540 5 592 6C598 7 599 12 594 14C540 15 480 16 420 18C270 22 140 30 16 38C6 38 3 33 10 31Z" />
+                </svg>
+              </h1>
+
+              <img class="hero__badge hero__badge--narrow" src="../images/badge-two-weeks.webp"
+                alt="2 weeks to job-ready" width="135" height="135" data-enter style="--d: 3">
+
+              <p class="hero__lead" data-enter style="--d: 3">Your first step from education into a real job.</p>
+
+              <p class="hero__body" data-enter style="--d: 4">Gain workplace experience, sharpen your CV and interview
+                skills, and build the confidence employers look for, with a local team supporting you every step.</p>
+
+              <div class="hero__actions" data-enter style="--d: 5">
+                <a class="btn-brush" href="#join">Join the programme <span aria-hidden="true">&rarr;</span></a>
+                <a class="link-sketch" href="#about">See how it works <span aria-hidden="true">&rarr;</span></a>
+              </div>
+
+              <ul class="hero__chips" aria-label="At a glance" data-enter style="--d: 6">
+                <li class="chip"><svg class="chip__tick" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>Free to join</li>
+                <li class="chip"><svg class="chip__tick" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>Just 2 weeks</li>
+                <li class="chip"><svg class="chip__tick" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>Local Support</li>
+              </ul>
+
+            </div>
+
+            <section class="perks" aria-labelledby="perks-title">
+              <h2 class="perks__tag" id="perks-title" data-enter style="--d: 4">What you&rsquo;ll get</h2>
+              <img class="hero__badge hero__badge--wide" src="../images/badge-two-weeks.webp"
+                alt="2 weeks to job-ready" width="135" height="135" data-enter style="--d: 4">
+              <ul class="perks__list">
+                <li class="perk perk--yellow" data-enter style="--d: 5">
+                  <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-briefcase" /></svg></span>
+                  <span class="perk__name">Real work experience</span>
+                  <span class="perk__desc">Time in a real workplace</span>
+                </li>
+                <li class="perk perk--green" data-enter style="--d: 6">
+                  <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-doc" /></svg></span>
+                  <span class="perk__name">CV and interview prep</span>
+                  <span class="perk__desc">Stand out and succeed</span>
+                </li>
+                <li class="perk perk--yellow" data-enter style="--d: 7">
+                  <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-star" /></svg></span>
+                  <span class="perk__name">Confidence and skills</span>
+                  <span class="perk__desc">What employers look for</span>
+                </li>
+                <li class="perk perk--green" data-enter style="--d: 8">
+                  <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-pin" /></svg></span>
+                  <span class="perk__name">A local team</span>
+                  <span class="perk__desc">Skelmersdale Jobcentre</span>
+                </li>
+              </ul>
+            </section>
+
+          </div>
+        </section>
+
+        <!-- ============================================================
+             MASK TRANSITION  (decorative)
+             A green field with the words cut out of it, so the hero
+             photograph shows through the letters. main.js fades and
+             shrinks it in, then lifts the words away. Two drawings: a
+             landscape one, and a stacked, condensed one for phones.
+             ============================================================ -->
+        <div class="reveal" aria-hidden="true" data-reveal>
+          <svg class="reveal__svg reveal__svg--wide" viewBox="0 0 1292 728" preserveAspectRatio="xMidYMid slice"
+            focusable="false">
+            <defs>
+              <linearGradient id="rv-field-wide" x1="0" y1="0" x2="1" y2=".45">
+                <stop offset="0" stop-color="#036a74" />
+                <stop offset=".42" stop-color="#027b45" />
+                <stop offset="1" stop-color="#05962c" />
+              </linearGradient>
+              <linearGradient id="rv-glow-wide" x1="0" y1="0" x2="0" y2="1">
+                <stop offset=".35" stop-color="#3f9b5c" stop-opacity="0" />
+                <stop offset="1" stop-color="#4a9b63" stop-opacity=".95" />
+              </linearGradient>
+              <mask id="rv-mask-wide" maskUnits="userSpaceOnUse" x="-2000" y="-2000" width="5292" height="4728">
+                <rect x="-2000" y="-2000" width="5292" height="4728" fill="#fff" />
+                <g class="reveal__words" data-reveal-words>
+                  <text x="646" y="345" text-anchor="middle" textLength="1122" lengthAdjust="spacingAndGlyphs"
+                    font-size="190">MOVEMENT</text>
+                  <text x="684" y="572" text-anchor="middle" textLength="905" lengthAdjust="spacingAndGlyphs"
+                    font-size="190">TO WORK</text>
+                </g>
+              </mask>
+            </defs>
+            <g mask="url(#rv-mask-wide)">
+              <rect x="-2000" y="-2000" width="5292" height="4728" fill="url(#rv-field-wide)" />
+              <path fill="#ffffff" fill-opacity=".05"
+                d="M-20 300C200 230 420 320 640 260s420-140 680-60V-20H-20z" />
+              <path fill="#0a3d2a" fill-opacity=".12" d="M-20 728V520c240-80 520 40 760-20s380-120 572-60V748z" />
+              <rect x="-20" y="0" width="1332" height="748" fill="url(#rv-glow-wide)" />
+            </g>
+          </svg>
+
+          <svg class="reveal__svg reveal__svg--tall" viewBox="0 0 360 800" preserveAspectRatio="xMidYMid slice"
+            focusable="false">
+            <defs>
+              <linearGradient id="rv-field-tall" x1="0" y1="0" x2=".7" y2="1">
+                <stop offset="0" stop-color="#02705a" />
+                <stop offset=".45" stop-color="#078f39" />
+                <stop offset="1" stop-color="#35a05a" />
+              </linearGradient>
+              <mask id="rv-mask-tall" maskUnits="userSpaceOnUse" x="-1000" y="-1000" width="2360" height="2800">
+                <rect x="-1000" y="-1000" width="2360" height="2800" fill="#fff" />
+                <g class="reveal__words" data-reveal-words>
+                  <text x="180" y="380" text-anchor="middle" textLength="324" lengthAdjust="spacingAndGlyphs"
+                    font-size="96">MOVEMENT</text>
+                  <text x="182" y="520" text-anchor="middle" textLength="262" lengthAdjust="spacingAndGlyphs"
+                    font-size="96">TO WORK</text>
+                </g>
+              </mask>
+            </defs>
+            <g mask="url(#rv-mask-tall)">
+              <rect x="-1000" y="-1000" width="2360" height="2800" fill="url(#rv-field-tall)" />
+              <path fill="#ffffff" fill-opacity=".06" d="M-10 330c90-40 220 20 380-30V-10H-10z" />
+            </g>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- =================================================================
+         ABOUT
+         Slides up over the end of the intro track (see grid.css), so the
+         words appear to lift away as this page arrives.
+         ================================================================= -->
+    <section class="about" id="about" aria-labelledby="about-title">
+
+      <svg class="about__edge" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path
+          d="M0 60V34.0 C35.8 34.0 53.7 32.2 89.4 32.2 C117.6 32.2 131.7 38.7 159.9 38.7 C207.7 38.7 231.5 39.0 279.3 39.0 C313.6 39.0 330.7 24.6 365.1 24.6 C394.4 24.6 409.0 24.5 438.3 24.5 C466.9 24.5 481.2 33.5 509.8 33.5 C546.6 33.5 565.0 35.7 601.7 35.7 C648.0 35.7 671.1 27.3 717.4 27.3 C749.4 27.3 765.4 27.3 797.4 27.3 C826.1 27.3 840.5 32.7 869.2 32.7 C901.8 32.7 918.0 23.7 950.6 23.7 C999.9 23.7 1024.6 28.9 1073.9 28.9 C1124.6 28.9 1150.0 38.6 1200.7 38.6 C1244.6 38.6 1266.6 25.5 1310.5 25.5 C1342.0 25.5 1357.8 25.4 1389.4 25.4 C1409.6 25.4 1419.7 30.2 1440.0 30.2 V60Z" />
+      </svg>
+
+      <!-- Spacer under the fixed header corners. -->
+      <div class="about__bar" aria-hidden="true"></div>
+
+      <div class="about__frame">
+
+        <div class="about__copy">
+          <p class="about__kicker" data-rise>
+            Your next chapter starts here
+            <svg class="about__kicker-line" viewBox="0 0 280 16" preserveAspectRatio="none" aria-hidden="true"
+              focusable="false">
+              <path d="M2 13C70 9 160 4 278 1l-1 5C170 9 80 13 3 16z" />
+            </svg>
+          </p>
+
+          <h2 class="about__title" id="about-title" data-rise style="--d: 1">
+            <span class="about__title-script">From education
+              <svg class="about__title-arrow" viewBox="0 0 70 52" aria-hidden="true" focusable="false">
+                <path d="M4 20c16-12 38-12 54 4 3 3 5 7 6 11m0 0 2-13m-2 13-12-6" />
+              </svg>
+            </span>
+            <span class="about__title-main">to employment</span>
+          </h2>
+
+          <p class="about__text" data-rise style="--d: 2">Movement to Work is a short, practical programme that helps
+            young people aged 18-30 build the skills, confidence and support they need to get into work.</p>
+        </div>
+
+        <img class="about__art" src="../images/about-education-to-employment.webp"
+          alt="A smiling young woman in a green hoodie holding her books, standing between a school on one side and a glass office building on the other."
+          width="1704" height="988" loading="lazy" decoding="async" data-rise style="--d: 1">
+
+        <img class="about__skyline" src="../images/decor-skyline.webp" alt="" width="214" height="94" loading="lazy">
+
+        <ol class="steps" aria-label="Your path through Movement to Work">
+          <li class="step step--green" style="--i: 0">
+            <span class="step__num">1</span>
+            <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-cap" /></svg></span>
+            <span class="step__label">Education</span>
+            <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
+          </li>
+          <li class="step step--yellow" style="--i: 1">
+            <span class="step__num">2</span>
+            <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-bulb" /></svg></span>
+            <span class="step__label">Discover</span>
+            <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
+          </li>
+          <li class="step step--green" style="--i: 2">
+            <span class="step__num">3</span>
+            <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-gear" /></svg></span>
+            <span class="step__label">Develop</span>
+            <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
+          </li>
+          <li class="step step--yellow" style="--i: 3">
+            <span class="step__num">4</span>
+            <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-doc" /></svg></span>
+            <span class="step__label">Prepare</span>
+            <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
+          </li>
+          <li class="step step--green" style="--i: 4">
+            <span class="step__num">5</span>
+            <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-bag" /></svg></span>
+            <span class="step__label">Employment</span>
+            <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
+          </li>
+          <li class="step step--yellow" style="--i: 5">
+            <span class="step__num">6</span>
+            <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-rocket" /></svg></span>
+            <span class="step__label">Next Steps</span>
+            <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 34C40 30 74 18 100 4m0 0-14 2m14-2-4 14" /></svg>
+          </li>
+        </ol>
+
+      </div>
+
+      <svg class="foliage about__leaves about__leaves--left" viewBox="0 0 240 224" aria-hidden="true" focusable="false"><use href="#foliage" /></svg>
+      <svg class="foliage about__leaves about__leaves--right" viewBox="0 0 240 224" aria-hidden="true" focusable="false"><use href="#foliage" /></svg>
+
+    </section>
+
+
+    <!-- =================================================================
+         JOURNEY
+         Four full-screen scenes. Each one pins to the top of the screen
+         and the next slides up over it, so the timeline rail reads as one
+         continuous line through all four.
+         ================================================================= -->
+    <section class="journey" id="journey" aria-labelledby="journey-title">
+      <h2 class="visually-hidden" id="journey-title">Your journey: four stages</h2>
+
+      <ol class="journey__list">
+
+        <li class="scene" data-scene>
+          <div class="scene__media"><img class="scene__img" src="../images/timeline-discover.webp" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
+          <span class="scene__rail" aria-hidden="true"></span>
+          <div class="scene__marker">
+            <span class="scene__num" aria-hidden="true">01</span>
+            <span class="scene__dot" aria-hidden="true"><span>01</span></span>
+            <h3 class="scene__label">Discover</h3>
+          </div>
+          <div class="scene__body">
+            <p class="scene__title">Finding direction and building confidence</p>
+            <p class="scene__text">Explore interests, understand strengths, and start building the confidence needed to
+              take the next step.</p>
+          </div>
+        </li>
+
+        <li class="scene" data-scene>
+          <div class="scene__media"><img class="scene__img" src="../images/timeline-develop.webp" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
+          <span class="scene__rail" aria-hidden="true"></span>
+          <div class="scene__marker">
+            <span class="scene__num" aria-hidden="true">02</span>
+            <span class="scene__dot" aria-hidden="true"><span>02</span></span>
+            <h3 class="scene__label">Develop</h3>
+          </div>
+          <div class="scene__body">
+            <p class="scene__title">Building the skills to move forward</p>
+            <p class="scene__text">Develop practical skills, experience and knowledge that help turn potential into real
+              opportunities.</p>
+          </div>
+        </li>
+
+        <li class="scene" data-scene>
+          <div class="scene__media"><img class="scene__img" src="../images/timeline-prepare.webp" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
+          <span class="scene__rail" aria-hidden="true"></span>
+          <div class="scene__marker">
+            <span class="scene__num" aria-hidden="true">03</span>
+            <span class="scene__dot" aria-hidden="true"><span>03</span></span>
+            <h3 class="scene__label">Prepare</h3>
+          </div>
+          <div class="scene__body">
+            <p class="scene__title">Getting ready for the world of work</p>
+            <p class="scene__text">Build the tools, confidence and support needed to approach employment with greater
+              independence.</p>
+          </div>
+        </li>
+
+        <li class="scene" data-scene>
+          <div class="scene__media"><img class="scene__img scene__img--employment" src="../images/timeline-employment.webp"
+              alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
+          <span class="scene__rail" aria-hidden="true"></span>
+          <div class="scene__marker">
+            <span class="scene__num" aria-hidden="true">04</span>
+            <span class="scene__dot" aria-hidden="true"><span>04</span></span>
+            <h3 class="scene__label"><span class="wide-only">Employment</span><span class="narrow-only">Employed</span>
+            </h3>
+          </div>
+          <div class="scene__body">
+            <p class="scene__title">Taking the next step into work</p>
+            <p class="scene__text">Put your skills into practice, connect with employers and take the next step towards
+              employment.</p>
+          </div>
+        </li>
+
+      </ol>
+    </section>
+
+    <!-- =================================================================
+         GET TO KNOW
+         A crossword of the three key words, with a panel that explains
+         each one. Clicking a word in the grid, or its card, swaps the
+         panel to that word: the letters fill with colour and the panel
+         header takes on the same colour, so the two halves read as one.
+         The grid is decorative; the cards are the accessible controls.
+         Without JavaScript every topic is simply listed under the cards.
+         ================================================================= -->
+    <section class="explore" id="get-to-know" aria-labelledby="explore-title">
+
+      <svg class="explore__edge" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path
+          d="M0 60V34.0 C35.8 34.0 53.7 32.2 89.4 32.2 C117.6 32.2 131.7 38.7 159.9 38.7 C207.7 38.7 231.5 39.0 279.3 39.0 C313.6 39.0 330.7 24.6 365.1 24.6 C394.4 24.6 409.0 24.5 438.3 24.5 C466.9 24.5 481.2 33.5 509.8 33.5 C546.6 33.5 565.0 35.7 601.7 35.7 C648.0 35.7 671.1 27.3 717.4 27.3 C749.4 27.3 765.4 27.3 797.4 27.3 C826.1 27.3 840.5 32.7 869.2 32.7 C901.8 32.7 918.0 23.7 950.6 23.7 C999.9 23.7 1024.6 28.9 1073.9 28.9 C1124.6 28.9 1150.0 38.6 1200.7 38.6 C1244.6 38.6 1266.6 25.5 1310.5 25.5 C1342.0 25.5 1357.8 25.4 1389.4 25.4 C1409.6 25.4 1419.7 30.2 1440.0 30.2 V60Z" />
+      </svg>
+
+      <div class="explore__frame">
+
+        <div class="explore__intro">
+          <h2 class="explore__title" id="explore-title" data-rise>
+            <span class="explore__kicker">Get to know</span>
+            <span class="explore__script">Movement to Work</span>
+            <span class="explore__main">a little better
+              <svg class="explore__arrow" viewBox="0 0 64 20" aria-hidden="true" focusable="false">
+                <path d="M3 12c18-3 36-4 56-3m0 0-9-7m9 7-10 7" />
+              </svg>
+            </span>
+          </h2>
+          <p class="explore__text" data-rise style="--d: 1">Click on the words below to find out more about the
+            programme and how it can help you.</p>
+        </div>
+
+        <div class="cw" aria-hidden="true" data-cw>
+          <svg class="cw__wash" viewBox="0 0 560 350" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <filter id="cw-paint" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n" />
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="16" />
+              </filter>
+              <radialGradient id="cw-wash-fill" cx="45%" cy="45%" r="65%">
+                <stop offset="0" stop-color="#E4F0D6" />
+                <stop offset=".7" stop-color="#CFE3BD" />
+                <stop offset="1" stop-color="#B9D7A4" />
+              </radialGradient>
+            </defs>
+            <path class="cw__wash-shadow"
+              d="M24 84C70 40 150 22 236 30c62 6 96-22 168-14 70 8 128 18 142 62 12 40-10 70 2 112 14 48-6 92-58 112-44 18-104 6-150 26-48 20-112 22-164 6-46-14-74-50-118-62C28 260 4 228 12 186 18 150-6 116 24 84z" />
+            <path class="cw__wash-base"
+              d="M24 84C70 40 150 22 236 30c62 6 96-22 168-14 70 8 128 18 142 62 12 40-10 70 2 112 14 48-6 92-58 112-44 18-104 6-150 26-48 20-112 22-164 6-46-14-74-50-118-62C28 260 4 228 12 186 18 150-6 116 24 84z" />
+          </svg>
+
+          <div class="cw__grid">
+            <span class="cw__cell" style="--r:1;--c:5;--k:3"></span>
+            <span class="cw__cell" style="--r:1;--c:12;--k:9"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose" data-num="2" style="--r:1;--c:15;--k:0">P</span>
+            <span class="cw__cell" style="--r:2;--c:1;--k:8"></span>
+            <span class="cw__cell" style="--r:2;--c:2;--k:2"></span>
+            <span class="cw__cell" style="--r:2;--c:5;--k:5"></span>
+            <span class="cw__cell" style="--r:2;--c:6;--k:9"></span>
+            <span class="cw__cell" style="--r:2;--c:7;--k:7"></span>
+            <span class="cw__cell" style="--r:2;--c:10;--k:10"></span>
+            <span class="cw__cell" style="--r:2;--c:11;--k:9"></span>
+            <span class="cw__cell" style="--r:2;--c:12;--k:1"></span>
+            <span class="cw__cell" style="--r:2;--c:13;--k:9"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:2;--c:15;--k:1">U</span>
+            <span class="cw__cell" style="--r:2;--c:16;--k:0"></span>
+            <span class="cw__cell" style="--r:3;--c:2;--k:7"></span>
+            <span class="cw__cell" style="--r:3;--c:3;--k:4"></span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" data-num="1" style="--r:3;--c:4;--k:0">M</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:5;--k:1">O</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:6;--k:2">V</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:7;--k:3">E</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:8;--k:4">M</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:9;--k:5">E</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:10;--k:6">N</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:11;--k:7">T</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:12;--k:8">O</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:13;--k:9">W</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:14;--k:10">O</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw purpose" style="--r:3;--c:15;--k:11">R</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:16;--k:12">K</span>
+            <span class="cw__cell" style="--r:4;--c:2;--k:8"></span>
+            <span class="cw__cell" style="--r:4;--c:3;--k:3"></span>
+            <span class="cw__cell" style="--r:4;--c:5;--k:3"></span>
+            <span class="cw__cell" style="--r:4;--c:6;--k:11"></span>
+            <span class="cw__cell" style="--r:4;--c:9;--k:7"></span>
+            <span class="cw__cell" style="--r:4;--c:10;--k:8"></span>
+            <span class="cw__cell" style="--r:4;--c:11;--k:8"></span>
+            <span class="cw__cell" style="--r:4;--c:12;--k:7"></span>
+            <span class="cw__cell" style="--r:4;--c:13;--k:6"></span>
+            <span class="cw__cell" style="--r:4;--c:14;--k:10"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:4;--c:15;--k:3">P</span>
+            <span class="cw__cell" style="--r:4;--c:16;--k:2"></span>
+            <span class="cw__cell" style="--r:5;--c:3;--k:3"></span>
+            <span class="cw__cell" style="--r:5;--c:6;--k:10"></span>
+            <span class="cw__cell" style="--r:5;--c:7;--k:2"></span>
+            <span class="cw__cell" style="--r:5;--c:9;--k:8"></span>
+            <span class="cw__cell" style="--r:5;--c:10;--k:6"></span>
+            <span class="cw__cell" style="--r:5;--c:11;--k:11"></span>
+            <span class="cw__cell" style="--r:5;--c:14;--k:0"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:5;--c:15;--k:4">O</span>
+            <span class="cw__cell" style="--r:5;--c:16;--k:10"></span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" data-num="3" style="--r:6;--c:3;--k:0">E</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:4;--k:1">L</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:5;--k:2">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:6;--k:3">G</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:7;--k:4">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:8;--k:5">B</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:9;--k:6">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:10;--k:7">L</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:11;--k:8">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:12;--k:9">T</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:13;--k:10">Y</span>
+            <span class="cw__cell" style="--r:6;--c:14;--k:12"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:6;--c:15;--k:5">S</span>
+            <span class="cw__cell" style="--r:7;--c:4;--k:1"></span>
+            <span class="cw__cell" style="--r:7;--c:5;--k:2"></span>
+            <span class="cw__cell" style="--r:7;--c:6;--k:12"></span>
+            <span class="cw__cell" style="--r:7;--c:9;--k:9"></span>
+            <span class="cw__cell" style="--r:7;--c:10;--k:0"></span>
+            <span class="cw__cell" style="--r:7;--c:11;--k:4"></span>
+            <span class="cw__cell" style="--r:7;--c:12;--k:12"></span>
+            <span class="cw__cell" style="--r:7;--c:14;--k:0"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:7;--c:15;--k:6">E</span>
+            <span class="cw__cell" style="--r:8;--c:5;--k:4"></span>
+            <span class="cw__cell" style="--r:8;--c:8;--k:7"></span>
+            <span class="cw__cell" style="--r:8;--c:9;--k:9"></span>
+            <span class="cw__cell" style="--r:8;--c:12;--k:11"></span>
+            <span class="cw__cell" style="--r:8;--c:14;--k:6"></span>
+            <span class="cw__cell" style="--r:9;--c:5;--k:11"></span>
+            <span class="cw__cell" style="--r:9;--c:6;--k:12"></span>
+            <span class="cw__cell" style="--r:9;--c:7;--k:6"></span>
+            <span class="cw__cell" style="--r:9;--c:8;--k:6"></span>
+          </div>
+
+          <svg class="cw__bulb" viewBox="0 0 90 90" focusable="false">
+            <path d="M45 30c-11 0-19 8-19 18 0 7 4 12 8 16 2 2 3 4 3 7v3h16v-3c0-3 1-5 3-7 4-4 8-9 8-16 0-10-8-18-19-18z" />
+            <path d="M38 80h14M45 6v10M14 20l7 7M76 20l-7 7M4 50h10M76 50h10" />
+          </svg>
+          <svg class="cw__streaks" viewBox="0 0 50 60" focusable="false">
+            <path class="cw__streak-green" d="M8 6c12 6 22 16 30 30" />
+            <path class="cw__streak-yellow" d="M6 30c8 2 14 8 18 16" />
+          </svg>
+          <img class="cw__star" src="../images/decor-star.webp" alt="" width="116" height="114" loading="lazy">
+        </div>
+
+        <div class="panel" data-panel>
+
+          <div class="panel__list-view" data-panel-list>
+            <div class="panel__head panel__head--green">
+              <h3 class="panel__heading">Click a word to explore</h3>
+            </div>
+
+            <ul class="panel__cards">
+              <li>
+                <button class="word-card word-card--green" type="button" data-word-open="purpose" aria-controls="topic-purpose" aria-expanded="false">
+                  <span class="word-card__disc"><svg aria-hidden="true" focusable="false"><use href="#i-target-arrow" /></svg></span>
+                  <span class="word-card__text">
+                    <span class="word-card__title">Purpose</span>
+                    <span class="word-card__sub">Why does Movement to Work exist?</span>
+                  </span>
+                  <span class="word-card__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+                </button>
+              </li>
+              <li>
+                <button class="word-card word-card--yellow" type="button" data-word-open="mtw" aria-controls="topic-mtw" aria-expanded="false">
+                  <span class="word-card__disc"><svg aria-hidden="true" focusable="false"><use href="#i-group" /></svg></span>
+                  <span class="word-card__text">
+                    <span class="word-card__title">Movement to Work</span>
+                    <span class="word-card__sub">What is Movement to Work?</span>
+                  </span>
+                  <span class="word-card__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+                </button>
+              </li>
+              <li>
+                <button class="word-card word-card--blue" type="button" data-word-open="eligibility" aria-controls="topic-eligibility" aria-expanded="false">
+                  <span class="word-card__disc"><svg aria-hidden="true" focusable="false"><use href="#i-person-check" /></svg></span>
+                  <span class="word-card__text">
+                    <span class="word-card__title">Eligibility</span>
+                    <span class="word-card__sub">Who is Movement to Work for?</span>
+                  </span>
+                  <span class="word-card__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Topics. Shown one at a time with JavaScript, all at once
+               without it. -->
+          <article class="topic topic--green" id="topic-purpose" data-topic="purpose" aria-labelledby="topic-purpose-title" tabindex="-1">
+            <header class="topic__head">
+              <svg class="topic__icon" aria-hidden="true" focusable="false"><use href="#i-target-arrow" /></svg>
+              <p class="topic__name">Purpose</p>
+              <button class="topic__close" type="button" data-word-close>
+                <svg class="draw-x" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path class="draw-x__a" d="M11.5 10.5c5.6 6.4 11.4 13 17.4 19.6" /><path class="draw-x__b" d="M28.6 10.2c-5.8 6.2-11.2 12.8-17 19.8" /></svg><span class="visually-hidden">Back to all words</span>
+              </button>
+            </header>
+            <h4 class="topic__title" id="topic-purpose-title">Why does Movement to Work exist?</h4>
+            <div class="topic__body">
+              <p>Movement to Work helps young people aged 18-30 build confidence, develop practical skills and gain experience.</p>
+              <p>It provides a supportive environment where you can learn, develop and prepare for the workplace.</p>
+              <p>The programme helps you recognise your strengths and take positive steps towards employment.</p>
+            </div>
+            <aside class="topic__note">
+              <svg class="topic__note-icon" aria-hidden="true" focusable="false"><use href="#i-check-circle" /></svg>
+              <p><strong>Why it matters</strong> Build confidence, gain experience and feel ready for your next step.</p>
+            </aside>
+            <p class="topic__more">Also explore
+              <button type="button" class="topic__chip topic__chip--yellow" data-word-open="mtw">Movement to Work</button>
+              <button type="button" class="topic__chip topic__chip--blue" data-word-open="eligibility">Eligibility</button>
+            </p>
+          </article>
+
+          <article class="topic topic--yellow" id="topic-mtw" data-topic="mtw" aria-labelledby="topic-mtw-title" tabindex="-1">
+            <header class="topic__head">
+              <svg class="topic__icon" aria-hidden="true" focusable="false"><use href="#i-group" /></svg>
+              <p class="topic__name">Movement to Work</p>
+              <button class="topic__close" type="button" data-word-close>
+                <svg class="draw-x" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path class="draw-x__a" d="M11.5 10.5c5.6 6.4 11.4 13 17.4 19.6" /><path class="draw-x__b" d="M28.6 10.2c-5.8 6.2-11.2 12.8-17 19.8" /></svg><span class="visually-hidden">Back to all words</span>
+              </button>
+            </header>
+            <h4 class="topic__title" id="topic-mtw-title">What is Movement to Work?</h4>
+            <div class="topic__body">
+              <p>Movement to Work helps young people aged 18-30 build the skills, confidence and experience they need to move towards employment.</p>
+              <p>It connects young people with opportunities to gain work experience, training and practical skills, helping break down barriers that can make getting into work difficult.</p>
+              <p>The aim is to help you build experience, recognise your strengths and feel more prepared for your next step towards work.</p>
+            </div>
+            <aside class="topic__note">
+              <svg class="topic__note-icon" aria-hidden="true" focusable="false"><use href="#i-target-arrow" /></svg>
+              <p><strong>Our goal for you</strong> To help you feel confident, prepared and ready for work.</p>
+            </aside>
+            <p class="topic__more">Also explore
+              <button type="button" class="topic__chip topic__chip--green" data-word-open="purpose">Purpose</button>
+              <button type="button" class="topic__chip topic__chip--blue" data-word-open="eligibility">Eligibility</button>
+            </p>
+          </article>
+
+          <article class="topic topic--blue" id="topic-eligibility" data-topic="eligibility" aria-labelledby="topic-eligibility-title" tabindex="-1">
+            <header class="topic__head">
+              <svg class="topic__icon" aria-hidden="true" focusable="false"><use href="#i-person-check" /></svg>
+              <p class="topic__name">Eligibility</p>
+              <button class="topic__close" type="button" data-word-close>
+                <svg class="draw-x" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path class="draw-x__a" d="M11.5 10.5c5.6 6.4 11.4 13 17.4 19.6" /><path class="draw-x__b" d="M28.6 10.2c-5.8 6.2-11.2 12.8-17 19.8" /></svg><span class="visually-hidden">Back to all words</span>
+              </button>
+            </header>
+            <h4 class="topic__title" id="topic-eligibility-title">Who is Movement to Work for?</h4>
+            <div class="topic__body">
+              <p>Movement to Work is aimed at young people aged 18-30 who want to develop their skills and gain experience.</p>
+              <p>It can support those with limited or no recent work experience who want to build their confidence.</p>
+              <p>If you&rsquo;re unsure about your next step or would benefit from additional support, speak to your Jobcentre adviser.</p>
+            </div>
+            <aside class="topic__note">
+              <svg class="topic__note-icon" aria-hidden="true" focusable="false"><use href="#i-walk" /></svg>
+              <p><strong>Take your next step</strong> Build confidence, develop workplace skills and gain experience for your next step towards employment.</p>
+            </aside>
+            <p class="topic__more">Also explore
+              <button type="button" class="topic__chip topic__chip--green" data-word-open="purpose">Purpose</button>
+              <button type="button" class="topic__chip topic__chip--yellow" data-word-open="mtw">Movement to Work</button>
+            </p>
+          </article>
+
+        </div>
+      </div>
+
+      <svg class="foliage explore__leaves explore__leaves--left" viewBox="0 0 240 224" aria-hidden="true" focusable="false"><use href="#foliage" /></svg>
+      <svg class="foliage explore__leaves explore__leaves--right" viewBox="0 0 240 224" aria-hidden="true" focusable="false"><use href="#foliage" /></svg>
+    </section>
+
+
+    <!-- =================================================================
+         SKILLS
+         Twelve puzzle pieces and a round board. Click a piece to read
+         why it matters and add it; or drag it straight onto the board
+         (long-press to drag on touch screens). The counter, the board
+         and a short "added" note all update, and the board completes
+         with a tick at 12 / 12.
+         Every piece is a button, so the whole thing works by keyboard.
+         ================================================================= -->
+    <section class="skills" id="skills" aria-labelledby="skills-title">
+
+      <svg class="skills__edge" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M0 60V34.0 C35.8 34.0 53.7 32.2 89.4 32.2 C117.6 32.2 131.7 38.7 159.9 38.7 C207.7 38.7 231.5 39.0 279.3 39.0 C313.6 39.0 330.7 24.6 365.1 24.6 C394.4 24.6 409.0 24.5 438.3 24.5 C466.9 24.5 481.2 33.5 509.8 33.5 C546.6 33.5 565.0 35.7 601.7 35.7 C648.0 35.7 671.1 27.3 717.4 27.3 C749.4 27.3 765.4 27.3 797.4 27.3 C826.1 27.3 840.5 32.7 869.2 32.7 C901.8 32.7 918.0 23.7 950.6 23.7 C999.9 23.7 1024.6 28.9 1073.9 28.9 C1124.6 28.9 1150.0 38.6 1200.7 38.6 C1244.6 38.6 1266.6 25.5 1310.5 25.5 C1342.0 25.5 1357.8 25.4 1389.4 25.4 C1409.6 25.4 1419.7 30.2 1440.0 30.2 V60Z" />
+      </svg>
+
+      <div class="skills__frame">
+
+        <div class="skills__intro">
+          <h2 class="skills__title" id="skills-title" data-rise>
+            <span class="skills__script">What Skills do you</span>
+            <span class="skills__main">
+              <svg class="skills__sparks skills__sparks--l" viewBox="0 0 40 34" aria-hidden="true" focusable="false"><path d="M4 6l22 8M2 20h26M6 32l20-8" /></svg>
+              gain?
+              <svg class="skills__sparks skills__sparks--r" viewBox="0 0 40 34" aria-hidden="true" focusable="false"><path d="M36 6l-22 8M38 20H12M34 32l-20-8" /></svg>
+            </span>
+          </h2>
+          <p class="skills__text" data-rise style="--d: 1">Discover the 12 key skills you&rsquo;ll develop through the
+            programme. Click or drag the puzzle pieces to learn more about each one.</p>
+        </div>
+
+        <div class="skills__hint" aria-hidden="true">
+          <svg class="skills__hint-piece" viewBox="0 0 100 100" focusable="false">
+            <path class="p-shade" transform="translate(2 4)" d="M20 30H40C36 22 38 12 50 12S64 22 60 30H80V50C88 46 98 48 98 60S88 74 80 70V90H60C64 82 62 74 50 74S36 82 40 90H20V70C12 74 2 72 2 60S12 46 20 50Z" />
+            <path class="p-body" d="M20 30H40C36 22 38 12 50 12S64 22 60 30H80V50C88 46 98 48 98 60S88 74 80 70V90H60C64 82 62 74 50 74S36 82 40 90H20V70C12 74 2 72 2 60S12 46 20 50Z" />
+            <path class="p-light" d="M24 34h18c-2-4-2-8 0-12 3-5 9-6 13-4-6-1-10 3-10 8 0 3 1 6 3 8H24z" opacity=".8" />
+          </svg>
+          <p class="skills__hint-text"><span class="wide-only">Drag, drop or click to learn more</span><span class="narrow-only">Click a puzzle piece to learn more</span></p>
+          <svg class="skills__hint-arrow" viewBox="0 0 50 54" focusable="false"><path d="M8 4c-4 18 4 36 30 42m0 0-10-8m10 8-12 4" /></svg>
+        </div>
+
+        <div class="board" data-board>
+          <p class="board__count" aria-live="polite">
+            <span class="board__num"><span data-count>0</span> / 12</span>
+            <span class="board__label">skills added</span>
+          </p>
+          <img class="board__scene" src="../images/skills-scene.webp" alt="" width="682" height="342" loading="lazy">
+          <div class="board__disc" data-board-disc>
+            <ol class="board__slots" aria-label="Your skills board">
+              <li class="board__slot" data-slot="0"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="1"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="2"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="3"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="4"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="5"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="6"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="7"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="8"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="9"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="10"><span class="board__plus" aria-hidden="true">+</span></li>
+              <li class="board__slot" data-slot="11"><span class="board__plus" aria-hidden="true">+</span></li>
+            </ol>
+            <span class="board__done" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9" /></svg></span>
+          </div>
+          <p class="board__toast" data-toast role="status"></p>
+          <p class="board__blob" aria-hidden="true"><span>Small steps.</span><span>Big opportunities.</span></p>
+        </div>
+
+        <ul class="pieces" aria-label="Skills to explore" data-pieces>
+          <li class="pieces__item" style="--i: 0">
+            <button class="piece" type="button" data-skill="confidence" style="--piece: #318E31; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-confidence" /></svg>
+              <span class="piece__label">Confidence</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 1">
+            <button class="piece" type="button" data-skill="problem-solving" style="--piece: #FDD114; --ink: #1D2B17">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-gear" /></svg>
+              <span class="piece__label">Problem-Solving</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 2">
+            <button class="piece" type="button" data-skill="goal-setting" style="--piece: #1096E4; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-target" /></svg>
+              <span class="piece__label">Goal Setting</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 3">
+            <button class="piece" type="button" data-skill="teamwork" style="--piece: #953ECC; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-team" /></svg>
+              <span class="piece__label">Teamwork</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 4">
+            <button class="piece" type="button" data-skill="adaptability" style="--piece: #02AFA6; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-adapt" /></svg>
+              <span class="piece__label">Adaptability</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 5">
+            <button class="piece" type="button" data-skill="interview-skills" style="--piece: #FD3A99; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-interview" /></svg>
+              <span class="piece__label">Interview Skills</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 6">
+            <button class="piece" type="button" data-skill="personal-development" style="--piece: #3AC33A; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-personal" /></svg>
+              <span class="piece__label">Personal Development</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 7">
+            <button class="piece" type="button" data-skill="employability" style="--piece: #F7801E; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-employ" /></svg>
+              <span class="piece__label">Employability</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 8">
+            <button class="piece" type="button" data-skill="digital-skills" style="--piece: #8C3AC9; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-digital" /></svg>
+              <span class="piece__label">Digital Skills</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 9">
+            <button class="piece" type="button" data-skill="cv-applications" style="--piece: #025375; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-cv" /></svg>
+              <span class="piece__label">CV &amp; Applications</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 10">
+            <button class="piece" type="button" data-skill="communication" style="--piece: #2D3830; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-comm" /></svg>
+              <span class="piece__label">Communication</span>
+            </button>
+          </li>
+          <li class="pieces__item" style="--i: 11">
+            <button class="piece" type="button" data-skill="time-management" style="--piece: #E52337; --ink: #FFFFFF">
+              <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-time" /></svg>
+              <span class="piece__label">Time Management</span>
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </section>
+
+    <!-- Next build stage: "How it works: your journey through the
+         programme" continues from here. -->
+
+  </main>
+
+
+  <!-- ===================================================================
+       SKILL SHEET  (modal dialog)
+       A centred card on wide screens, a sheet that slides up from the
+       bottom on phones (drag it down, or tap outside, to dismiss).
+       Filled in by main.js from the skill data there.
+       ================================================================= -->
+  <dialog class="sheet" data-sheet aria-labelledby="sheet-title">
+    <div class="sheet__card" data-sheet-card>
+      <span class="sheet__grab" aria-hidden="true" data-sheet-grab></span>
+
+      <header class="sheet__head">
+        <span class="sheet__tile" data-sheet-tile><svg aria-hidden="true" focusable="false"><use data-sheet-icon href="#i-sk-confidence" /></svg></span>
+        <div class="sheet__names">
+          <p class="sheet__eyebrow">Employability skill <span data-sheet-pos></span></p>
+          <h3 class="sheet__title" id="sheet-title" data-sheet-name>Confidence</h3>
+        </div>
+        <button class="sheet__close" type="button" data-sheet-close>
+          <span aria-hidden="true">X</span><span class="visually-hidden">Close</span>
+        </button>
+      </header>
+
+      <div class="sheet__body">
+        <h4 class="sheet__sub">Why does this matter?</h4>
+        <p class="sheet__why" data-sheet-why></p>
+        <h4 class="sheet__sub">You can build:</h4>
+        <ul class="sheet__build" data-sheet-build></ul>
+      </div>
+
+      <footer class="sheet__foot">
+        <button class="sheet__add" type="button" data-sheet-add>Add Confidence to your skills</button>
+        <button class="sheet__later" type="button" data-sheet-close>Maybe later</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <script src="../js/main.js" defer></script>
+
+</body>
+
+</html>

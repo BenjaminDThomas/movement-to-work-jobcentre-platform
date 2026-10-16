@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<!--
+  =========================================================================
+  MOVEMENT TO WORK — SKELMERSDALE JOBCENTRE PLUS
+  Hero section
+  =========================================================================
+  Stage 13 — Platform implementation
+
+  Accessibility notes for this document:
+    - Landmarks: banner (header) > main > region (hero) > region (benefits)
+    - One <h1> per page; the benefits panel uses <h2>
+    - Every decorative image carries alt="" so screen readers skip it; the
+      only image with a description is the photograph, which carries the
+      meaning of the section
+    - Tag chips are authored in sentence case and uppercased in CSS so that
+      screen readers announce "2 weeks", not "T-W-O W-E-E-K-S"
+    - The animated arrow is CSS-driven and respects prefers-reduced-motion
+    - Page works fully without JavaScript
+
+  File map:
+    css/grid.css   layout, breakpoints, structural rules
+    css/style.css  design tokens, typography, components, motion
+    js/main.js     progressive enhancement (below-fold reveal only)
+    images/        photography, brand artwork and icons
+  =========================================================================
+-->
+<html lang="en-GB">
+
+<head>
+
+  <!-- ===================================================================
+       1. DOCUMENT META
+       =================================================================== -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Movement to Work | Skelmersdale Jobcentre Plus</title>
+  <meta name="description"
+    content="Movement to Work is a free two-week programme from Skelmersdale Jobcentre Plus, helping young people move from education into employment with practical experience, confidence building and job-readiness support.">
+  <meta name="theme-color" content="#2e7d1e">
+
+  <!-- Social sharing (Open Graph) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Movement to Work | Skelmersdale Jobcentre Plus">
+  <meta property="og:description"
+    content="A free two-week programme helping young people move from education to employment.">
+  <meta property="og:image" content="images/hero-education-to-employment-1086.jpg">
+  <meta property="og:locale" content="en_GB">
+
+  <!-- ===================================================================
+       2. FONTS
+       Archivo  — display headline and all UI text
+       Caveat   — handwritten script accents ("to Work", header tagline)
+       preconnect shortens the handshake; display=swap avoids invisible text
+       =================================================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,400..900&family=Caveat:wght@600;700&display=swap">
+
+  <!-- ===================================================================
+       3. STYLESHEETS  (grid first: layout, then skin)
+       =================================================================== -->
+  <link rel="stylesheet" href="css/grid.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- ===================================================================
+       4. NO-FLASH SCRIPTING FLAG
+       Runs before first paint so CSS can hide below-fold reveal targets
+       only when JavaScript is available to bring them back.
+       =================================================================== -->
+  <script>document.documentElement.classList.add('js');</script>
+
+</head>
+
+<body>
+
+  <!-- ===================================================================
+       SKIP LINK
+       First focusable element on the page (WCAG 2.4.1 Bypass Blocks).
+       Visually hidden until it receives keyboard focus.
+       =================================================================== -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+
+  <!-- ===================================================================
+       SVG ICON SPRITE
+       Only the two interface glyphs that are not supplied as artwork: the
+       button arrow and the gift mark. Defined once, referenced with <use>,
+       and removed from the accessibility tree.
+       =================================================================== -->
+  <svg class="svg-sprite" aria-hidden="true" focusable="false" width="0" height="0">
+    <defs>
+
+      <symbol id="icon-arrow-right" viewBox="0 0 24 24">
+        <path d="M4 12h15m0 0-6.2-6.2M19 12l-6.2 6.2" />
+      </symbol>
+
+      <symbol id="icon-gift" viewBox="0 0 24 24">
+        <rect x="3.2" y="9.4" width="17.6" height="11.4" rx="2.2" />
+        <path d="M3.2 13.6h17.6M12 9.4v11.4" />
+        <path d="M12 9.4S10.6 4 8.1 4a2.3 2.3 0 0 0 0 5.4ZM12 9.4S13.4 4 15.9 4a2.3 2.3 0 0 1 0 5.4Z" />
+      </symbol>
+
+    </defs>
+  </svg>
+
+
+  <!-- ===================================================================
+       PAGE SHELL
+       The rounded card that frames the whole hero composition.
+       =================================================================== -->
+  <div class="page">
+
+    <!-- =================================================================
+         SITE HEADER  (banner landmark)
+         Logo · script tagline · primary call to action
+         ================================================================= -->
+    <header class="site-header">
+
+      <!-- Logo -----------------------------------------------------------
+           Built in HTML + CSS rather than as an image so it stays crisp at
+           any zoom level and inherits the user's text settings.
+           aria-label gives assistive tech a clean, spaced reading of the
+           name, which the concatenated visual text would not provide.
+      ------------------------------------------------------------------ -->
+      <a class="logo" href="#main" aria-label="Jobcentre Plus — Movement to Work home">
+        <span class="logo__lockup" aria-hidden="true">
+          <span class="logo__word">jobcentre</span><span class="logo__plus">plus</span>
+        </span>
+      </a>
+
+      <!-- Script tagline -------------------------------------------------
+           The brush stroke behind the phrase is a background image on the
+           text itself, so it grows and shrinks with the words. The spark
+           marks either side are decorative (alt="").
+      ------------------------------------------------------------------ -->
+      <p class="tagline">
+        <img class="tagline__sparks" src="images/tagline-sparks-start.png" alt="" width="96" height="146">
+        <span class="tagline__text">From education to employment</span>
+        <img class="tagline__sparks" src="images/tagline-sparks-end.png" alt="" width="96" height="143">
+      </p>
+
+      <!-- Header call to action ------------------------------------------
+           An anchor, not a button: it navigates to the sign-up destination.
+      ------------------------------------------------------------------ -->
+      <nav class="site-header__nav" aria-label="Primary">
+        <a class="btn btn--outline btn--compact" href="#join">
+          <span class="btn__label">Join now</span>
+          <span class="btn__badge" aria-hidden="true">
+            <svg class="btn__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-right" /></svg>
+          </span>
+        </a>
+      </nav>
+
+    </header>
+
+
+    <!-- =================================================================
+         MAIN CONTENT
+         ================================================================= -->
+    <main id="main" class="main">
+
+      <!-- ===============================================================
+           HERO
+           DOM order is the logical reading order: message → image → panel.
+           CSS Grid places these three regions side by side on wide screens
+           without reordering them, so focus order always matches what is
+           seen (WCAG 1.3.2 Meaningful Sequence, 2.4.3 Focus Order).
+           =============================================================== -->
+      <section class="hero" aria-labelledby="hero-title">
+
+        <!-- ============================================================
+             HERO · A. MESSAGE COLUMN
+             ============================================================ -->
+        <div class="hero__content">
+
+          <!-- Headline ---------------------------------------------------
+               Reads as a single string: "Movement to Work".
+               The motion lines and the sweeping arrow are decorative
+               artwork, absolutely positioned so they add nothing to the
+               height of the heading and nothing to its accessible name.
+          ----------------------------------------------------------------->
+          <h1 class="hero__title" id="hero-title">
+
+            <span class="hero__line hero__line--one">
+              <img class="hero__speed" src="images/title-speed-lines.png" alt="" width="460" height="341">
+              <span class="hero__display">Movement</span>
+            </span>
+
+            <span class="hero__line hero__line--two">
+              <span class="hero__script hero__script--to">to</span>
+              <span class="hero__script hero__script--work">Work</span>
+
+              <!-- The arrow is revealed left to right on page entry, so it
+                   appears to draw itself along the sweep. See style.css
+                   section 14. -->
+              <img class="hero__flourish" src="images/title-arrow.png" alt="" width="900" height="97">
+            </span>
+
+          </h1>
+
+          <!-- Supporting copy -->
+          <p class="hero__lede">
+            Helping young people move from education to employment through a free 2-week programme with practical
+            experience, confidence building, and job-readiness support.
+          </p>
+
+          <!-- Calls to action ------------------------------------------
+               Both are links. Minimum target size is enforced in CSS.
+          --------------------------------------------------------------->
+          <div class="hero__actions">
+
+            <a class="btn btn--primary" href="#about">
+              <span class="btn__label">Learn more</span>
+              <svg class="btn__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-right" /></svg>
+            </a>
+
+            <a class="btn btn--outline" id="join" href="#apply">
+              <span class="btn__label">Join now</span>
+              <svg class="btn__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-right" /></svg>
+            </a>
+
+          </div>
+
+          <!-- Reassurance chip -->
+          <p class="chip">
+            <svg class="chip__icon" aria-hidden="true" focusable="false"><use href="#icon-gift" /></svg>
+            <span>Free support</span>
+          </p>
+
+        </div>
+
+
+        <!-- ============================================================
+             HERO · B. PHOTOGRAPH
+             A composite portrait: the same person as a student on the
+             left and as a working professional on the right. The alt text
+             describes that contrast because it carries the meaning of the
+             whole section — it is not decorative.
+
+             Two widths are offered so phones do not download the desktop
+             file. WebP first, JPEG for anything that cannot read it. No
+             lazy loading: this is the largest element on the screen.
+             ============================================================ -->
+        <div class="hero__media">
+          <picture>
+            <source type="image/webp" sizes="(min-width: 75em) 30vw, (min-width: 48em) 40vw, 92vw"
+              srcset="images/hero-education-to-employment-760.webp   760w,
+                      images/hero-education-to-employment-1086.webp 1086w">
+            <img class="hero__image" src="images/hero-education-to-employment-1086.jpg"
+              sizes="(min-width: 75em) 30vw, (min-width: 48em) 40vw, 92vw"
+              srcset="images/hero-education-to-employment-760.jpg   760w,
+                      images/hero-education-to-employment-1086.jpg 1086w" width="1086" height="1448"
+              decoding="async" fetchpriority="high"
+              alt="The same young woman shown side by side in one photograph: on the left as a student wearing a hoodie and backpack and carrying books, on the right as a working professional in a blazer holding a laptop.">
+          </picture>
+        </div>
+
+
+        <!-- ============================================================
+             HERO · C. BENEFITS PANEL
+             A labelled region so screen reader users can jump straight to
+             it. The list is a real <ul> so its length is announced. Every
+             icon is decorative — each one sits beside its own text label.
+             ============================================================ -->
+        <section class="panel" aria-labelledby="benefits-title">
+
+          <div class="panel__head">
+            <h2 class="panel__title" id="benefits-title">What you&rsquo;ll get</h2>
+            <img class="panel__mark" src="images/icon-community.png" alt="" width="128" height="74">
+          </div>
+
+          <ul class="benefits">
+
+            <!-- 1 · Duration -->
+            <li class="benefit" data-reveal>
+              <span class="benefit__badge">
+                <img class="benefit__icon" src="images/icon-calendar.png" alt="" width="96" height="100">
+              </span>
+              <span class="benefit__body">
+                <span class="benefit__name">2-week programme</span>
+                <span class="benefit__desc">Focused support to help you become job-ready.</span>
+              </span>
+              <span class="benefit__tag">2 weeks</span>
+            </li>
+
+            <!-- 2 · Location -->
+            <li class="benefit" data-reveal>
+              <span class="benefit__badge">
+                <img class="benefit__icon" src="images/icon-pin.png" alt="" width="96" height="122">
+              </span>
+              <span class="benefit__body">
+                <span class="benefit__name">Skelmersdale Jobcentre Plus</span>
+                <span class="benefit__desc">Local support from a team that understands your area.</span>
+              </span>
+              <span class="benefit__tag">Local</span>
+            </li>
+
+            <!-- 3 · Application support -->
+            <li class="benefit" data-reveal>
+              <span class="benefit__badge">
+                <img class="benefit__icon" src="images/icon-document.png" alt="" width="96" height="120">
+              </span>
+              <span class="benefit__body">
+                <span class="benefit__name">Support with CVs, personal statements and interviews</span>
+                <span class="benefit__desc">Get expert help to stand out and succeed.</span>
+              </span>
+              <span class="benefit__tag">Practical</span>
+            </li>
+
+            <!-- 4 · Confidence and skills -->
+            <li class="benefit" data-reveal>
+              <span class="benefit__badge">
+                <img class="benefit__icon" src="images/icon-people.png" alt="" width="96" height="79">
+              </span>
+              <span class="benefit__body">
+                <span class="benefit__name">Build confidence and workplace skills</span>
+                <span class="benefit__desc">Develop the skills employers value and grow your confidence.</span>
+              </span>
+              <span class="benefit__tag">Skills</span>
+            </li>
+
+            <!-- 5 · Featured: work experience -->
+            <li class="benefit benefit--featured" data-reveal>
+              <span class="benefit__badge">
+                <img class="benefit__icon" src="images/icon-star.png" alt="" width="96" height="95">
+              </span>
+              <span class="benefit__body">
+                <span class="benefit__name">Practical experience</span>
+                <span class="benefit__desc">Gain real-world experience to boost your employability.</span>
+              </span>
+              <span class="benefit__tag">Hands-on</span>
+            </li>
+
+          </ul>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- ===================================================================
+       SCRIPTS
+       Deferred: nothing here is required for the page to work or render.
+       =================================================================== -->
+  <script src="js/main.js" defer></script>
+
+</body>
+
+</html>

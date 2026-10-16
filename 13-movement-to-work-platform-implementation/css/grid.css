@@ -1,0 +1,2806 @@
+@charset "UTF-8";
+/* ==========================================================================
+   MOVEMENT TO WORK: GRID.CSS
+   Reset, scale unit, layout and breakpoints
+   ==========================================================================
+   This file owns where things sit and how big they are. Colour, type,
+   decoration and motion live in style.css.
+
+   The scale unit (--u)
+     Every Figma measurement is written as N * var(--u), where --u is one
+     Figma pixel at the current screen size. Proportions, spacing and crops
+     therefore match the frames at every size instead of drifting.
+
+       Narrow   360 x 800 frame    --u follows the width, clamped so a
+                                   portrait tablet does not blow up the type
+       Wide     1292 x 728 frame   --u is the smaller of width / 1292 and
+                                   height / 728, so the whole frame always
+                                   fits; any spare space is split evenly
+
+   Breakpoint
+     Wide = (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)
+     The same query the <picture> sources use, so artwork and layout switch
+     together. Phones, portrait tablets and short landscape phones all take
+     the narrow, stacked arrangement from the mobile frames.
+
+   Pinned scroll story
+     Only applied under `.js` and a motion-friendly, tall-enough screen:
+     (prefers-reduced-motion: no-preference) and (min-height: 30em).
+     Otherwise every section is an ordinary block in reading order.
+
+   Contents
+     1.  Reset
+     2.  Scale unit
+     3.  Utilities
+     4.  Menu toggle
+     5.  Menu
+     6.  Intro track and stage
+     7.  Hero
+     8.  Mask transition
+     9.  About
+    10.  Journey scenes
+    11.  Wide layout
+    12.  Pinned scroll story
+    13.  Get to know
+    14.  Skills
+    15.  Skill sheet
+    16.  Wide layout for Get to know, Skills and the sheet
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. RESET
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+p,
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+
+/* ==========================================================================
+   2. SCALE UNIT
+   ========================================================================== */
+
+:root {
+  /* Narrow: one 360px-frame pixel. */
+  --u: clamp(0.85px, calc(100vw / 360), 1.55px);
+
+  /* Height of one screen. svh where supported, so mobile browser chrome
+     never pushes a pinned stage under the address bar. */
+  --screen: 100vh;
+}
+
+@supports (height: 100svh) {
+  :root {
+    --screen: 100svh;
+  }
+}
+
+/* Short landscape phones: the narrow layout, sized to the height so the
+   hero still fits on screen. */
+@media (orientation: landscape) and (max-height: 33.99em) {
+  :root {
+    --u: clamp(0.75px, calc(100vh / 640), 1.2px);
+  }
+}
+
+@media (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  :root {
+    --u: min(calc(100vw / 1292), calc(100vh / 728));
+  }
+
+  @supports (height: 100svh) {
+    :root {
+      --u: min(calc(100vw / 1292), calc(100svh / 728));
+    }
+  }
+}
+
+
+/* ==========================================================================
+   3. UTILITIES
+   ========================================================================== */
+
+.svg-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.wide-only {
+  display: none;
+}
+
+
+/* ==========================================================================
+   4. MENU TOGGLE
+   Fixed to the bottom-right corner. The box is anchored on its right
+   edge, so stretching it on hover grows it towards the page.
+   ========================================================================== */
+
+.menu-toggle {
+  position: fixed;
+  right: calc(16 * var(--u));
+  bottom: calc(18 * var(--u));
+  z-index: 45;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* Generous hit area around the drawn control (WCAG 2.5.5). */
+  padding: calc(6 * var(--u));
+  margin: calc(-6 * var(--u));
+}
+
+/* The menu needs main.js, so its button only appears with it. */
+html:not(.js) .menu-toggle {
+  display: none;
+}
+
+/* The cap's brim rests on the box's top rim, just tilted. */
+.menu-toggle__cap {
+  width: calc(38 * var(--u));
+  height: auto;
+  margin-bottom: calc(-8 * var(--u));
+  position: relative;
+  z-index: 1;
+}
+
+.menu-toggle__box {
+  position: relative;
+  width: calc(44 * var(--u));
+  height: calc(44 * var(--u));
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(5 * var(--u));
+}
+
+.menu-toggle__bar {
+  display: block;
+  width: calc(22 * var(--u));
+  height: calc(3.5 * var(--u));
+}
+
+
+/* ==========================================================================
+   5. MENU
+   Mobile frame: photograph top right, brand and guide top left, list
+   below, blob bottom right.
+   ========================================================================== */
+
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.menu__art {
+  position: absolute;
+  inset: 0 0 auto auto;
+  width: 100%;
+  height: 100%;
+  min-height: calc(800 * var(--u));
+  pointer-events: none;
+}
+
+.menu__art picture {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: calc(168 * var(--u));
+}
+
+.menu__photo {
+  width: 100%;
+  height: auto;
+}
+
+.menu__slogan {
+  display: none;
+}
+
+/* Wide screens only: on a phone the menu keeps to the essentials. */
+.menu__blob {
+  display: none !important;
+  position: absolute;
+  right: calc(74 * var(--u));
+  bottom: calc(20 * var(--u));
+  width: calc(122 * var(--u));
+  height: calc(98 * var(--u));
+
+  display: grid;
+  place-items: center;
+  padding: calc(10 * var(--u)) calc(14 * var(--u)) calc(18 * var(--u));
+}
+
+.menu__blob-arrow {
+  position: absolute;
+  right: calc(26 * var(--u));
+  bottom: calc(14 * var(--u));
+  width: calc(30 * var(--u));
+}
+
+.menu__panel {
+  position: relative;
+  z-index: 1;
+  padding: calc(34 * var(--u)) 0 calc(40 * var(--u)) 0;
+  min-height: 100%;
+}
+
+.menu__brand {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  margin-left: calc(24 * var(--u));
+  padding-bottom: calc(10 * var(--u));
+}
+
+.menu__brand-script {
+  margin-left: calc(20 * var(--u));
+  margin-top: calc(-6 * var(--u));
+}
+
+.menu__brand-line {
+  position: absolute;
+  left: calc(4 * var(--u));
+  bottom: 0;
+  width: calc(150 * var(--u));
+  height: calc(14 * var(--u));
+  overflow: visible;
+}
+
+.menu__brand-sparks {
+  display: none;
+}
+
+.menu__guide {
+  display: block;
+  width: calc(120 * var(--u));
+  margin: calc(22 * var(--u)) 0 0 calc(26 * var(--u));
+  padding-bottom: calc(10 * var(--u));
+  position: relative;
+}
+
+.menu__nav {
+  margin-top: calc(30 * var(--u));
+}
+
+.menu__list {
+  position: relative;
+  margin-left: calc(46 * var(--u));
+}
+
+/* The vertical rail that threads every step together. */
+.menu__list::before {
+  content: "";
+  position: absolute;
+  left: calc(-28 * var(--u));
+  top: calc(22 * var(--u));
+  bottom: calc(30 * var(--u));
+  width: calc(1.5 * var(--u));
+}
+
+.menu__item {
+  position: relative;
+}
+
+/* Rail dot for each step. */
+.menu__item::before {
+  content: "";
+  position: absolute;
+  left: calc(-28 * var(--u));
+  top: 50%;
+  width: calc(10 * var(--u));
+  height: calc(10 * var(--u));
+  translate: calc(-50% + calc(0.75 * var(--u))) -50%;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.menu__link {
+  position: relative;
+  display: grid;
+  grid-template-columns: calc(22 * var(--u)) calc(26 * var(--u)) minmax(0, 1fr) calc(26 * var(--u));
+  align-items: center;
+  column-gap: calc(10 * var(--u));
+
+  min-height: calc(50 * var(--u));
+  padding: 0 calc(16 * var(--u)) 0 calc(20 * var(--u));
+  text-decoration: none;
+}
+
+.menu__num {
+  display: grid;
+  place-items: center;
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.menu__icon {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.menu__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.menu__go {
+  display: grid;
+  place-items: center;
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+}
+
+.menu__go svg {
+  width: calc(16 * var(--u));
+  height: calc(16 * var(--u));
+}
+
+.menu__link--faq {
+  margin: calc(12 * var(--u)) 0 0 calc(46 * var(--u));
+  padding-top: calc(12 * var(--u));
+  grid-template-columns: calc(22 * var(--u)) minmax(0, 1fr) calc(26 * var(--u));
+}
+
+/* Divider above FAQ. */
+.menu__link--faq::before {
+  content: "";
+  position: absolute;
+  left: calc(34 * var(--u));
+  right: calc(32 * var(--u));
+  top: 0;
+  height: calc(1 * var(--u));
+}
+
+.menu__join {
+  display: grid;
+  grid-template-columns: calc(26 * var(--u)) auto minmax(0, 1fr) calc(24 * var(--u));
+  align-items: center;
+  column-gap: calc(14 * var(--u));
+
+  width: calc(100% - calc(54 * var(--u)));
+  max-width: calc(420 * var(--u));
+  min-height: calc(40 * var(--u));
+  margin: calc(16 * var(--u)) 0 0 calc(42 * var(--u));
+  padding: 0 calc(16 * var(--u)) 0 calc(18 * var(--u));
+  text-decoration: none;
+}
+
+.menu__join-icon {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.menu__join-sub {
+  justify-self: end;
+}
+
+.menu__join-arrow {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.menu__leaves {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: calc(145 * var(--u));
+  pointer-events: none;
+}
+
+.menu__close {
+  position: fixed;
+  top: calc(14 * var(--u));
+  right: calc(14 * var(--u));
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: calc(46 * var(--u));
+  height: calc(46 * var(--u));
+}
+
+
+/* ==========================================================================
+   6. INTRO TRACK AND STAGE
+   ========================================================================== */
+
+.intro {
+  position: relative;
+}
+
+.intro__stage {
+  position: relative;
+  min-height: var(--screen);
+  overflow: hidden;
+}
+
+.intro__photo,
+.intro__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.intro__figure {
+  z-index: 1;
+}
+
+.intro__photo img {
+  object-fit: cover;
+  object-position: 50% 0%;
+  transform-origin: 50% 0%;
+  transform: none;
+}
+
+
+/* ==========================================================================
+   7. HERO  (narrow: mobile frame, stacked)
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  z-index: 2;
+  min-height: var(--screen);
+}
+
+.hero__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.site-header > a,
+.about__bar > a {
+  pointer-events: auto;
+}
+
+.brand,
+.corner-cta {
+  position: relative;
+  display: block;
+  width: calc(118 * var(--u));
+  height: calc(54 * var(--u));
+  text-decoration: none;
+}
+
+/* The shapes are drawn 40 units past the screen edge on the outer sides,
+   so scaling or nudging them never opens a gap at the edge. */
+.brand__shape,
+.corner-cta__shape {
+  position: absolute;
+  top: calc(-40 / 220 * calc(118 * var(--u)));
+  width: calc(300 / 220 * calc(118 * var(--u)));
+  height: auto;
+  max-width: none;
+  overflow: visible;
+}
+
+.brand__shape { left: calc(-40 / 220 * calc(118 * var(--u))); }
+.corner-cta__shape { right: calc(-40 / 220 * calc(118 * var(--u))); }
+
+.brand__word {
+  position: absolute;
+  left: calc(11 * var(--u));
+  top: calc(14 * var(--u));
+}
+
+.corner-cta__text {
+  position: absolute;
+  right: calc(12 * var(--u));
+  top: calc(7 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.corner-cta__text span {
+  margin-left: calc(2 * var(--u));
+}
+
+.corner-cta__arrow {
+  position: absolute;
+  right: calc(11 * var(--u));
+  top: calc(35 * var(--u));
+  width: calc(52 * var(--u));
+  height: calc(10 * var(--u));
+  overflow: visible;
+}
+
+.hero__frame {
+  position: relative;
+  z-index: 2;
+  padding: calc(76 * var(--u)) calc(22 * var(--u)) calc(110 * var(--u)) calc(26 * var(--u));
+  max-width: calc(560 * var(--u));
+}
+
+.hero__tagline {
+  width: calc(318 * var(--u));
+  margin: 0 auto 0 calc(-4 * var(--u));
+}
+
+.hero__tagline img {
+  width: 100%;
+}
+
+.hero__intro {
+  position: relative;
+  margin-top: calc(30 * var(--u));
+}
+
+.hero__title {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: calc(14 * var(--u));
+}
+
+.hero__title-script {
+  margin: calc(-4 * var(--u)) 0 0 calc(2 * var(--u));
+}
+
+.hero__title-line {
+  position: absolute;
+  left: calc(-2 * var(--u));
+  bottom: calc(-2 * var(--u));
+  width: calc(204 * var(--u));
+  height: calc(15 * var(--u));
+  overflow: visible;
+}
+
+.hero__badge--narrow {
+  position: absolute;
+  right: calc(-6 * var(--u));
+  top: calc(66 * var(--u));
+  width: calc(82 * var(--u));
+}
+
+.hero__badge--wide {
+  display: none;
+}
+
+.hero__lead {
+  margin-top: calc(30 * var(--u));
+  max-width: calc(222 * var(--u));
+}
+
+.hero__body {
+  margin-top: calc(18 * var(--u));
+  max-width: calc(318 * var(--u));
+  padding: calc(5 * var(--u)) calc(10 * var(--u)) calc(5 * var(--u)) calc(12 * var(--u));
+}
+
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: calc(18 * var(--u));
+  margin-top: calc(24 * var(--u));
+}
+
+.btn-brush {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(4 * var(--u));
+  min-height: 44px;
+  height: calc(44 * var(--u));
+  padding: 0 calc(20 * var(--u));
+}
+
+.link-sketch {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
+  min-height: 44px;
+  padding: 0 calc(4 * var(--u));
+}
+
+.hero__chips {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: calc(11 * var(--u)) calc(18 * var(--u));
+  margin-top: calc(24 * var(--u));
+}
+
+/* Mobile frame order: Free to join, Local Support / Just 2 weeks. */
+.hero__chips .chip:nth-child(2) {
+  order: 3;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  min-width: calc(112 * var(--u));
+  height: calc(24 * var(--u));
+  padding: 0 calc(12 * var(--u)) 0 calc(3 * var(--u));
+}
+
+.chip__tick {
+  width: calc(17 * var(--u));
+  height: calc(17 * var(--u));
+  flex: 0 0 auto;
+}
+
+/* The mobile frame has no perks panel; the chips carry the same points. */
+.perks {
+  display: none;
+}
+
+.perk {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: calc(12 * var(--u));
+  align-items: center;
+}
+
+.perk__icon {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: calc(40 * var(--u));
+  height: calc(40 * var(--u));
+}
+
+.perk__icon svg {
+  width: calc(21 * var(--u));
+  height: calc(21 * var(--u));
+}
+
+
+/* ==========================================================================
+   8. MASK TRANSITION
+   ========================================================================== */
+
+.reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+}
+
+.reveal__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.reveal__svg--wide {
+  display: none;
+}
+
+
+/* ==========================================================================
+   9. ABOUT  (narrow: mobile frame)
+   ========================================================================== */
+
+.about {
+  position: relative;
+  z-index: 5;
+  min-height: var(--screen);
+  padding-bottom: calc(110 * var(--u));
+}
+
+.about__edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  width: 100%;
+  height: calc(26 * var(--u));
+  max-width: none;
+  pointer-events: none;
+}
+
+/* Keeps About's copy clear of the fixed header corners. */
+.about__bar {
+  height: calc(50 * var(--u));
+}
+
+.about__frame {
+  position: relative;
+  max-width: calc(600 * var(--u));
+}
+
+.about__copy {
+  position: relative;
+  z-index: 2;
+  padding: calc(26 * var(--u)) calc(22 * var(--u)) 0 calc(15 * var(--u));
+}
+
+.about__kicker {
+  position: relative;
+  display: inline-block;
+  padding-bottom: calc(6 * var(--u));
+}
+
+.about__kicker-line {
+  position: absolute;
+  left: calc(-2 * var(--u));
+  bottom: calc(-2 * var(--u));
+  width: 100%;
+  height: calc(8 * var(--u));
+}
+
+.about__title {
+  display: flex;
+  flex-direction: column;
+  margin-top: calc(26 * var(--u));
+}
+
+.about__title-script {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: calc(4 * var(--u));
+}
+
+.about__title-arrow {
+  display: none;
+}
+
+.about__text {
+  margin-top: calc(16 * var(--u));
+  max-width: calc(310 * var(--u));
+  padding-left: calc(12 * var(--u));
+}
+
+.about__art {
+  position: relative;
+  z-index: 1;
+  width: calc(100% - calc(4 * var(--u)));
+  max-width: calc(560 * var(--u));
+  margin: calc(10 * var(--u)) auto 0;
+}
+
+.about__skyline {
+  position: absolute;
+  right: calc(12 * var(--u));
+  top: calc(438 * var(--u));
+  width: calc(82 * var(--u));
+  z-index: 1;
+}
+
+.steps {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  row-gap: calc(14 * var(--u));
+  margin: calc(14 * var(--u)) auto 0;
+  padding: 0 calc(22 * var(--u));
+  max-width: calc(420 * var(--u));
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step__disc {
+  display: grid;
+  place-items: center;
+  width: calc(36 * var(--u));
+  height: calc(36 * var(--u));
+  margin-top: calc(3 * var(--u));
+}
+
+.step__disc svg {
+  width: calc(18 * var(--u));
+  height: calc(18 * var(--u));
+}
+
+.step__label {
+  margin-top: calc(4 * var(--u));
+  position: relative;
+  padding: 0 calc(4 * var(--u)) calc(3 * var(--u));
+}
+
+.step__arrow {
+  position: absolute;
+  left: calc(50% + calc(24 * var(--u)));
+  top: calc(30 * var(--u));
+  width: calc(44 * var(--u));
+  height: calc(16 * var(--u));
+  overflow: visible;
+}
+
+/* End of each row on the phone layout: nowhere for the arrow to point. */
+.step:nth-child(3n) .step__arrow {
+  display: none;
+}
+
+/* Drawn foliage rising out of the bottom corners. The stems start at the
+   very bottom edge, so the section boundary reads as the ground they grow
+   from rather than a crop. */
+.foliage {
+  position: absolute;
+  bottom: -1px;
+  width: calc(110 * var(--u));
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.about__leaves {
+  z-index: 1;
+}
+
+.about__leaves--left {
+  left: 0;
+}
+
+.about__leaves--right {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+
+/* ==========================================================================
+   10. JOURNEY SCENES  (narrow: mobile frame)
+   ========================================================================== */
+
+.journey {
+  position: relative;
+  z-index: 6;
+}
+
+.scene {
+  position: relative;
+  height: var(--screen);
+  min-height: 34em;
+  overflow: hidden;
+}
+
+.scene__media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.scene__img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+/* Each photograph cropped to its subject, as in the mobile frames. */
+.scene:nth-child(1) .scene__img { object-position: 74% 30%; }
+.scene:nth-child(2) .scene__img { object-position: 28% 30%; }
+.scene:nth-child(3) .scene__img { object-position: 26% 30%; }
+.scene:nth-child(4) .scene__img { object-position: 57% 30%; }
+
+.scene__rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(33 * var(--u));
+  width: calc(1.5 * var(--u));
+  z-index: 1;
+}
+
+.scene__marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 41%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+.scene__num {
+  display: none;
+}
+
+.scene__dot {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+  margin-left: calc(20 * var(--u));
+}
+
+.scene__label {
+  margin-left: calc(6 * var(--u));
+}
+
+.scene__body {
+  position: absolute;
+  left: calc(48 * var(--u));
+  right: calc(14 * var(--u));
+  top: calc(41% + calc(58 * var(--u)));
+  z-index: 2;
+  padding: calc(14 * var(--u)) calc(12 * var(--u)) calc(18 * var(--u)) calc(10 * var(--u));
+}
+
+.scene__text {
+  margin-top: calc(12 * var(--u));
+}
+
+
+/* ==========================================================================
+   11. WIDE LAYOUT  (desktop frame, 1292 x 728)
+   Composed inside a centred frame the size of the Figma artboard, so
+   every coordinate below is lifted straight from the design.
+   ========================================================================== */
+
+@media (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+
+  .wide-only {
+    display: inline;
+  }
+
+  .narrow-only {
+    display: none;
+  }
+
+  /* --- Toggle ---------------------------------------------------------- */
+  /* Tucked into the real bottom-right corner of the window. */
+  .menu-toggle {
+    right: calc(26 * var(--u));
+    bottom: calc(22 * var(--u));
+  }
+
+  .menu-toggle__cap {
+    width: calc(50 * var(--u));
+    margin-bottom: calc(-11 * var(--u));
+  }
+
+  .menu-toggle__box {
+    width: calc(58 * var(--u));
+    height: calc(58 * var(--u));
+    gap: calc(6.5 * var(--u));
+  }
+
+  .menu-toggle__bar {
+    width: calc(28 * var(--u));
+    height: calc(4.5 * var(--u));
+  }
+
+  /* --- Menu ------------------------------------------------------------ */
+  /* The art box keeps the photograph's own proportions and is pinned to
+     the right edge, so the slogan and the blob, placed in percentages of
+     it, always land beside her face rather than on it, at any size. */
+  /* --aw is the photo's width: as tall as the screen where there is room,
+     otherwise narrow enough that her face (from 45% across the picture)
+     starts right of the link list. When it has to shrink it sits at the
+     bottom and fades in from the top, so there is no hard edge. */
+  .menu__art {
+    --aw: min(calc(var(--screen) * 1289 / 728), calc((100vw - calc(600 * var(--u))) / 0.55));
+    --fade: clamp(0px, calc((var(--screen) - var(--aw) * 728 / 1289) * 3), 140px);
+    inset: auto 0 0 auto;
+    width: var(--aw);
+    height: calc(var(--aw) * 728 / 1289);
+    min-height: 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade));
+    mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade));
+  }
+
+  .menu__art picture,
+  .menu__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+
+  .menu__photo {
+    object-fit: cover;
+  }
+
+  .menu__slogan {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: 81%;
+    top: 15%;
+    width: 17%;
+  }
+
+  .menu__slogan-sparks {
+    position: absolute;
+    left: calc(-26 * var(--u));
+    top: calc(42 * var(--u));
+    width: calc(22 * var(--u));
+  }
+
+  .menu__slogan span + span {
+    margin-left: calc(4 * var(--u));
+  }
+
+  .menu__slogan-line {
+    width: calc(220 * var(--u));
+    height: calc(12 * var(--u));
+    margin-top: calc(2 * var(--u));
+  }
+
+  .menu__blob {
+    display: grid !important;
+    left: 83%;
+    right: auto;
+    top: 33%;
+    bottom: auto;
+    width: 15%;
+    height: auto;
+    aspect-ratio: 205 / 140;
+    padding: 2% 2.4% 3.4%;
+  }
+
+  .menu__blob-arrow {
+    right: calc(46 * var(--u));
+    bottom: calc(18 * var(--u));
+    width: calc(40 * var(--u));
+  }
+
+  /* Squarer windows: rather than shrinking the photograph, it fills the
+     space right of the list at full height and is cropped around her
+     face, with a soft edge where it meets the list. */
+  @media (max-aspect-ratio: 9/5) {
+    .menu__art {
+      --bw: calc(100vw - calc(480 * var(--u)));
+      --pw: calc(var(--screen) * 1289 / 728);
+      inset: 0 0 0 auto;
+      width: var(--bw);
+      height: 100%;
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16%);
+      mask-image: linear-gradient(to right, transparent 0, #000 16%);
+    }
+
+    .menu__photo {
+      object-position: clamp(calc(var(--bw) - var(--pw)), calc(var(--bw) * 0.4 - var(--pw) * 0.56), 0px) 50%;
+    }
+
+    .menu__slogan {
+      left: auto;
+      right: 4%;
+      top: 9%;
+      width: calc(200 * var(--u));
+    }
+
+    .menu__blob {
+      left: auto;
+      right: 5%;
+      top: 27%;
+      width: calc(150 * var(--u));
+      padding: calc(14 * var(--u)) calc(18 * var(--u)) calc(20 * var(--u));
+    }
+  }
+
+  .menu__panel {
+    width: calc(610 * var(--u));
+    min-height: 100%;
+    padding: calc(46 * var(--u)) 0 calc(40 * var(--u));
+  }
+
+  .menu__brand {
+    margin-left: calc(40 * var(--u));
+    padding-bottom: calc(16 * var(--u));
+  }
+
+  .menu__brand-script {
+    margin-left: calc(22 * var(--u));
+    margin-top: calc(-10 * var(--u));
+  }
+
+  .menu__brand-line {
+    width: calc(210 * var(--u));
+    height: calc(18 * var(--u));
+  }
+
+  .menu__brand-sparks {
+    display: block;
+    position: absolute;
+    right: calc(-48 * var(--u));
+    top: calc(26 * var(--u));
+    width: calc(26 * var(--u));
+  }
+
+  .menu__guide {
+    display: none;
+  }
+
+  .menu__nav {
+    margin-top: calc(26 * var(--u));
+  }
+
+  .menu__list {
+    margin-left: calc(135 * var(--u));
+  }
+
+  .menu__list::before {
+    left: calc(-32 * var(--u));
+    top: calc(28 * var(--u));
+    bottom: calc(32 * var(--u));
+  }
+
+  .menu__item::before {
+    left: calc(-32 * var(--u));
+    width: calc(12 * var(--u));
+    height: calc(12 * var(--u));
+  }
+
+  .menu__link {
+    grid-template-columns: calc(36 * var(--u)) calc(30 * var(--u)) minmax(0, 1fr) calc(28 * var(--u));
+    column-gap: calc(16 * var(--u));
+    width: calc(430 * var(--u));
+    min-height: calc(67 * var(--u));
+    padding: 0 calc(40 * var(--u)) 0 calc(30 * var(--u));
+  }
+
+  .menu__num {
+    width: calc(36 * var(--u));
+    height: calc(36 * var(--u));
+  }
+
+  .menu__icon {
+    width: calc(28 * var(--u));
+    height: calc(28 * var(--u));
+  }
+
+  .menu__go {
+    width: calc(28 * var(--u));
+    height: calc(28 * var(--u));
+  }
+
+  .menu__go svg {
+    width: calc(18 * var(--u));
+    height: calc(18 * var(--u));
+  }
+
+  .menu__link--faq {
+    grid-template-columns: calc(36 * var(--u)) minmax(0, 1fr) calc(28 * var(--u));
+    margin: calc(8 * var(--u)) 0 0 calc(135 * var(--u));
+    padding-top: calc(10 * var(--u));
+    min-height: calc(74 * var(--u));
+  }
+
+  .menu__link--faq::before {
+    left: calc(30 * var(--u));
+    right: calc(52 * var(--u));
+  }
+
+  .menu__join {
+    grid-template-columns: calc(28 * var(--u)) auto minmax(0, 1fr) calc(26 * var(--u));
+    column-gap: calc(18 * var(--u));
+    width: calc(370 * var(--u));
+    min-height: calc(46 * var(--u));
+    margin: calc(22 * var(--u)) 0 0 calc(167 * var(--u));
+    padding: 0 calc(18 * var(--u)) 0 calc(22 * var(--u));
+  }
+
+  .menu__join-icon {
+    width: calc(26 * var(--u));
+    height: calc(26 * var(--u));
+  }
+
+  .menu__leaves {
+    display: block;
+    width: calc(150 * var(--u));
+  }
+
+  .menu__close {
+    top: calc(24 * var(--u));
+    right: calc(26 * var(--u));
+    width: calc(62 * var(--u));
+    height: calc(62 * var(--u));
+  }
+
+  /* --- Hero ------------------------------------------------------------ */
+  /* The classroom / office photograph is composed for this frame: the
+     split runs down the centre and her head reaches the tagline. */
+  .intro__photo img {
+    object-position: 50% 30%;
+    transform: none;
+  }
+
+  .brand,
+  .corner-cta {
+    width: calc(210 * var(--u));
+    height: calc(96 * var(--u));
+  }
+
+  .brand__shape,
+  .corner-cta__shape {
+    top: calc(-40 / 220 * calc(210 * var(--u)));
+    width: calc(300 / 220 * calc(210 * var(--u)));
+  }
+
+  .brand__shape { left: calc(-40 / 220 * calc(210 * var(--u))); }
+  .corner-cta__shape { right: calc(-40 / 220 * calc(210 * var(--u))); }
+
+  .brand__word { left: calc(22 * var(--u)); top: calc(26 * var(--u)); }
+  .corner-cta__text { right: calc(20 * var(--u)); top: calc(14 * var(--u)); }
+  .corner-cta__arrow { right: calc(20 * var(--u)); top: calc(62 * var(--u)); width: calc(92 * var(--u)); height: calc(17 * var(--u)); }
+
+  .hero__frame {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(1292 * var(--u));
+    height: calc(728 * var(--u));
+    max-width: none;
+    padding: 0;
+    translate: -50% -50%;
+  }
+
+  .hero__tagline {
+    position: absolute;
+    left: 50%;
+    top: calc(24 * var(--u));
+    width: calc(548 * var(--u));
+    margin: 0;
+    translate: -50% 0;
+  }
+
+  .hero__intro {
+    position: absolute;
+    left: calc(46 * var(--u));
+    top: calc(176 * var(--u));
+    width: calc(500 * var(--u));
+    margin: 0;
+  }
+
+  .hero__title {
+    padding-bottom: calc(20 * var(--u));
+  }
+
+  .hero__title-script {
+    margin: calc(-14 * var(--u)) 0 0 calc(8 * var(--u));
+  }
+
+  .hero__title-line {
+    left: calc(4 * var(--u));
+    bottom: calc(-4 * var(--u));
+    width: calc(356 * var(--u));
+    height: calc(24 * var(--u));
+  }
+
+  .hero__badge--narrow {
+    display: none;
+  }
+
+  .hero__lead {
+    margin-top: calc(36 * var(--u));
+    max-width: calc(290 * var(--u));
+  }
+
+  .hero__body {
+    margin-top: calc(16 * var(--u));
+    max-width: calc(440 * var(--u));
+    padding: 0 0 0 calc(14 * var(--u));
+  }
+
+  .hero__actions {
+    gap: calc(26 * var(--u));
+    margin-top: calc(30 * var(--u));
+    margin-left: calc(-12 * var(--u));
+  }
+
+  .btn-brush {
+    height: calc(52 * var(--u));
+    padding: 0 calc(30 * var(--u));
+  }
+
+  .hero__chips {
+    display: flex;
+    gap: calc(16 * var(--u));
+    margin-top: calc(30 * var(--u));
+    margin-left: calc(-12 * var(--u));
+  }
+
+  .hero__chips .chip:nth-child(2) {
+    order: 0;
+  }
+
+  .chip {
+    min-width: calc(146 * var(--u));
+    height: calc(30 * var(--u));
+    padding: 0 calc(14 * var(--u)) 0 calc(4 * var(--u));
+    gap: calc(8 * var(--u));
+  }
+
+  .chip__tick {
+    width: calc(21 * var(--u));
+    height: calc(21 * var(--u));
+  }
+
+  .perks {
+    display: block;
+    position: absolute;
+    left: calc(762 * var(--u));
+    top: calc(168 * var(--u));
+    width: calc(370 * var(--u));
+    height: calc(450 * var(--u));
+  }
+
+  .perks__tag {
+    position: absolute;
+    left: calc(8 * var(--u));
+    top: calc(88 * var(--u));
+    padding: calc(4 * var(--u)) calc(18 * var(--u)) calc(6 * var(--u));
+  }
+
+  /* Lifted clear of the first card, which tilts up towards it. */
+  .hero__badge--wide {
+    display: block;
+    position: absolute;
+    left: calc(252 * var(--u));
+    top: calc(-22 * var(--u));
+    width: calc(112 * var(--u));
+  }
+
+  .perks__list {
+    position: absolute;
+    left: 0;
+    top: calc(148 * var(--u));
+    display: flex;
+    flex-direction: column;
+    gap: calc(22 * var(--u));
+  }
+
+  .perk {
+    width: calc(310 * var(--u));
+    min-height: calc(56 * var(--u));
+    padding: calc(8 * var(--u)) calc(22 * var(--u)) calc(8 * var(--u)) calc(9 * var(--u));
+  }
+
+  .perk:nth-child(2) { margin-left: calc(50 * var(--u)); }
+  .perk:nth-child(3) { margin-left: calc(2 * var(--u)); }
+  .perk:nth-child(4) { margin-left: calc(92 * var(--u)); }
+
+  /* --- Mask ------------------------------------------------------------ */
+  .reveal__svg--wide {
+    display: block;
+  }
+
+  .reveal__svg--tall {
+    display: none;
+  }
+
+  /* --- About ----------------------------------------------------------- */
+  /* The frame is 728 design pixels tall; on a squarer window that is
+     less than a screen, so the section hugs the frame rather than
+     leaving bands of empty space above and below it. */
+  .about {
+    min-height: calc(790 * var(--u));
+    padding-bottom: 0;
+  }
+
+  .about__bar {
+    height: 0;
+  }
+
+  .about__frame {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    width: calc(1292 * var(--u));
+    height: calc(728 * var(--u));
+    max-width: none;
+    translate: -50% -50%;
+  }
+
+  .about__copy {
+    position: absolute;
+    left: calc(34 * var(--u));
+    top: calc(124 * var(--u));
+    width: calc(520 * var(--u));
+    padding: 0;
+  }
+
+  .about__kicker {
+    margin-left: calc(18 * var(--u));
+    padding-bottom: calc(8 * var(--u));
+  }
+
+  .about__kicker-line {
+    width: calc(270 * var(--u));
+    height: calc(12 * var(--u));
+  }
+
+  .about__title {
+    margin-top: calc(30 * var(--u));
+  }
+
+  .about__title-arrow {
+    display: block;
+    width: calc(54 * var(--u));
+    height: calc(40 * var(--u));
+    margin: 0 0 calc(-4 * var(--u)) calc(2 * var(--u));
+  }
+
+  .about__text {
+    margin-top: calc(40 * var(--u));
+    margin-left: 0;
+    max-width: calc(470 * var(--u));
+    padding-left: calc(22 * var(--u));
+  }
+
+  .about__art {
+    position: absolute;
+    left: calc(490 * var(--u));
+    top: calc(66 * var(--u));
+    width: calc(802 * var(--u));
+    max-width: none;
+    margin: 0;
+  }
+
+  .about__skyline {
+    left: calc(1050 * var(--u));
+    right: auto;
+    top: calc(446 * var(--u));
+    width: calc(236 * var(--u));
+  }
+
+  .steps {
+    position: absolute;
+    left: calc(150 * var(--u));
+    top: calc(508 * var(--u));
+    width: calc(960 * var(--u));
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .step {
+    width: calc(150 * var(--u));
+  }
+
+  /* The path rises and falls across the page, as drawn. */
+  .step:nth-child(1) { translate: 0 0; }
+  .step:nth-child(2) { translate: 0 calc(16 * var(--u)); }
+  .step:nth-child(3) { translate: 0 calc(28 * var(--u)); }
+  .step:nth-child(4) { translate: 0 calc(42 * var(--u)); }
+  .step:nth-child(5) { translate: 0 calc(30 * var(--u)); }
+  .step:nth-child(6) { translate: 0 calc(22 * var(--u)); }
+
+  .step__num {
+    display: none;
+  }
+
+  .step__disc {
+    width: calc(88 * var(--u));
+    height: calc(88 * var(--u));
+    margin: 0;
+  }
+
+  .step__disc svg {
+    width: calc(40 * var(--u));
+    height: calc(40 * var(--u));
+  }
+
+  .step__label {
+    margin-top: calc(8 * var(--u));
+    padding: 0 calc(10 * var(--u)) calc(6 * var(--u));
+  }
+
+  /* Each arrow spans the gap between two discs and stops just short of
+     the next one, so its head is never hidden behind it. */
+  .step__arrow,
+  .step:nth-child(3n) .step__arrow {
+    display: block;
+    z-index: 2;
+    left: calc(50% + calc(49 * var(--u)));
+    top: calc(10 * var(--u));
+    width: calc(66 * var(--u));
+    height: calc(30 * var(--u));
+  }
+
+  .step:nth-child(6) .step__arrow {
+    left: calc(50% + calc(52 * var(--u)));
+    top: calc(-34 * var(--u));
+    width: calc(120 * var(--u));
+    height: calc(46 * var(--u));
+  }
+
+  .foliage {
+    width: calc(160 * var(--u));
+  }
+
+  /* --- Journey --------------------------------------------------------- */
+  .scene__img,
+  .scene:nth-child(n) .scene__img {
+    object-position: 50% 50%;
+  }
+
+  .scene__rail {
+    left: calc(50% - calc(646 * var(--u)) + calc(221 * var(--u)));
+    width: calc(2 * var(--u));
+  }
+
+  .scene__marker {
+    top: calc(50% - calc(364 * var(--u)) + calc(334 * var(--u)));
+    left: calc(50% - calc(646 * var(--u)));
+    width: calc(1292 * var(--u));
+    height: calc(44 * var(--u));
+    display: block;
+  }
+
+  .scene__num {
+    display: block;
+    position: absolute;
+    right: calc(calc(1292 * var(--u)) - calc(171 * var(--u)));
+    top: 50%;
+    translate: 0 -50%;
+  }
+
+  .scene__dot {
+    position: absolute;
+    left: calc(202 * var(--u));
+    top: 50%;
+    width: calc(40 * var(--u));
+    height: calc(40 * var(--u));
+    margin: 0;
+    translate: 0 -50%;
+  }
+
+  .scene__dot span {
+    display: none;
+  }
+
+  .scene__label {
+    position: absolute;
+    left: calc(275 * var(--u));
+    top: 50%;
+    margin: 0;
+    translate: 0 -50%;
+  }
+
+  .scene__body {
+    left: calc(50% - calc(646 * var(--u)) + calc(580 * var(--u)));
+    right: auto;
+    top: calc(50% - calc(364 * var(--u)) + calc(150 * var(--u)));
+    width: calc(670 * var(--u));
+    padding: 0;
+  }
+
+  .scene__title {
+    max-width: calc(520 * var(--u));
+  }
+
+  .scene__text {
+    margin-top: calc(28 * var(--u));
+  }
+}
+
+
+/* ==========================================================================
+   12. PINNED SCROLL STORY
+   The intro track is several screens tall; its stage sticks to the top
+   while the hero hands over to the mask. About is pulled up by one screen
+   so it slides over the last part of that pin, which is when the words
+   lift away. The journey then pins, and each scene slides up over the last.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) and (min-height: 30em) {
+
+  .js .intro {
+    height: calc(var(--screen) * 4.2);
+  }
+
+  .js .intro__stage {
+    position: sticky;
+    top: 0;
+    height: var(--screen);
+    min-height: 0;
+  }
+
+  .js .hero {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .js .reveal {
+    display: block;
+  }
+
+  .js .about {
+    margin-top: calc(var(--screen) * -1);
+  }
+
+  /* Journey: one pinned stage. The track is several screens tall; the
+     list sticks to the top and the four scenes are stacked inside it.
+     main.js slides each new scene up over the one before (--enter runs
+     from 1, below the screen, to 0, in place), so the reader stays still
+     while the photographs move. */
+  .js .journey {
+    height: calc(var(--screen) * 4.9);
+  }
+
+  .js .journey__list {
+    position: sticky;
+    top: 0;
+    height: var(--screen);
+    overflow: hidden;
+  }
+
+  .js .scene {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    min-height: 0;
+    transform: translate3d(0, calc(var(--enter, 0) * 100%), 0);
+    will-change: transform;
+  }
+
+  .js .scene:nth-child(2) { z-index: 2; }
+  .js .scene:nth-child(3) { z-index: 3; }
+  .js .scene:nth-child(4) { z-index: 4; }
+}
+
+
+/* ==========================================================================
+   13. GET TO KNOW  (narrow: mobile frame, stacked)
+   ========================================================================== */
+
+.explore {
+  position: relative;
+  z-index: 7;
+  padding: calc(40 * var(--u)) 0 calc(96 * var(--u));
+}
+
+.explore__edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  width: 100%;
+  height: calc(26 * var(--u));
+  max-width: none;
+  pointer-events: none;
+}
+
+.explore__frame {
+  position: relative;
+  max-width: calc(600 * var(--u));
+  margin: 0 auto;
+  padding: 0 calc(18 * var(--u));
+}
+
+.explore__title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.explore__kicker {
+  position: relative;
+  margin-left: calc(70 * var(--u));
+  padding-bottom: calc(4 * var(--u));
+}
+
+.explore__script {
+  margin: 0 0 0 calc(2 * var(--u));
+}
+
+.explore__main {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  margin: calc(2 * var(--u)) 0 0 calc(10 * var(--u));
+}
+
+.explore__arrow {
+  width: calc(54 * var(--u));
+  height: calc(18 * var(--u));
+}
+
+.explore__text {
+  margin-top: calc(10 * var(--u));
+  max-width: calc(320 * var(--u));
+  padding-left: calc(10 * var(--u));
+}
+
+/* --- Crossword ----------------------------------------------------------- */
+.cw {
+  position: relative;
+  width: calc(332 * var(--u));
+  margin: calc(26 * var(--u)) auto 0;
+  padding: calc(16 * var(--u)) calc(12 * var(--u));
+}
+
+.cw__wash {
+  position: absolute;
+  inset: calc(-6 * var(--u)) calc(-14 * var(--u)) calc(-18 * var(--u)) calc(-12 * var(--u));
+  width: calc(100% + calc(26 * var(--u)));
+  height: calc(100% + calc(24 * var(--u)));
+  max-width: none;
+}
+
+.cw__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: calc(1.6 * var(--u));
+}
+
+.cw__cell {
+  grid-row: var(--r);
+  grid-column: var(--c);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.cw__bulb {
+  position: absolute;
+  left: calc(-2 * var(--u));
+  top: calc(100% + calc(4 * var(--u)));
+  width: calc(46 * var(--u));
+}
+
+.cw__streaks {
+  display: none;
+}
+
+.cw__star {
+  position: absolute;
+  right: calc(-10 * var(--u));
+  top: calc(100% - calc(14 * var(--u)));
+  width: calc(62 * var(--u));
+}
+
+/* --- Panel --------------------------------------------------------------- */
+.panel {
+  position: relative;
+  margin-top: calc(64 * var(--u));
+  overflow: hidden;
+}
+
+.panel__head {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: max-content;
+  max-width: 100%;
+  min-height: calc(46 * var(--u));
+  margin: 0 auto;
+  padding: calc(6 * var(--u)) calc(18 * var(--u)) calc(8 * var(--u));
+}
+
+.panel__cards {
+  display: grid;
+  gap: calc(16 * var(--u));
+  margin-top: calc(22 * var(--u));
+  padding: 0 calc(8 * var(--u));
+}
+
+.word-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: calc(62 * var(--u)) minmax(0, 1fr) calc(28 * var(--u));
+  align-items: center;
+  column-gap: calc(12 * var(--u));
+  width: 100%;
+  min-height: calc(64 * var(--u));
+  padding: 0 calc(12 * var(--u)) 0 0;
+  text-align: left;
+  isolation: isolate;
+}
+
+/* The painted pill behind the text. */
+.word-card::before {
+  content: "";
+  position: absolute;
+  inset: calc(7 * var(--u)) 0 calc(7 * var(--u)) calc(26 * var(--u));
+  z-index: -1;
+}
+
+.word-card__disc {
+  display: grid;
+  place-items: center;
+  width: calc(62 * var(--u));
+  height: calc(62 * var(--u));
+}
+
+.word-card__disc svg {
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+}
+
+.word-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4 * var(--u));
+  min-width: 0;
+}
+
+.word-card__title {
+  position: relative;
+  align-self: flex-start;
+  padding-bottom: calc(3 * var(--u));
+}
+
+.word-card__go {
+  display: grid;
+  place-items: center;
+  width: calc(28 * var(--u));
+  height: calc(28 * var(--u));
+}
+
+.word-card__go svg {
+  width: calc(15 * var(--u));
+  height: calc(15 * var(--u));
+}
+
+/* --- Topics --------------------------------------------------------------- */
+.topic {
+  position: relative;
+  margin-top: calc(26 * var(--u));
+  padding: 0 0 calc(22 * var(--u));
+}
+
+.topic__head {
+  position: relative;
+  display: grid;
+  grid-template-columns: calc(34 * var(--u)) minmax(0, 1fr) calc(44 * var(--u));
+  align-items: center;
+  column-gap: calc(10 * var(--u));
+  min-height: calc(66 * var(--u));
+  padding: calc(8 * var(--u)) calc(10 * var(--u)) calc(10 * var(--u)) calc(18 * var(--u));
+}
+
+.topic__icon {
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+}
+
+.topic__close {
+  display: grid;
+  place-items: center;
+  width: calc(44 * var(--u));
+  height: calc(44 * var(--u));
+}
+
+.topic__title {
+  position: relative;
+  display: inline-block;
+  margin: calc(18 * var(--u)) calc(18 * var(--u)) 0;
+  padding-bottom: calc(6 * var(--u));
+}
+
+.topic__body {
+  display: grid;
+  gap: calc(10 * var(--u));
+  margin-top: calc(14 * var(--u));
+  padding: 0 calc(18 * var(--u));
+}
+
+.topic__note {
+  position: relative;
+  display: grid;
+  grid-template-columns: calc(34 * var(--u)) minmax(0, 1fr);
+  align-items: center;
+  column-gap: calc(12 * var(--u));
+  margin: calc(18 * var(--u)) calc(14 * var(--u)) 0;
+  padding: calc(14 * var(--u)) calc(16 * var(--u));
+  isolation: isolate;
+}
+
+.topic__note::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.topic__note-icon {
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+}
+
+.topic__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  margin: calc(18 * var(--u)) calc(18 * var(--u)) 0;
+}
+
+.topic__chip {
+  min-height: calc(34 * var(--u));
+  padding: calc(2 * var(--u)) calc(14 * var(--u)) calc(4 * var(--u));
+}
+
+.explore__leaves {
+  z-index: 0;
+  bottom: calc(-18 * var(--u));
+}
+
+.explore__leaves--left {
+  left: 0;
+}
+
+.explore__leaves--right {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+
+/* ==========================================================================
+   14. SKILLS  (narrow: mobile frame)
+   Intro, then the board with the hint tucked into its top-left corner,
+   then the pieces on a painted green mat.
+   ========================================================================== */
+
+.skills {
+  position: relative;
+  z-index: 8;
+  padding: calc(44 * var(--u)) 0 calc(48 * var(--u));
+  overflow-x: clip;
+}
+
+.skills__edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  width: 100%;
+  height: calc(26 * var(--u));
+  max-width: none;
+  pointer-events: none;
+}
+
+.skills__frame {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "intro"
+    "stage"
+    "pieces";
+  max-width: calc(600 * var(--u));
+  margin: 0 auto;
+  padding: 0 calc(14 * var(--u));
+}
+
+.skills__intro {
+  grid-area: intro;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skills__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skills__main {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  margin-top: calc(-2 * var(--u));
+}
+
+.skills__sparks {
+  width: calc(26 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.skills__text {
+  margin-top: calc(10 * var(--u));
+  max-width: calc(330 * var(--u));
+  padding-left: calc(10 * var(--u));
+  align-self: flex-start;
+}
+
+.skills__hint {
+  grid-area: stage;
+  position: relative;
+  z-index: 3;
+  align-self: start;
+  justify-self: start;
+  width: calc(120 * var(--u));
+  margin-top: calc(26 * var(--u));
+  pointer-events: none;
+}
+
+.skills__hint-piece {
+  height: auto;
+  aspect-ratio: 1;
+  width: calc(50 * var(--u));
+  margin-left: calc(20 * var(--u));
+}
+
+.skills__hint-text {
+  margin-top: calc(6 * var(--u));
+  max-width: calc(108 * var(--u));
+}
+
+.skills__hint-arrow {
+  width: calc(30 * var(--u));
+  margin: calc(2 * var(--u)) 0 0 calc(44 * var(--u));
+}
+
+.board {
+  grid-area: stage;
+  position: relative;
+  height: calc(400 * var(--u));
+  margin: 0 calc(-14 * var(--u));
+}
+
+.board__count {
+  position: absolute;
+  left: 50%;
+  top: calc(6 * var(--u));
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  translate: calc(-50% + calc(50 * var(--u))) 0;
+}
+
+.board__scene {
+  position: absolute;
+  left: calc(4 * var(--u));
+  top: calc(196 * var(--u));
+  width: calc(368 * var(--u));
+  max-width: none;
+}
+
+.board__disc {
+  position: absolute;
+  left: calc(50% - calc(128 * var(--u)) + calc(46 * var(--u)));
+  top: calc(62 * var(--u));
+  width: calc(256 * var(--u));
+  height: calc(256 * var(--u));
+  z-index: 1;
+}
+
+.board__slots {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+
+.board__slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.board__slot:nth-child(1) { grid-area: 1 / 2; }
+.board__slot:nth-child(2) { grid-area: 1 / 3; }
+.board__slot:nth-child(3) { grid-area: 2 / 1; }
+.board__slot:nth-child(4) { grid-area: 2 / 2; }
+.board__slot:nth-child(5) { grid-area: 2 / 3; }
+.board__slot:nth-child(6) { grid-area: 2 / 4; }
+.board__slot:nth-child(7) { grid-area: 3 / 1; }
+.board__slot:nth-child(8) { grid-area: 3 / 2; }
+.board__slot:nth-child(9) { grid-area: 3 / 3; }
+.board__slot:nth-child(10) { grid-area: 3 / 4; }
+.board__slot:nth-child(11) { grid-area: 4 / 2; }
+.board__slot:nth-child(12) { grid-area: 4 / 3; }
+
+/* Corner slots of the 4 x 4 are cut off by the circle, so the empty
+   ones stretch out to fill the corners instead. */
+.board__slot:nth-child(1) { margin-left: -100%; }
+.board__slot:nth-child(2) { margin-right: -100%; }
+.board__slot:nth-child(11) { margin-left: -100%; }
+.board__slot:nth-child(12) { margin-right: -100%; }
+
+.board__tile {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(3 * var(--u));
+  padding: calc(4 * var(--u));
+}
+
+/* Edge tiles keep their content inside the visible part of the circle. */
+.board__slot:nth-child(-n+2) .board__tile { justify-content: flex-end; padding-bottom: 10%; }
+.board__slot:nth-child(n+11) .board__tile { justify-content: flex-start; padding-top: 10%; }
+.board__slot:nth-child(1) .board__tile,
+.board__slot:nth-child(11) .board__tile { padding-left: 50%; }
+.board__slot:nth-child(2) .board__tile,
+.board__slot:nth-child(12) .board__tile { padding-right: 50%; }
+.board__slot:nth-child(3) .board__tile,
+.board__slot:nth-child(7) .board__tile { padding-left: 22%; }
+.board__slot:nth-child(6) .board__tile,
+.board__slot:nth-child(10) .board__tile { padding-right: 22%; }
+
+.board__tile svg {
+  width: 30%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.board__done {
+  position: absolute;
+  right: 4%;
+  top: 4%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: calc(46 * var(--u));
+  height: calc(46 * var(--u));
+}
+
+.board__done svg {
+  width: 60%;
+}
+
+.board__toast {
+  position: absolute;
+  left: 50%;
+  top: calc(330 * var(--u));
+  z-index: 4;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  width: max-content;
+  max-width: calc(100% - calc(24 * var(--u)));
+  padding: calc(6 * var(--u)) calc(6 * var(--u)) calc(6 * var(--u)) calc(14 * var(--u));
+}
+
+.board__blob {
+  position: absolute;
+  right: calc(4 * var(--u));
+  top: calc(296 * var(--u));
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: calc(146 * var(--u));
+  height: calc(94 * var(--u));
+  padding: calc(12 * var(--u)) calc(22 * var(--u)) calc(16 * var(--u));
+}
+
+/* --- Pieces -------------------------------------------------------------- */
+.pieces {
+  grid-area: pieces;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(6 * var(--u)) 0;
+  margin: calc(18 * var(--u)) calc(-6 * var(--u)) 0;
+  padding: calc(18 * var(--u)) calc(8 * var(--u)) calc(22 * var(--u));
+  isolation: isolate;
+}
+
+/* Painted green mat behind the pieces. */
+.pieces::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.pieces__item {
+  position: relative;
+}
+
+.piece {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(2 * var(--u));
+  width: 100%;
+  aspect-ratio: 160 / 110;
+  padding: calc(4 * var(--u)) 12% calc(6 * var(--u));
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.piece__icon {
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+  flex: 0 0 auto;
+}
+
+.piece__label {
+  position: relative;
+  padding-bottom: calc(2 * var(--u));
+}
+
+/* Floating copy that follows the pointer while dragging (main.js). */
+.piece-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+
+/* ==========================================================================
+   15. SKILL SHEET  (native <dialog>)
+   Bottom sheet on narrow screens, centred card on wide ones.
+   ========================================================================== */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.sheet[open] {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet__card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(10 * var(--u)) calc(20 * var(--u)) calc(calc(18 * var(--u)) + env(safe-area-inset-bottom));
+}
+
+.sheet__grab {
+  display: block;
+  width: calc(44 * var(--u));
+  height: calc(5 * var(--u));
+  margin: 0 auto calc(12 * var(--u));
+  touch-action: none;
+}
+
+.sheet__head {
+  display: grid;
+  grid-template-columns: calc(56 * var(--u)) minmax(0, 1fr) calc(46 * var(--u));
+  align-items: center;
+  column-gap: calc(14 * var(--u));
+  padding-bottom: calc(14 * var(--u));
+}
+
+.sheet__tile {
+  display: grid;
+  place-items: center;
+  width: calc(56 * var(--u));
+  height: calc(56 * var(--u));
+}
+
+.sheet__tile svg {
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+}
+
+.sheet__close {
+  display: grid;
+  place-items: center;
+  width: calc(46 * var(--u));
+  height: calc(46 * var(--u));
+}
+
+.sheet__body {
+  padding-top: calc(14 * var(--u));
+}
+
+.sheet__why {
+  margin: calc(6 * var(--u)) 0 calc(16 * var(--u));
+}
+
+.sheet__build {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: calc(10 * var(--u));
+  margin-top: calc(10 * var(--u));
+}
+
+.sheet__build li {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.sheet__build li::before {
+  content: "";
+  flex: 0 0 auto;
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.sheet__foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  margin-top: calc(20 * var(--u));
+}
+
+.sheet__add {
+  position: relative;
+  width: calc(100% - calc(40 * var(--u)));
+  min-height: calc(52 * var(--u));
+  padding: calc(8 * var(--u)) calc(20 * var(--u));
+}
+
+.sheet__later {
+  min-height: 44px;
+  padding: 0 calc(16 * var(--u));
+}
+
+
+/* ==========================================================================
+   16. WIDE LAYOUT FOR GET TO KNOW, SKILLS AND THE SHEET
+   ========================================================================== */
+
+@media (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+
+  /* --- Get to know ------------------------------------------------------ */
+  .explore {
+    min-height: calc(790 * var(--u));
+    padding: 0;
+  }
+
+  .explore__frame {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(1292 * var(--u));
+    height: calc(728 * var(--u));
+    max-width: none;
+    padding: 0;
+    translate: -50% -50%;
+  }
+
+  .explore__intro {
+    position: absolute;
+    left: calc(36 * var(--u));
+    top: calc(112 * var(--u));
+    width: calc(640 * var(--u));
+  }
+
+  .explore__kicker {
+    margin-left: calc(44 * var(--u));
+  }
+
+  .explore__script {
+    margin: calc(-6 * var(--u)) 0 0 calc(-6 * var(--u));
+  }
+
+  .explore__main {
+    margin: calc(-6 * var(--u)) 0 0 calc(36 * var(--u));
+    gap: calc(22 * var(--u));
+  }
+
+  .explore__arrow {
+    width: calc(62 * var(--u));
+    height: calc(20 * var(--u));
+  }
+
+  .explore__text {
+    margin-top: calc(14 * var(--u));
+    max-width: calc(350 * var(--u));
+    padding-left: calc(16 * var(--u));
+  }
+
+  .cw {
+    position: absolute;
+    left: calc(206 * var(--u));
+    top: calc(372 * var(--u));
+    width: calc(530 * var(--u));
+    margin: 0;
+    padding: calc(24 * var(--u)) calc(22 * var(--u));
+  }
+
+  .cw__wash {
+    inset: calc(-10 * var(--u)) calc(-14 * var(--u)) calc(-26 * var(--u)) calc(-12 * var(--u));
+  }
+
+  .cw__bulb {
+    left: calc(-146 * var(--u));
+    top: calc(118 * var(--u));
+    width: calc(92 * var(--u));
+  }
+
+  .cw__streaks {
+    display: block;
+    position: absolute;
+    left: calc(-54 * var(--u));
+    top: calc(34 * var(--u));
+    width: calc(46 * var(--u));
+  }
+
+  .cw__star {
+    left: auto;
+    right: calc(-66 * var(--u));
+    top: auto;
+    bottom: calc(-40 * var(--u));
+    width: calc(98 * var(--u));
+  }
+
+  .panel {
+    position: absolute;
+    left: calc(796 * var(--u));
+    top: calc(140 * var(--u));
+    width: calc(456 * var(--u));
+    max-height: calc(580 * var(--u));
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .panel__head {
+    min-height: calc(60 * var(--u));
+    margin-top: calc(30 * var(--u));
+    padding: calc(8 * var(--u)) calc(34 * var(--u)) calc(10 * var(--u));
+  }
+
+  .panel__cards {
+    gap: calc(18 * var(--u));
+    margin-top: calc(20 * var(--u));
+    padding: calc(18 * var(--u)) calc(34 * var(--u)) calc(34 * var(--u)) calc(36 * var(--u));
+  }
+
+  .word-card {
+    grid-template-columns: calc(78 * var(--u)) minmax(0, 1fr) calc(30 * var(--u));
+    column-gap: calc(16 * var(--u));
+    min-height: calc(78 * var(--u));
+    padding-right: calc(14 * var(--u));
+  }
+
+  .word-card::before {
+    inset: calc(6 * var(--u)) 0 calc(6 * var(--u)) calc(40 * var(--u));
+  }
+
+  .word-card__disc {
+    width: calc(78 * var(--u));
+    height: calc(78 * var(--u));
+  }
+
+  .word-card__disc svg {
+    width: calc(38 * var(--u));
+    height: calc(38 * var(--u));
+  }
+
+  .word-card__go {
+    width: calc(30 * var(--u));
+    height: calc(30 * var(--u));
+  }
+
+  .topic {
+    margin-top: 0;
+    padding-bottom: calc(26 * var(--u));
+  }
+
+  .topic__head {
+    grid-template-columns: calc(38 * var(--u)) minmax(0, 1fr) calc(50 * var(--u));
+    min-height: calc(100 * var(--u));
+    padding: calc(12 * var(--u)) calc(18 * var(--u)) calc(16 * var(--u)) calc(30 * var(--u));
+  }
+
+  .topic__icon {
+    width: calc(36 * var(--u));
+    height: calc(36 * var(--u));
+  }
+
+  .topic__close {
+    width: calc(50 * var(--u));
+    height: calc(50 * var(--u));
+  }
+
+  .topic__title {
+    margin: calc(16 * var(--u)) calc(30 * var(--u)) 0;
+  }
+
+  .topic__body {
+    padding: 0 calc(30 * var(--u));
+  }
+
+  .topic__note {
+    margin: calc(18 * var(--u)) calc(26 * var(--u)) 0;
+  }
+
+  .topic__more {
+    margin: calc(16 * var(--u)) calc(30 * var(--u)) 0;
+  }
+
+
+  /* --- Skills ----------------------------------------------------------- */
+  .skills {
+    min-height: calc(790 * var(--u));
+    padding: 0;
+  }
+
+  .skills__frame {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: block;
+    width: calc(1292 * var(--u));
+    height: calc(728 * var(--u));
+    max-width: none;
+    padding: 0;
+    translate: -50% -50%;
+  }
+
+  .skills__intro {
+    position: absolute;
+    left: calc(50 * var(--u));
+    top: calc(86 * var(--u));
+    width: calc(600 * var(--u));
+    align-items: flex-start;
+  }
+
+  .skills__title {
+    align-items: flex-start;
+  }
+
+  .skills__main {
+    margin: calc(-10 * var(--u)) 0 0 calc(108 * var(--u));
+    gap: calc(12 * var(--u));
+  }
+
+  .skills__sparks {
+    width: calc(42 * var(--u));
+    height: calc(34 * var(--u));
+  }
+
+  .skills__text {
+    margin-top: calc(14 * var(--u));
+    max-width: calc(400 * var(--u));
+    padding-left: calc(16 * var(--u));
+  }
+
+  .skills__hint {
+    position: absolute;
+    left: calc(622 * var(--u));
+    top: calc(92 * var(--u));
+    width: calc(170 * var(--u));
+    margin: 0;
+  }
+
+  .skills__hint-piece {
+    width: calc(96 * var(--u));
+    margin-left: calc(24 * var(--u));
+  }
+
+  .skills__hint-text {
+    max-width: calc(150 * var(--u));
+    margin: calc(4 * var(--u)) 0 0 calc(6 * var(--u));
+  }
+
+  .skills__hint-arrow {
+    width: calc(48 * var(--u));
+    margin: calc(4 * var(--u)) 0 0 calc(76 * var(--u));
+  }
+
+  .board {
+    position: absolute;
+    left: calc(640 * var(--u));
+    top: calc(56 * var(--u));
+    width: calc(652 * var(--u));
+    height: calc(650 * var(--u));
+    margin: 0;
+  }
+
+  .board__count {
+    left: calc(355 * var(--u));
+    top: calc(4 * var(--u));
+    translate: -50% 0;
+  }
+
+  .board__scene {
+    left: 0;
+    top: calc(262 * var(--u));
+    width: calc(682 * var(--u));
+  }
+
+  .board__disc {
+    left: calc(128 * var(--u));
+    top: calc(77 * var(--u));
+    width: calc(455 * var(--u));
+    height: calc(455 * var(--u));
+  }
+
+  .board__done {
+    width: calc(58 * var(--u));
+    height: calc(58 * var(--u));
+  }
+
+  .board__toast {
+    left: calc(262 * var(--u));
+    top: calc(552 * var(--u));
+  }
+
+  .board__blob {
+    left: calc(362 * var(--u));
+    right: auto;
+    top: calc(448 * var(--u));
+    width: calc(244 * var(--u));
+    height: calc(154 * var(--u));
+    padding: calc(22 * var(--u)) calc(40 * var(--u)) calc(30 * var(--u));
+  }
+
+  .pieces {
+    position: absolute;
+    left: calc(40 * var(--u));
+    top: calc(344 * var(--u));
+    width: calc(662 * var(--u));
+    margin: 0;
+    padding: 0;
+    gap: calc(7 * var(--u)) 0;
+  }
+
+  .pieces::before,
+  .pieces::after {
+    display: none;
+  }
+
+  .piece {
+    padding: calc(8 * var(--u)) 14% calc(10 * var(--u));
+    gap: calc(6 * var(--u));
+  }
+
+  .piece__icon {
+    width: calc(42 * var(--u));
+    height: calc(42 * var(--u));
+  }
+
+  /* --- Sheet ------------------------------------------------------------ */
+  .sheet[open] {
+    align-items: center;
+  }
+
+  .sheet__card {
+    width: calc(620 * var(--u));
+    max-width: calc(100% - 48px);
+    max-height: calc(100% - 48px);
+    padding: calc(22 * var(--u)) calc(34 * var(--u)) calc(24 * var(--u));
+  }
+
+  .sheet__grab {
+    display: none;
+  }
+
+  .sheet__head {
+    grid-template-columns: calc(68 * var(--u)) minmax(0, 1fr) calc(60 * var(--u));
+    column-gap: calc(18 * var(--u));
+    padding-bottom: calc(12 * var(--u));
+  }
+
+  .sheet__tile {
+    width: calc(68 * var(--u));
+    height: calc(68 * var(--u));
+  }
+
+  .sheet__tile svg {
+    width: calc(36 * var(--u));
+    height: calc(36 * var(--u));
+  }
+
+  .sheet__close {
+    width: calc(60 * var(--u));
+    height: calc(60 * var(--u));
+  }
+
+  .sheet__build {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(14 * var(--u)) calc(26 * var(--u));
+  }
+
+  .sheet__add {
+    width: calc(520 * var(--u));
+    min-height: calc(62 * var(--u));
+  }
+}
