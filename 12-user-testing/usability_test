@@ -1,0 +1,41 @@
+**User Testing
+
+**Movement to Work — Testing During Prototyping and Development
+
+*Testing Approach
+- Informal usability testing was carried out with approximately five people while the designs were being developed.
+- Participants were shown individual sections and asked to explore the prototype, try interactions and share what felt clear, confusing or difficult to use.
+- Testing was kept conversational rather than following a formal script, allowing people to give straightforward feedback as they used the platform.
+- Feedback was gathered throughout prototyping and continued during implementation, rather than being left until the website was finished.
+
+*Areas Tested
+- Homepage content, navigation and how easily people could find the main sections.
+- Information about the programme, including the two-week journey and how to join.
+- Interactive elements such as the About Us crossword and skills puzzle.
+- Get Job Ready features, including CV feedback, interview practice and questionnaires.
+- Desktop and mobile layouts, focusing on readability, spacing, scrolling and ease of tapping controls.
+
+*Feedback and Common Themes
+- Keeping instructions short and visible helped make interactive sections easier to understand.
+- Smaller screens needed their own layouts rather than scaled-down versions of desktop pages.
+- Important actions and navigation needed to be easy to spot, especially on mobile.
+- Busy sections benefited from clearer spacing, larger text and a more obvious order of information.
+- Testing the interactions themselves was useful alongside reviewing how the screens looked.
+
+*Changes Made During Prototyping
+- Mobile layouts were adjusted to stack content vertically and make better use of narrow screens.
+- The two-week programme journey was adapted into a vertical mobile timeline rather than relying on desktop-style horizontal scrolling.
+- The skills activity was arranged as a visible grid on mobile, with tapping considered as the main alternative to drag-and-drop.
+- Navigation for CV Review and other Get Job Ready tools was adapted into a collapsible mobile panel.
+- Cards, buttons and supporting text were reviewed for size, spacing and legibility, including the Join Now and FAQ sections.
+
+*Testing During Implementation
+- The same approach continues as working screens replace the Figma prototypes.
+- Testing now focuses on whether buttons, menus, progress indicators and tools behave as expected on desktop and mobile.
+- Changes are made as issues are noticed, then checked again to see whether the experience is clearer.
+- Further checks are still needed across different devices, especially for keyboard use, smaller screens and the longer interactive flows.
+
+**Overall Outcome
+- User feedback has been used to guide small, ongoing improvements rather than one large redesign at the end.
+- The main focus has been making the platform easier to understand and navigate while keeping its visual style and interactive features.
+- This is informal feedback from a small group, so it helps identify usability issues but does not prove that every user will have the same experience.
