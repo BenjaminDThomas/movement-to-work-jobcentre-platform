@@ -63,7 +63,7 @@
     o('tech', 'Technology and IT'), o('business', 'Business and administration'), o('creative', 'Creative and digital'),
     o('engineering', 'Engineering and manufacturing'), o('construction', 'Construction and trades'),
     o('care', 'Health and social care'), o('retail', 'Retail and customer service'), o('hospitality', 'Hospitality'),
-    o('education', 'Education and community'), o('logistics', 'Logistics and transport'),
+    o('education', 'Education and community'), o('logistics', 'Warehousing, logistics and transport'),
     o('outdoor', 'Environmental and outdoor work'), o('exploring', 'Still exploring')
   ];
 
@@ -162,7 +162,7 @@
         { id: 'w1', type: 'single', text: 'Do you prefer working independently or as part of a team?', options: [
           o('independent', 'Independently'), o('team', 'As part of a team'), o('mix', 'A mix of both')] },
         { id: 'w2', type: 'multi', max: 2, text: 'Which type of environment sounds most appealing?', help: 'Select up to 2.', options: [
-          o('office', 'Office'), o('workshop', 'Workshop'), o('outdoors', 'Outdoors'), o('retail', 'Shop or retail'),
+          o('office', 'Office'), o('workshop', 'Workshop'), o('warehouse', 'Warehouse or factory floor'), o('outdoors', 'Outdoors'), o('retail', 'Shop or retail'),
           o('community', 'Community setting'), o('remote', 'Remote or hybrid, where available'), o('any', 'No strong preference')] },
         { id: 'w3', type: 'single', text: 'Do you enjoy practical or computer-based tasks?', options: [
           o('practical', 'Practical, hands-on tasks'), o('computer', 'Computer-based tasks'), o('both', 'Both')] },

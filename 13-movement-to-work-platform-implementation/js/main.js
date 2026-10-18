@@ -226,6 +226,7 @@
     // the section you chose: one animation, then the section, no jump.
     // (It used to fade, then lose the fade class while still on screen,
     // which made the menu reappear and play its close a second time.)
+    stopAutoplay();
     var y = target.getBoundingClientRect().top + window.scrollY;
     if (id === 'home') {
       y = 0;
@@ -818,6 +819,9 @@
     var since = performance.now();
     pending = play;
     function check(now) {
+      if (!pending) {
+        return;    // cancelled (a menu link was chosen meanwhile)
+      }
       if (now - lastInputAt >= QUIET_MS || now - since > 360) {
         var fn = pending;
         pending = null;
@@ -829,6 +833,21 @@
     window.requestAnimationFrame(check);
   }
   var REWIND_MS = 1700;    // back up to the hero (no mask)
+
+  /** Stop any hand-over or glide that is playing or waiting to play, and
+   *  hand scrolling straight back to the reader. Used when a menu link is
+   *  chosen part-way through one, so the page goes where they asked rather
+   *  than carrying on to where the animation was heading. */
+  function stopAutoplay() {
+    auto = null;
+    outroAuto = null;
+    nextAuto = null;
+    pending = null;
+    tween = null;
+    lockUntil = 0;
+    inTail = false;
+    doc.classList.remove('is-autoplaying', 'is-rewinding');
+  }
 
   function introEnd() {
     return intro.offsetTop + intro.offsetHeight - window.innerHeight;
@@ -853,9 +872,10 @@
     var span = Math.max(end - intro.offsetTop, 1);
     var duration = Math.max(900, (dir > 0 ? AUTO_MS : REWIND_MS) * dist / span);
     var start = null;
+    var mine = null;
     whenSettled(function () {
       from = window.scrollY;
-      auto = { to: to };
+      mine = auto = { to: to };
       window.requestAnimationFrame(step);
     });
     doc.classList.add('is-autoplaying');
@@ -863,6 +883,9 @@
     doc.classList.toggle('is-rewinding', dir < 0);
 
     function step(now) {
+      if (auto !== mine) {
+        return;    // stopped: the reader chose somewhere else to go
+      }
       if (start === null) {
         start = now;
       }
@@ -2224,12 +2247,16 @@
       from = window.scrollY;
       to = outroEnd();
       ms = Math.max(900, OUTRO_MS * (to - from) / span);
-      outroAuto = {};
+      mine = outroAuto = {};
       window.requestAnimationFrame(step);
     });
+    var mine = null;
     doc.classList.add('is-autoplaying');
     doc.classList.remove('is-ready-rewinding');
     function step(now) {
+      if (outroAuto !== mine) {
+        return;    // stopped: the reader chose somewhere else to go
+      }
       if (start === null) {
         start = now;
       }
@@ -3259,8 +3286,104 @@
     });
   }
 
+  // A short message at the foot of the screen (a tool that failed to load).
+  var toastTimer = 0;
+  function toolToast(text) {
+    var el = document.querySelector('.page-toast');
+    if (!el) {
+      el = document.createElement('p');
+      el.className = 'page-toast';
+      el.setAttribute('role', 'status');
+      document.body.appendChild(el);
+    }
+    el.textContent = text;
+    el.classList.add('is-shown');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(function () {
+      el.classList.remove('is-shown');
+    }, 5000);
+  }
+
+  /* Coming back to a tool you have used: the card shows where you got to
+     (read from this browser only, the same saved data the tool itself
+     uses) and the button says "Continue". Refreshed when a tool closes. */
+  function initToolProgress() {
+    var cards = {
+      interview: document.querySelector('[data-tool="interview"]'),
+      strengths: document.querySelector('[data-tool="strengths"]')
+    };
+    var original = {};
+    Object.keys(cards).forEach(function (k) {
+      var card = cards[k];
+      if (!card) {
+        return;
+      }
+      var pill = card.querySelector('.tool__time span');
+      var btn = card.querySelector('.tool__btn');
+      original[k] = { pill: pill ? pill.textContent : '', btn: btn ? btn.firstChild.textContent : '' };
+    });
+
+    function read(key) {
+      try {
+        return JSON.parse(window.localStorage.getItem(key) || 'null');
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function set(k, pillText, btnText) {
+      var card = cards[k];
+      if (!card) {
+        return;
+      }
+      var pill = card.querySelector('.tool__time span');
+      var btn = card.querySelector('.tool__btn');
+      if (pill) {
+        pill.textContent = pillText || original[k].pill;
+      }
+      if (btn && btn.firstChild && btn.firstChild.nodeType === 3) {
+        btn.firstChild.textContent = (btnText || original[k].btn.trim()) + ' ';
+      }
+      card.classList.toggle('has-progress', !!pillText);
+    }
+
+    function refresh() {
+      var profile = read('mtw-profile-v1');
+      var answered = profile && profile.answers ? Object.keys(profile.answers).length : 0;
+      if (profile && typeof profile.done === 'number' && profile.done >= (profile.total || 7)) {
+        set('strengths', 'Profile ready', 'View your profile');
+      } else if (answered) {
+        set('strengths', typeof profile.done === 'number' ? profile.done + ' of ' + (profile.total || 7) + ' done' : 'In progress',
+          'Continue your profile');
+      } else {
+        set('strengths', '', '');
+      }
+      var saving = false;
+      try {
+        saving = window.localStorage.getItem('mtw-interview-save') === '1';
+      } catch (e) { /* not saved */ }
+      var iv = saving ? read('mtw-interview-v1') : null;
+      var last = iv && iv.history && iv.history.length ? iv.history[iv.history.length - 1] : null;
+      if (last && typeof last.score === 'number') {
+        set('interview', 'Scored ' + last.score, 'Practise again');
+      } else {
+        set('interview', '', '');
+      }
+    }
+
+    refresh();
+    ['[data-ivw]', '[data-qnw]'].forEach(function (sel) {
+      var d = document.querySelector(sel);
+      if (d) {
+        d.addEventListener('close', refresh);
+      }
+    });
+    window.addEventListener('storage', refresh);
+  }
+
   function initTools() {
     initDataCss();
+    initToolProgress();
 
     // Capture phase, so this runs before the tool's own click handler
     // (which only exists once its script has arrived).
@@ -3281,6 +3404,7 @@
           opener.click();
         }, function () {
           opener.removeAttribute('aria-busy');
+          toolToast('That tool could not load. Check your connection and try again.');
         });
         return true;
       });

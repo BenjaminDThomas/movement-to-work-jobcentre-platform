@@ -1,0 +1,3 @@
+# Cloudflare Pages: the site lives in /frontend, so the bare address goes there.
+/              /frontend/   301
+/index.html    /frontend/   301

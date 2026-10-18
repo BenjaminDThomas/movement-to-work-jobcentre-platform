@@ -25,30 +25,45 @@
     summary: [
       'summary', 'professional summary', 'personal summary', 'profile', 'personal profile',
       'professional profile', 'career profile', 'about me', 'personal statement', 'career summary',
-      'career objective', 'objective', 'objectives', 'introduction'
+      'career objective', 'objective', 'objectives', 'introduction', 'about', 'overview', 'career aim',
+      'career aims', 'career goals', 'my goals', 'professional statement'
     ],
     experience: [
       'experience', 'work experience', 'employment', 'employment history', 'professional experience',
       'work history', 'career history', 'relevant experience', 'work placements', 'placements',
       'employment experience', 'volunteering', 'volunteer experience', 'voluntary work',
-      'volunteering experience', 'internships', 'internship', 'experience and volunteering'
+      'volunteering experience', 'internships', 'internship', 'experience and volunteering',
+      'professional background', 'work background', 'employment background', 'career background',
+      'career experience', 'previous employment', 'previous experience', 'employment record', 'work record',
+      'positions held', 'jobs', 'paid work', 'part-time work', 'part time work', 'part-time jobs',
+      'work experience and placements', 'placements and work experience', 'industry experience',
+      'experience to date', 'where i have worked', 'voluntary experience', 'community work'
     ],
     education: [
       'education', 'qualifications', 'education and qualifications', 'education & qualifications',
       'academic background', 'academic qualifications', 'education and training', 'education & training',
-      'training', 'academic history', 'schooling'
+      'training', 'academic history', 'schooling', 'school', 'schools', 'school and college',
+      'education history', 'educational background', 'education background', 'educational history',
+      'qualifications and training', 'training and development', 'professional development', 'cpd', 'studies'
     ],
     skills: [
       'skills', 'key skills', 'technical skills', 'core skills', 'skills and abilities', 'skills & abilities',
       'competencies', 'core competencies', 'key competencies', 'abilities', 'skills summary',
       'transferable skills', 'it skills', 'digital skills', 'skills and interests', 'strengths', 'key strengths',
-      'skills and tools', 'tools', 'toolkit', 'software', 'tech stack', 'technical expertise', 'areas of expertise'
+      'skills and tools', 'tools', 'toolkit', 'software', 'tech stack', 'technical expertise', 'areas of expertise',
+      'skills profile', 'skills overview', 'skill set', 'skillset', 'my skills', 'what i can offer',
+      'what i bring', 'key skills and attributes', 'skills and qualities', 'personal skills', 'practical skills',
+      'it and digital skills', 'computer skills', 'attributes', 'key attributes', 'qualities'
     ],
     other: [
       'interests', 'hobbies', 'hobbies and interests', 'hobbies & interests', 'achievements', 'awards',
       'achievements and awards', 'references', 'referees', 'languages', 'certifications', 'certificates',
       'courses', 'projects', 'additional information', 'activities', 'extracurricular activities',
-      'memberships', 'licences', 'driving licence', 'publications'
+      'memberships', 'licences', 'driving licence', 'publications', 'licences and certificates',
+      'certificates and licences', 'licences and tickets', 'tickets', 'training and tickets', 'cards and tickets',
+      'certifications and training', 'courses and certifications', 'certifications and licences',
+      'key achievements', 'accomplishments', 'interests and hobbies', 'personal interests', 'other information',
+      'further information', 'clubs and societies', 'awards and certificates'
     ]
   };
 
@@ -83,7 +98,13 @@
     'applied utilised utilized employed adopted assisted aided served handled processed welcomed ' +
     'resolved escalated logged scheduled booked invoiced audited reconciled forecasted presented ' +
     'pitched negotiated sourced procured researched surveyed tested user-tested piloted rolled ' +
-    'introduced spearheaded championed mentored coached onboarded trained inducted supervised'
+    'introduced spearheaded championed mentored coached onboarded trained inducted supervised ' +
+    'took mixed dealt priced opened closed counted covered kept baked prepped plated washed served ' +
+    'replenished rotated unpacked received dispatched despatched labelled labeled scanned weighed ' +
+    'wired plastered painted decorated laid dug installed safeguarded escorted patrolled responded ' +
+    'de-escalated upsold cross-sold hit beat met cashed merchandised refilled fed bathed dressed ' +
+    'accompanied comforted reassured listened advertised posted answered ordered stocktook audited ' +
+    'demonstrated volunteered fundraised campaigned refereed captained umpired performed competed'
   ).split(/\s+/);
 
   // Alternatives to suggest when a verb is overused.
@@ -272,7 +293,33 @@
   }
 
   function stripBullet(line) {
-    return line.replace(/^[\s•●▪■‣⁃∙·*\-–\u2014>➢✓✔o]+\s*/, '');
+    // A lone "o" (a common Word bullet) only counts when a space follows,
+    // so "organisation" keeps its first letter.
+    return line.replace(/^(?:[\s•●▪■‣⁃∙·*\-–\u2014>➢➤►▸◦○✓✔]+|o\s+)+/, '');
+  }
+
+  /** Split a list on commas, semicolons, pipes and bullets, but not inside
+   *  brackets: "Microsoft Office (Word, Excel), Git" is two items. */
+  function splitList(body) {
+    var out = [];
+    var depth = 0;
+    var cur = '';
+    for (var i = 0; i < body.length; i++) {
+      var ch = body.charAt(i);
+      if (ch === '(' || ch === '[') {
+        depth += 1;
+      } else if ((ch === ')' || ch === ']') && depth) {
+        depth -= 1;
+      }
+      if (!depth && /[,;|•●·]/.test(ch)) {
+        out.push(cur);
+        cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    out.push(cur);
+    return out.map(function (x) { return x.trim(); }).filter(Boolean);
   }
 
   /** A point that opens with a short label, such as "Front-End
@@ -289,7 +336,7 @@
    *  "Figma, HTML, CSS, JavaScript" or "Tools: Excel, Word, Outlook". */
   function isListLine(l) {
     var body = dropLabel(stripBullet(l));
-    var items = body.split(/\s*[,;|•·]\s*/).filter(Boolean);
+    var items = splitList(body);
     if (items.length < 3) {
       return false;
     }
@@ -331,10 +378,10 @@
     ['experience', /\bexperience\b|\bemployment\b|\bwork history\b|\bcareer history\b|\bcareer\b|\bplacements?\b|\binternships?\b|\bvolunteer|\bjobs\b|\broles\b|\bwork\b/],
     ['education', /\beducation\b|\bqualifications?\b|\bacademic|\btraining\b|\bcertificat|\bstudies\b|\bschooling\b|\bcourses?\b/],
     ['summary', /\bsummary\b|\bprofile\b|\babout me\b|\babout\b|\bpersonal statement\b|\bobjectives?\b|\bintroduction\b|\bbio\b/],
-    ['other', /\binterests?\b|\bhobbies\b|\bawards?\b|\bachievements?\b|\breferences?\b|\breferees\b|\blanguages?\b|\bprojects?\b|\bportfolio\b|\bactivities\b|\bpublications?\b|\bmemberships?\b|\blicen[cs]es?\b/]
+    ['other', /\binterests?\b|\bhobbies\b|\bawards?\b|\bachievements?\b|\breferences?\b|\breferees\b|\blanguages?\b|\bprojects?\b|\bportfolio\b|\bactivities\b|\bpublications?\b|\bmemberships?\b|\blicen[cs]es?\b|\btickets\b|\baccomplishments\b/]
   ];
   // Words a heading can end in (after qualifiers such as "tools").
-  var ENDINGS = /(skills?|competencies|expertise|toolkit|tools|capabilities|strengths|experience|employment|history|placements?|internships?|volunteering|education|qualifications?|training|certifications?|certificates|courses|summary|profile|statement|objectives?|interests|hobbies|awards|achievements|references|referees|languages|projects|portfolio|activities|publications|memberships|licences|licenses)$/;
+  var ENDINGS = /(skills?|competencies|expertise|toolkit|tools|capabilities|strengths|experience|employment|history|placements?|internships?|volunteering|education|qualifications?|training|certifications?|certificates|courses|summary|profile|statement|objectives?|interests|hobbies|awards|achievements|references|referees|languages|projects|portfolio|activities|publications|memberships|licences|licenses|tickets|accomplishments)$/;
   function headingKind(line, styled) {
     var raw = line.replace(/^[\s#*\-•|=_~>]+|[\s#*\-•|=_~]+$/g, '');
     var colon = /:\s*$/.test(raw);
@@ -373,7 +420,7 @@
     var titled = raw.split(/\s+/).every(function (w) {
       return !/^[a-z]/.test(w) || /^(and|of|in|at|for|to|the|&)$/.test(w);
     });
-    var strong = /^(skills|experience|employment|history|education|qualifications|summary|profile|interests|achievements|projects|certifications|languages|references)$/.test(end[0]);
+    var strong = /^(skills|experience|employment|history|education|qualifications|summary|profile|interests|achievements|accomplishments|projects|certifications|certificates|licences|licenses|tickets|languages|references)$/.test(end[0]);
     if (shouting || colon || styled || (titled && strong && count <= 7)) {
       for (i = 0; i < SECTION_WORDS.length; i++) {
         if (SECTION_WORDS[i][1].test(end[0])) {
@@ -412,7 +459,7 @@
         if (!location) {
           // Each piece between separators is checked on its own, with notes
           // in brackets such as "(Open to Relocation)" left out.
-          l.split(/\s*[|•·]\s*|\s{3,}/).some(function (part) {
+          l.split(/\s*[|•·]\s*|\s+\/\s+|\s{3,}/).some(function (part) {
             var rest = part.replace(EMAIL_RE, ' ').replace(PHONE_RE, ' ').replace(LINKEDIN_RE, ' ')
               .replace(/https?:\/\/\S+|\b[\w\-]+\.(com|co\.uk|net|org|app|io|dev|me|uk)\b\S*/gi, ' ')
               .replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim().replace(/^[,\s]+|[,\s]+$/g, '');
@@ -444,8 +491,12 @@
     return l.toLowerCase().replace(/\s+/g, ' ').trim();
   }
 
-  var RANGE_RE = new RegExp('((' + MONTHS + ')\\.?\\s+)?((19|20)\\d{2}|\\b\\d{1,2}\\/(19|20)\\d{2})\\s*(-|–|\u2014|to|until)\\s*' +
-    '(((' + MONTHS + ')\\.?\\s+)?((19|20)\\d{2}|\\d{1,2}\\/(19|20)\\d{2})|present|current|now|date|ongoing)', 'i');
+  // A point in time: "Jun 2023", "June '23", "Jan 22", "Summer 2022",
+  // "06/2023" or "2023". A range is two of these, or one and "Present".
+  var MONTH_YEAR = '(?:(?:' + MONTHS + ')\\.?\\s+(?:(?:19|20)\\d{2}|\'?\\d{2}\\b))';
+  var WHEN = '(?:' + MONTH_YEAR + '|(?:spring|summer|autumn|winter)\\s+(?:19|20)\\d{2}|\\b\\d{1,2}\\/(?:19|20)?\\d{2}\\b|(?:19|20)\\d{2})';
+  var RANGE_RE = new RegExp(WHEN + '\\s*(?:-|–|\u2014|to|until|till)\\s*(?:' + WHEN +
+    '|present|current|now|date|ongoing|today)', 'i');
   var QUAL_RE = /\b(gcses?|a[\s\-]levels?|as level|btec|nvq|hnc|hnd|bsc|b\.sc|ba|b\.a|msc|m\.sc|ma|mba|phd|pgce|degree|diploma|t[\s\-]level|foundation year|access to|level [1-7]|functional skills|(first|2:1|2:2|third)[\s\-]class|honours|\(hons\))\b/i;
   var CONTACT_RE = /@|https?:|www\.|linkedin\.com|github\.com|\+?\d[\d\s]{8,}/i;
 
@@ -456,7 +507,7 @@
     }
     var body = stripBullet(l);
     var group = body.match(/^([^:]{2,45}):\s*(.+)$/);
-    if (group && wordCount(group[1]) <= 6 && group[2].split(/\s*[,;|•·]\s*/).length >= 2) {
+    if (group && wordCount(group[1]) <= 6 && splitList(group[2]).length >= 2) {
       return true;
     }
     return isListLine(l);
@@ -648,7 +699,9 @@
       if (label) {
         body = label[2];
       }
-      body.split(/\s*[,;|•●·]\s*|\s+[–\u2014]\s+/).forEach(function (s) {
+      [].concat.apply([], splitList(body).map(function (part) {
+        return part.split(/\s+[–\u2014]\s+/);
+      })).forEach(function (s) {
         var item = stripBullet(s).replace(/^(and|&)\s+/i, '').replace(/[.:]+$/, '').trim();
         if (item && item.length <= 60 && /[A-Za-z]/.test(item)) {
           out.push(item);
@@ -656,6 +709,33 @@
       });
     });
     return out;
+  }
+
+  // Words that say nothing about which skill it is.
+  var SKILL_GENERIC = ('skills skill good strong basic advanced excellent knowledge awareness understanding ' +
+    'ability abilities experience time level working work using use of the and with in for to a an ' +
+    'microsoft').split(' ');
+  function stem(w) {
+    return w.length > 5 ? w.slice(0, 5) : w.replace(/(ing|ed|es|s)$/, '');
+  }
+
+  /** Whether a listed skill shows up in the writing: the whole phrase, or
+   *  at least half of its telling words (any form of them). */
+  function skillEvidenced(skill, evidence) {
+    var low = skill.toLowerCase();
+    if (low.length > 2 && countPhrase(evidence, low.replace(/\s*\(.*$/, '')) > 0) {
+      return true;
+    }
+    var have = {};
+    words(evidence).forEach(function (w) { have[stem(w)] = true; });
+    var keys = words(low).filter(function (w) {
+      return w.length >= 3 && SKILL_GENERIC.indexOf(w) === -1 && STOP.indexOf(w) === -1;
+    });
+    if (!keys.length) {
+      return false;
+    }
+    var hit = keys.filter(function (w) { return have[stem(w)]; }).length;
+    return hit >= Math.ceil(keys.length / 2);
   }
 
   /** The same skill listed more than once (ignoring case and spacing). */
@@ -725,11 +805,14 @@
     var re = {
       'Month Year (short)': new RegExp('\\b(jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\\.?\\s+(19|20)\\d{2}\\b', 'gi'),
       'Month Year (full)': /\b(january|february|march|april|june|july|august|september|october|november|december)\s+(19|20)\d{2}\b/gi,
+      'Month and two-digit year': new RegExp('\\b(' + MONTHS + ')\\.?\\s+\'?\\d{2}\\b(?!\\d)', 'gi'),
       'MM/YYYY': /\b(0?[1-9]|1[0-2])[\/\-.](19|20)\d{2}\b/g,
       'Year only': /(^|[^\/\d])(19|20)\d{2}\s*[\-–\u2014to]+\s*((19|20)\d{2}|present|current|now)\b/gi
     };
+    // Years that follow a month belong to that month, not to "Year only".
+    var bare = text.replace(new RegExp('\\b(' + MONTHS + ')\\.?\\s+(19|20)\\d{2}', 'gi'), ' M ');
     Object.keys(re).forEach(function (k) {
-      var n = (text.match(re[k]) || []).length;
+      var n = ((k === 'Year only' ? bare : text).match(re[k]) || []).length;
       if (n) {
         styles[k] = n;
       }
@@ -740,7 +823,7 @@
   /** Lines in a section that look like the start of a job or course:
    *  they hold a date. */
   function dateLines(text) {
-    var re = new RegExp('\\b(' + MONTHS + ')\\.?\\s+(19|20)\\d{2}\\b|\\b(19|20)\\d{2}\\b|\\b\\d{1,2}[\\/\\-.](19|20)\\d{2}\\b', 'i');
+    var re = new RegExp(MONTH_YEAR + '|\\b(19|20)\\d{2}\\b|\\b\\d{1,2}[\\/\\-.](19|20)\\d{2}\\b', 'i');
     return lines(text).filter(function (l) { return re.test(l); });
   }
 
@@ -775,13 +858,25 @@
    *  left out, wrapped lines are joined, and every form of a verb counts
    *  as that verb ("Organising" and "Organised" are both "organised"). */
   function openingVerbs(text) {
-    var dated = new RegExp('\\b(' + MONTHS + ')\\b.*\\b(19|20)\\d{2}\\b|\\b(19|20)\\d{2}\\b|\\b\\d{1,2}\\/(19|20)?\\d{2}\\b|\\bpresent\\b', 'i');
+    var dated = new RegExp('\\b(' + MONTHS + ')\\b.*\\b(19|20)\\d{2}\\b|' + MONTH_YEAR + '|\\b(19|20)\\d{2}\\b|\\b\\d{1,2}\\/(19|20)?\\d{2}\\b|\\bpresent\\b', 'i');
     var counts = {};
     var examples = {};
     var opened = 0;
     var points = [];
+    var prose = 0;
+    var units = [];
     logicalLines(text).forEach(function (l) {
-      var clean = stripBullet(l);
+      var parts = stripBullet(l).split(/(?:[.!?])\s+(?=[A-Z])/);
+      if (parts.length > 1 && wordCount(l) >= 12) {
+        prose += 1;
+        parts.forEach(function (p) { units.push(p.replace(/[.!?]+$/, '')); });
+      } else {
+        units.push(l);
+      }
+    });
+    units.forEach(function (l) {
+      var clean = stripBullet(l).replace(/^(i|we)\s+(also\s+|then\s+|often\s+|regularly\s+|sometimes\s+|would\s+)?/i, '');
+      clean = clean.charAt(0).toUpperCase() + clean.slice(1);
       if (wordCount(clean) < 4 || isRoleLine(l, dated) || isListLine(l)) {
         return;
       }
@@ -797,7 +892,7 @@
       counts.responsible = countPhrase(text, 'responsible for');
       examples.responsible = logicalLines(text).filter(function (l) { return /responsible for/i.test(l); }).map(stripBullet);
     }
-    return { counts: counts, examples: examples, opened: opened, bullets: points.length, points: points };
+    return { counts: counts, examples: examples, opened: opened, bullets: points.length, points: points, prose: prose };
   }
 
   /** Three-word phrases repeated three or more times. */
@@ -1030,7 +1125,9 @@
         add('experience', 'good', 'exp-verbs', 'Strong action verbs', verbs.opened + ' of your ' + verbs.bullets + ' points start with a clear action verb.');
       } else {
         add('experience', 'tip', 'exp-verbs', 'Use more action verbs',
-          'Only ' + verbs.opened + ' of your ' + verbs.bullets + ' points start with an action verb such as "Organised" or "Delivered".', {
+          (verbs.bullets === 1 ? 'Your point does not start' : verbs.opened ?
+            'Only ' + verbs.opened + ' of your ' + verbs.bullets + ' points start' : 'None of your ' + verbs.bullets + ' points start') +
+          ' with an action verb such as "Organised" or "Delivered".', {
             why: 'Starting with a verb makes it clear what you did, not just what the job was.',
             steps: ['Start each point with a verb: Organised, Delivered, Supported, Created, Improved.'],
             options: ['Organised', 'Delivered', 'Supported', 'Created', 'Improved', 'Coordinated'],
@@ -1052,6 +1149,16 @@
             steps: ['Add a number to two or three of your points: how many, how often, how much, or by what percentage.'],
             examples: results.map(function (r) { return r.line; })
           });
+      }
+
+      // Written as a paragraph rather than points: still read sentence by
+      // sentence above, but points are quicker for an employer to scan.
+      var bulletedExp = lines(cv.experience).some(function (l) { return stripBullet(l) !== l; });
+      if (verbs.prose && !bulletedExp) {
+        add('experience', 'tip', 'exp-bullets', 'Use bullet points', 'Your experience is written as sentences in a paragraph.', {
+          why: 'Employers skim a CV in seconds. Short points are easier to scan than a paragraph.',
+          steps: ['Put each task or achievement on its own line, starting with a verb: "Served up to 60 tables a shift".']
+        });
       }
 
       var expLines = verbs.points;
@@ -1150,8 +1257,7 @@
     });
     var evidenceText = (cv.experience + '\n' + cv.summary).toLowerCase();
     var used = skills.filter(function (s) {
-      var low = s.toLowerCase();
-      return low.length > 2 && countPhrase(evidenceText, low) > 0;
+      return skillEvidenced(s, evidenceText);
     });
     if (!hasSkills && !quality.skills.ok && cv.skills.trim()) {
       // Reported above as repeated or placeholder text.

@@ -55,13 +55,16 @@
   // Setting the scene (STAR: Situation).
   var SITUATION = /\b(when i|while i|during|at (my|the|our|a) |at (college|school|uni|university|work|home)|last (year|summer|term|month|week|christmas)|this (year|summer|term)|in my (first|last|final|previous|second|old)|on my (placement|work experience|course)|once|one day|one time|a few (days|weeks|months|years) ago|there was|we had (a|an|to)|i was (working|volunteering|studying|helping|at|on|in)|in year \d+|in 20\d\d)\b/i;
   // What needed doing (STAR: Task).
-  var TASK = /\b(i (needed|had|was asked|was responsible|was supposed|was tasked|wanted|offered|decided|volunteered|agreed|chose) to|my (job|role|task|responsibility|goal|aim|part) (was|were|is)|i was (in charge|responsible|asked)|the (goal|aim|task|challenge|problem|plan) was|we (needed|had|wanted) to|it was my job|i had (the|a) (job|task|role))\b/i;
+  var TASK = /\b(i (needed|had|was asked|was responsible|was supposed|was tasked|wanted|offered|decided|volunteered|agreed|chose) to|my (job|role|task|responsibility|goal|aim|part) (was|were|is)|i was (in charge|responsible|asked)|the (goal|aim|task|challenge|problem|plan|issue) was|we (needed|had|wanted) to|it was my job|i had (the|a) (job|task|role)|i was (put|left) in charge|put me in charge|(asked|told|wanted|needed|trusted) me to|it was (up to|down to) me|i (took on|stepped up|offered|volunteered)|i was given|(had|needed) to [a-z]+|we were (asked|told|given)|(was|were) due|deadline|(had gone|went|was|were) missing|(wasn'?t|weren'?t|was not|were not) working|kept (jamming|breaking|crashing|failing|going wrong|happening)|there was a problem|i'?d never|i had never|i hadn'?t (done|used|worked|been)|for the first time|i was new to)\b/i;
   // What happened (STAR: Result) and outcomes in general.
-  var RESULT = /\b(as a result|in the end|eventually|which (meant|helped|led|made|showed)|this (meant|helped|led|made|showed)|that (meant|helped|led|made)|the (result|outcome) (was|is)|we (achieved|won|finished|completed|raised|passed|got|managed|hit|met|reached)|i (achieved|passed|got|won|finished|completed|managed|reached|met|received|earned|gained)|it (worked|helped|went well|paid off)|now i|since then|successfully|feedback|managed to|ended up|was able to|were able to|improved|reduced|increased|saved|on time|ahead of|praised|thanked|asked me to|kept the idea|recognised|recognized)\b/i;
+  var RESULT = /\b(as a result|in the end|eventually|which (meant|helped|led|made|showed)|this (meant|helped|led|made|showed)|that (meant|helped|led|made)|the (result|outcome) (was|is)|we (achieved|won|finished|completed|raised|passed|got|managed|hit|met|reached)|i (achieved|passed|got|won|finished|completed|managed|reached|met|received|earned|gained)|it (worked|helped|went well|paid off)|now i|since then|successfully|feedback|managed to|ended up|was able to|were able to|improved|reduced|increased|saved|on time|ahead of|praised|thanked|asked me to|kept the idea|recognised|recognized|reviews?|five[- ]star|5[- ]star|compliment(ed|s)?|commended|merit|distinctions?|top (grade|mark)|grades?|promoted|employee of the month|by the end|after that|from then on|no (more|complaints|mistakes)|stopped|sold out|came back|pleased|happy with|grateful|confident enough|within (a|an|one|two|three|four|five|six|\d+) (days?|weeks?|months?)|went (really |very )?well|turned out|beat (the|my|our) target|hit (the|my|our) target|on target)\b/i;
   // Looking back (reflection).
   var REFLECT = /\b(i (learned|learnt|realised|realized|discovered|now know|understood|found out)|i('ve| have) learned|taught me|showed me|made me (realise|realize|see|more)|next time|since then|from now on|i would (do|change|now)|i('d| would) do (it )?differently|it helped me|helped me (to )?(see|understand|learn|grow|become|improve)|i('m| am) (now )?(more|better))\b/i;
   // A concrete example.
-  var EXAMPLE = /\b(for example|for instance|such as|when i|during|at (college|school|uni|university|work)|on my (placement|work experience|course)|last (year|summer|term|month|week)|one time|once|in my (job|role|placement|volunteering|course|last|previous|old)|while i was|i remember|at my (job|placement|school|college|last)|at (a|the) [a-z]+ (shop|cafe|café|club|centre|center|school|college|placement|job|charity|company|restaurant|store|bank|team|event)|volunteering (at|with|for)|from (college|school|university|my)|(group|college|school|class) projects?)\b/gi;
+  var EXAMPLE = /\b(for example|for instance|such as|when i|during|at (college|school|uni|university|work)|on my (placement|work experience|course)|last (year|summer|term|month|week)|one time|once|in my (job|role|placement|volunteering|course|last|previous|old)|while i was|i remember|at my (job|placement|school|college|last)|at (a|the) [a-z]+ (shop|cafe|café|club|centre|center|school|college|placement|job|charity|company|restaurant|store|bank|team|event)|volunteering (at|with|for)|from (college|school|university|my)|(group|college|school|class) projects?|back in|in year (7|8|9|10|11|12|13)|for my (btec|coursework|course|a ?levels?|gcses?|exams?|project|placement|job|dissertation|degree|apprenticeship|dofe|duke of edinburgh)|in my (first|last|second|final) (week|month|year|day|shift|job|term)|at my (school|college|uni|placement|job|work|last job|part-time job|saturday job|old job)|during my|on (a|my|our) (shift|placement|trip|course|work experience)|(at|in) the (shop|store|café|cafe|restaurant|pub|warehouse|office|care home|hospital|gym|club|food bank|charity shop|stall|fair)|where i (work|worked|volunteer|volunteered))\b/gi;
+  // Named places: "at Greggs", "for Tesco", "In Year 12". Case matters here,
+  // so it is checked on the answer as written.
+  var NAMED = /\b(at|for|with|in) (?!I\b)[A-Z][A-Za-z&']{2,}/g;
   // Reasons and support for a point.
   var REASON = /\b(because|so that|which means|this means|that means|for example|for instance|such as|that'?s why|this is why|which is why|since|so i|as a result|to make sure|which helps|this helps)\b/gi;
   // Forward-looking or summing-up close.
@@ -87,6 +90,37 @@
     'prioritise prioritize organise organize remind try start finish split track note read prepare learn practise ' +
     'practice help offer explain apologise apologize call contact speak talk find look follow double-check ' +
     'repeat show bring support give get go let own handle review').split(' ');
+
+  // Other ways people say a keyword, so an answer on topic is recognised.
+  var SAME = {
+    problem: ['issue', 'wrong', 'broken', 'jamming', 'missing', 'complaint', 'challenge'],
+    solved: ['sorted', 'fixed', 'resolved', 'worked out', 'figured out', 'stopped'],
+    fixed: ['sorted', 'solved', 'resolved', 'repaired'],
+    found: ['realised', 'realized', 'noticed', 'discovered', 'worked out'],
+    idea: ['suggested', 'thought of', 'came up with'],
+    helped: ['supported', 'assisted', 'showed', 'looked after', 'covered'],
+    team: ['group', 'together', 'everyone', 'colleagues', 'class', 'squad', 'crew'],
+    group: ['team', 'class', 'together'],
+    feedback: ['advice', 'comments', 'told me', 'pointed out', 'suggested'],
+    deadline: ['due', 'handed in', 'in time', 'on time', 'cut-off'],
+    mistake: ['wrong', 'error', 'messed up', 'slipped up', 'got it wrong'],
+    learned: ['learnt', 'taught me', 'realised', 'realized', 'picked up'],
+    learn: ['learnt', 'learned', 'pick up', 'taught', 'training'],
+    customer: ['customers', 'client', 'shopper', 'resident', 'guest', 'patient', 'member of the public'],
+    customers: ['customer', 'clients', 'shoppers', 'residents', 'guests', 'patients', 'public'],
+    calm: ['patient', 'relaxed', 'stay cool', 'deep breath'],
+    listen: ['hear them out', 'let them explain', 'understand'],
+    apologise: ['apologize', 'sorry'],
+    manager: ['supervisor', 'team leader', 'boss', 'line manager', 'tutor', 'teacher'],
+    responsibility: ['in charge', 'trusted', 'up to me', 'my job'],
+    organised: ['organized', 'planned', 'arranged', 'sorted out', 'rota', 'schedule'],
+    plan: ['planner', 'planned', 'list', 'schedule', 'rota', 'calendar'],
+    priorities: ['prioritise', 'prioritize', 'most urgent', 'first'],
+    proud: ['pleased', 'achievement', 'best thing'],
+    result: ['in the end', 'outcome', 'which meant', 'as a result'],
+    improved: ['better', 'faster', 'increased', 'reduced', 'saved'],
+    new: ['never', 'first time', 'unfamiliar']
+  };
 
   var FILLER_RE = /\b(lorem|ipsum|dolor|asdf\w*|qwerty\w*|blah|test(ing)?\s+test|xxx+|placeholder|sample text)\b/i;
   var SPOKEN_FILLERS = /\b(um+|uh+|erm+|er|ah+|you know|basically|kind of|sort of|i mean)\b/gi;
@@ -148,6 +182,17 @@
       var present = PRESENT_ACTIONS.indexOf(v) !== -1;
       if (past || present) {
         found.push(m[0].trim());
+        // Further actions in the same sentence, after a comma or "and".
+        var rest = t.slice(re.lastIndex).split(/[.!?\n]/)[0];
+        var more = /(?:,\s*|\s+and\s+|\s+then\s+)(?:then\s+|also\s+)?([a-z\-]+)/gi;
+        var mm;
+        while ((mm = more.exec(rest))) {
+          var w = mm[1].toLowerCase();
+          if ((/[a-z]{3,}ed$/.test(w) && NOT_ACTIONS.indexOf(w) === -1) || IRREGULAR_PAST.indexOf(w) !== -1 ||
+              (present && PRESENT_ACTIONS.indexOf(w) !== -1)) {
+            found.push(mm[0].replace(/^[,\s]+/, '').trim());
+          }
+        }
       }
     }
     return found;
@@ -213,7 +258,7 @@
     var first = sents ? sents[0] : raw.split(/\s+/).slice(0, 25).join(' ');
     var lastTwo = sents ? sents.slice(-2).join(' ') : raw.split(/\s+/).slice(-30).join(' ');
     var acts = personalActions(raw);
-    var examples = count(EXAMPLE, lower);
+    var examples = count(EXAMPLE, lower) + (raw.match(NAMED) || []).length;
     var weCount = count(/\bwe\b/, lower);
     var iCount = count(/\bi\b/, lower);
     var pts = result.points;
@@ -421,15 +466,15 @@
     var own = words(question.text).filter(function (w) {
       return w.length > 3 && STOP.indexOf(w) === -1 && QUESTION_FILLER.indexOf(w) === -1;
     });
+    function present(k) {
+      var parts = k.toLowerCase().split(/\s+/);
+      return parts.length > 1 ? lower.indexOf(k.toLowerCase()) !== -1 : !!stems[stem(parts[0])];
+    }
     var hits = (question.keywords || []).concat(own).filter(function (k, i, list) {
       if (list.indexOf(k) !== i) {
         return false;
       }
-      var parts = k.toLowerCase().split(/\s+/);
-      if (parts.length > 1) {
-        return lower.indexOf(k.toLowerCase()) !== -1;
-      }
-      return stems[stem(parts[0])];
+      return present(k) || (SAME[k.toLowerCase()] || []).some(present);
     });
     result.keywords = hits;
     pts.relevance = hits.length >= 3 ? 10 : hits.length === 2 ? 8 : hits.length === 1 ? 6 : 3;
@@ -489,6 +534,15 @@
     if (n < low * 0.35) {
       pts.structure = Math.min(pts.structure, 6);
       pts.relevance = Math.min(pts.relevance, 4);
+    } else if (n < low * 0.7) {
+      // Short answers: the parts found are there, but only in passing, so
+      // they count in proportion to how much was said rather than in full
+      // (otherwise 22 words could score as well as a full answer).
+      var share = n / (low * 0.7);
+      pts.structure = pts.structure * share;
+      pts.examples = pts.examples * share;
+      pts.outcomes = pts.outcomes * share;
+      pts.relevance = Math.min(pts.relevance, 8);
     }
     pts.clarity = clamp(clarity, 0, 10);
     if (pts.clarity >= 9 && sents && sents.length >= 2 && n >= low * 0.7) {

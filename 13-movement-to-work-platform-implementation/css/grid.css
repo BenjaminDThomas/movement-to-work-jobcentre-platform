@@ -4246,15 +4246,20 @@ html:not(.js) .menu-toggle {
     --top: max(0px, (var(--screen) - calc(728 * var(--u))) / 2);
   }
 
-  .ready__title { left: calc(58 * var(--u)); top: calc(var(--top) + calc(90 * var(--u))); }
+  /* Heading top left with the lead under it, the student top right, and
+     the three tools in one even row on the board below: the same top and
+     bottom, no overlaps, nothing turned. Each card is laid out the same
+     way (time, title, text, button, note), with its picture bottom right,
+     the people rising a little out of the top of their card. */
+  .ready__title { left: calc(58 * var(--u)); top: calc(var(--top) + calc(70 * var(--u))); }
   .ready__main { margin-top: calc(-10 * var(--u)); }
 
-  .ready__student { left: calc(822 * var(--u)); right: auto; top: calc(var(--top) + calc(26 * var(--u))); width: calc(380 * var(--u)); height: calc(290 * var(--u)); }
+  .ready__student { left: calc(846 * var(--u)); right: auto; top: calc(var(--top) + calc(14 * var(--u))); width: calc(380 * var(--u)); height: calc(290 * var(--u)); }
   .ready__student img { left: calc(18 * var(--u)); width: calc(338 * var(--u)); border-radius: 0; }
   .ready__student-blob { left: calc(-30 * var(--u)); right: 0; top: calc(92 * var(--u)); bottom: calc(-10 * var(--u)); }
   .ready__star { left: calc(390 * var(--u)); right: auto; top: calc(104 * var(--u)); width: calc(80 * var(--u)); height: calc(80 * var(--u)); }
 
-  .ready__lead { left: calc(410 * var(--u)); top: calc(var(--top) + calc(650 * var(--u))); width: calc(440 * var(--u)); margin: 0; padding-left: calc(26 * var(--u)); min-height: 0; }
+  .ready__lead { left: calc(64 * var(--u)); top: calc(var(--top) + calc(238 * var(--u))); width: calc(560 * var(--u)); margin: 0; padding-left: calc(20 * var(--u)); min-height: 0; }
   .ready__lead-wide { display: inline; }
   .ready__lead-narrow { display: none; }
 
@@ -4263,9 +4268,9 @@ html:not(.js) .menu-toggle {
   .ready__board {
     display: block;
     left: calc(14 * var(--u));
-    top: calc(var(--top) + calc(262 * var(--u)));
+    top: calc(var(--top) + calc(300 * var(--u)));
     width: calc(1264 * var(--u));
-    height: calc(452 * var(--u));
+    height: calc(418 * var(--u));
     border-radius: calc(40 * var(--u));
   }
 
@@ -4276,54 +4281,54 @@ html:not(.js) .menu-toggle {
     border-radius: calc(30 * var(--u));
     pointer-events: none;
   }
-  .tool { position: absolute; }
+  .tool { position: absolute; top: calc(var(--top) + calc(326 * var(--u))); height: calc(344 * var(--u)); z-index: 1; }
   .tool__card { min-height: 0; height: 100%; padding: 0; }
   .tool__card > * { position: absolute; margin: 0; }
 
-  .tool--interview { left: calc(29 * var(--u)); top: calc(var(--top) + calc(287 * var(--u))); width: calc(384 * var(--u)); height: calc(330 * var(--u)); z-index: 1; }
-  .tool--cv { left: calc(317 * var(--u)); top: calc(var(--top) + calc(229 * var(--u))); width: calc(662 * var(--u)); height: calc(404 * var(--u)); z-index: 2; }
-  .tool--strengths { left: calc(963 * var(--u)); top: calc(var(--top) + calc(284 * var(--u))); width: calc(300 * var(--u)); height: calc(340 * var(--u)); z-index: 1; }
+  .tool--interview { left: calc(38 * var(--u)); width: calc(380 * var(--u)); }
+  .tool--cv { left: calc(434 * var(--u)); width: calc(424 * var(--u)); }
+  .tool--strengths { left: calc(874 * var(--u)); width: calc(380 * var(--u)); }
 
-  /* Practise interviews */
-  .tool--interview .tool__time { left: calc(22 * var(--u)); top: calc(2 * var(--u)); width: calc(126 * var(--u)); height: calc(62 * var(--u)); }
-  .tool--interview .tool__title { left: calc(30 * var(--u)); top: calc(70 * var(--u)); }
-  .tool--interview .tool__text { left: calc(44 * var(--u)); top: calc(110 * var(--u)); width: calc(232 * var(--u)); }
-  .tool--interview .tool__btn { left: calc(46 * var(--u)); top: calc(166 * var(--u)); min-height: calc(38 * var(--u)); width: calc(176 * var(--u)); justify-content: space-between; white-space: nowrap; }
-  .tool--interview .tool__art { left: calc(22 * var(--u)); top: calc(192 * var(--u)); width: calc(182 * var(--u)); }
-  .tool__note--interview { left: calc(180 * var(--u)); top: calc(222 * var(--u)); right: auto; bottom: auto; }
-  .tool__note--interview .note__arrow { left: calc(30 * var(--u)); top: 100%; }
+  /* The same bones in every card */
+  .tool__time { left: calc(20 * var(--u)); top: calc(18 * var(--u)); width: calc(124 * var(--u)); height: calc(58 * var(--u)); }
+  .tool__title { left: calc(30 * var(--u)); top: calc(84 * var(--u)); white-space: nowrap; }
+  .tool__text { left: calc(32 * var(--u)); top: calc(132 * var(--u)); width: calc(214 * var(--u)); }
+  .tool__btn { left: calc(30 * var(--u)); top: calc(222 * var(--u)); min-height: calc(40 * var(--u)); justify-content: space-between; padding: 0 calc(18 * var(--u)); white-space: nowrap; }
 
-  /* Build your CV */
-  .tool--cv .tool__time { left: calc(22 * var(--u)); top: calc(30 * var(--u)); width: calc(172 * var(--u)); height: calc(84 * var(--u)); }
-  .tool--cv .tool__title { left: calc(46 * var(--u)); top: calc(116 * var(--u)); }
-  .tool--cv .tool__text { left: calc(42 * var(--u)); top: calc(172 * var(--u)); width: calc(206 * var(--u)); }
-  .tool--cv .tool__btn { left: calc(44 * var(--u)); top: calc(268 * var(--u)); min-height: calc(42 * var(--u)); justify-content: space-between; padding: 0 calc(18 * var(--u)); white-space: nowrap; }
-  .tool--cv .tool__file { left: calc(50 * var(--u)); top: calc(318 * var(--u)); }
-  .tool__note--cv { left: calc(50 * var(--u)); top: calc(344 * var(--u)); }
-  .tool__note--cv .note__arrow { left: 100%; top: calc(-14 * var(--u)); width: calc(60 * var(--u)); }
-  .cvx { left: calc(255 * var(--u)); top: calc(28 * var(--u)); width: calc(390 * var(--u)); padding: 0; }
-  .cvx__paper { width: calc(234 * var(--u)); }
-  .cvx__tips { left: calc(212 * var(--u)); right: auto; top: calc(44 * var(--u)); width: calc(182 * var(--u)); gap: calc(16 * var(--u)); }
-  .tool__note--impact { left: calc(518 * var(--u)); top: calc(340 * var(--u)); margin: 0; }
-  .tool__note--impact .note__arrow { right: 100%; top: calc(14 * var(--u)); }
-  .tool__doodle--marks-a { left: calc(228 * var(--u)); top: calc(14 * var(--u)); right: auto; }
-  .tool__doodle--marks-b { left: calc(586 * var(--u)); top: 0; right: auto; }
+  /* Practise interviews: he sits at the right, rising out of the card */
+  .tool--interview .tool__art { left: auto; right: calc(6 * var(--u)); top: auto; bottom: 0; width: calc(176 * var(--u)); }
+  .tool__note--interview { left: calc(36 * var(--u)); top: calc(278 * var(--u)); right: auto; bottom: auto; }
+  .tool__note--interview .note__arrow { left: calc(128 * var(--u)); top: calc(4 * var(--u)); rotate: -70deg; }
 
-  /* Discover your strengths */
-  .tool--strengths .tool__time { left: calc(16 * var(--u)); top: calc(18 * var(--u)); width: calc(132 * var(--u)); height: calc(64 * var(--u)); }
-  .tool--strengths .tool__title { left: calc(22 * var(--u)); top: calc(82 * var(--u)); white-space: nowrap; }
-  .tool--strengths .tool__text { left: calc(32 * var(--u)); top: calc(138 * var(--u)); width: calc(230 * var(--u)); }
-  .tool--strengths .tool__btn { left: calc(30 * var(--u)); top: calc(208 * var(--u)); min-height: calc(38 * var(--u)); justify-content: space-between; padding: 0 calc(16 * var(--u)); white-space: nowrap; }
-  .tool--strengths .tool__art { left: calc(150 * var(--u)); top: calc(222 * var(--u)); width: calc(144 * var(--u)); }
-  .tool__note--strengths { left: calc(34 * var(--u)); top: calc(272 * var(--u)); bottom: auto; }
-  .tool__note--strengths .note__arrow { left: calc(72 * var(--u)); top: calc(30 * var(--u)); }
+  /* Build your CV: the example CV with one piece of feedback on it */
+  .tool--cv .tool__time { width: calc(128 * var(--u)); height: calc(62 * var(--u)); }
+  .tool--cv .tool__title { left: calc(32 * var(--u)); top: calc(86 * var(--u)); }
+  .tool--cv .tool__text { width: calc(196 * var(--u)); }
+  .tool--cv .tool__file { left: calc(36 * var(--u)); top: calc(270 * var(--u)); }
+  .tool__note--cv { left: calc(36 * var(--u)); top: calc(296 * var(--u)); }
+  .tool__note--cv .note__arrow { display: none; }
+  .cvx { left: auto; right: calc(26 * var(--u)); top: calc(30 * var(--u)); width: calc(150 * var(--u)); padding: 0; }
+  .cvx__paper { width: calc(150 * var(--u)); }
+  .cvx__tips { left: auto; right: calc(-14 * var(--u)); top: calc(150 * var(--u)); bottom: auto; width: calc(172 * var(--u)); gap: 0; }
+  .cvx__tips .tip--good,
+  .cvx__tips .tip--skills { display: none; }
+  .tool__note--impact { display: none; }
+  .tool__doodle--marks-a { left: calc(160 * var(--u)); top: calc(16 * var(--u)); right: auto; }
+  .tool__doodle--marks-b { display: none; }
+
+  /* Discover your strengths: she sits at the right as well */
+  .tool--strengths .tool__art { left: auto; right: calc(8 * var(--u)); top: auto; bottom: 0; width: calc(164 * var(--u)); }
+  .tool__note--strengths { left: calc(36 * var(--u)); top: calc(278 * var(--u)); bottom: auto; }
+  .tool__note--strengths .note__arrow { left: calc(118 * var(--u)); top: calc(2 * var(--u)); rotate: -60deg; }
 
   .ready__paint { inset: 0; }
-  .ready__dab--mint { left: calc(50% - calc(103 * var(--u))); top: calc(var(--top) - calc(50 * var(--u))); width: calc(440 * var(--u)); height: calc(160 * var(--u)); }
+  .ready__dab--mint { left: calc(50% - calc(103 * var(--u))); top: calc(var(--top) - calc(70 * var(--u))); width: calc(440 * var(--u)); height: calc(160 * var(--u)); }
   .ready__dab--mint-side { right: calc(-60 * var(--u)); left: auto; top: calc(var(--top) + calc(236 * var(--u))); width: calc(190 * var(--u)); height: calc(200 * var(--u)); }
   .ready__dab--yellow { left: calc(-40 * var(--u)); bottom: auto; top: calc(var(--top) + calc(628 * var(--u))); width: calc(360 * var(--u)); height: calc(160 * var(--u)); }
   .ready__dab--green { right: calc(-60 * var(--u)); bottom: auto; top: calc(var(--top) + calc(600 * var(--u))); width: calc(520 * var(--u)); height: calc(200 * var(--u)); }
-  .ready__tagline { left: auto; right: calc(130 * var(--u)); bottom: auto; top: calc(var(--top) + calc(614 * var(--u))); width: calc(300 * var(--u)); height: calc(104 * var(--u)); margin: 0; }
+
+  /* The tagline: a sticker on the board's bottom edge, under the cards */
+  .ready__tagline { left: calc(50% - calc(150 * var(--u))); right: auto; bottom: auto; top: calc(var(--top) + calc(682 * var(--u))); width: calc(300 * var(--u)); height: calc(96 * var(--u)); margin: 0; z-index: 2; }
 }
 
 

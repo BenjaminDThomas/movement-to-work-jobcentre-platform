@@ -4674,25 +4674,27 @@ html:not(.js) .menu__link:hover::after {
     font-size: calc(27 * var(--u));
   }
 
-  .tool--interview .tool__card {
-    border-radius: calc(30 * var(--u)) calc(8 * var(--u)) calc(8 * var(--u)) calc(18 * var(--u));
-    transform: perspective(calc(1200 * var(--u))) rotateY(14deg) rotateZ(-1deg);
-    transform-origin: 100% 50%;
-  }
-
-  .tool--strengths .tool__card {
-    border-radius: calc(8 * var(--u)) calc(40 * var(--u)) calc(18 * var(--u)) calc(8 * var(--u));
-    transform: perspective(calc(1200 * var(--u))) rotateY(-12deg) rotateZ(1deg);
-    transform-origin: 0 50%;
+  /* All three cards share one shape and sit square to the page. */
+  .tool__card,
+  .tool--cv .tool__card {
+    border-radius: calc(28 * var(--u));
   }
 
   .tool--interview .tool__title,
   .tool--strengths .tool__title {
     font-size: calc(27 * var(--u));
   }
+
+  .tool--cv .tool__title {
+    font-size: calc(31 * var(--u));
+  }
+
+  .tool--cv .tool__text {
+    font-size: calc(12.5 * var(--u));
+  }
   /* Desktop cards: a lit paper face, a fine tinted edge, a shadow that
      picks up each card's colour, and a stitched line just inside the edge
-     (the same as the board's). On hover the side pages turn towards you. */
+     (the same as the board's). On hover a card lifts a little. */
   .tool__card {
     position: relative;
     background:
@@ -4722,16 +4724,8 @@ html:not(.js) .menu__link:hover::after {
   }
 
   @media (hover: hover) {
-    .tool--interview:hover .tool__card {
-      transform: perspective(calc(1200 * var(--u))) rotateY(6deg) rotateZ(-0.5deg) translateY(calc(-6 * var(--u)));
-    }
-
-    .tool--strengths:hover .tool__card {
-      transform: perspective(calc(1200 * var(--u))) rotateY(-5deg) rotateZ(0.5deg) translateY(calc(-6 * var(--u)));
-    }
-
-    .tool--cv:hover .tool__card {
-      transform: translateY(calc(-5 * var(--u)));
+    .tool:hover .tool__card {
+      transform: translateY(calc(-6 * var(--u)));
     }
 
     .tool:hover .tool__card {
@@ -5872,6 +5866,12 @@ html:not(.js) .menu__link:hover::after {
   border-radius: 999px;
 }
 
+/* A short page (the 404 page) still fills the screen. */
+.legal-body--single {
+  min-height: calc(100vh - 16rem);
+  min-height: calc(100svh - 16rem);
+}
+
 .legal-body {
   display: grid;
   gap: 40px;
@@ -5989,6 +5989,11 @@ html:not(.js) .menu__link:hover::after {
 @media (min-width: 56em) {
   .legal-body {
     grid-template-columns: 260px 1fr;
+  }
+
+  /* A page with no contents list (the 404 page): one readable column. */
+  .legal-body--single {
+    grid-template-columns: minmax(0, 760px);
   }
 
   .legal-toc {
@@ -6217,6 +6222,55 @@ html:not(.js) .menu__link:hover::after {
    Values that used to sit in style="" attributes in the markup. Keeping
    them here means the HTML carries no inline styles at all.
    ========================================================================== */
+
+/* A tool opening for the first time fetches its files: the button breathes
+   while it waits, so a tap never looks ignored. */
+.tool__btn[aria-busy="true"] {
+  cursor: progress;
+  animation: tool-wait 900ms var(--ease-in-out) infinite alternate;
+}
+@keyframes tool-wait {
+  to { opacity: 0.62; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool__btn[aria-busy="true"] { animation: none; opacity: 0.7; }
+}
+
+/* Coming back: the time pill shows where you got to instead */
+.tool.has-progress .tool__time span {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A short message at the foot of the screen (main.js toolToast) */
+.page-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 60;
+  width: max-content;
+  max-width: min(32rem, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0.8rem 1.15rem;
+  border-radius: 0.9rem;
+  background: var(--color-dark-green);
+  color: #fff;
+  font: 600 0.95rem/1.4 var(--font-ui);
+  box-shadow: 0 10px 30px rgb(3 40 20 / 30%);
+  opacity: 0;
+  translate: -50% 1rem;
+  pointer-events: none;
+  transition: opacity 260ms var(--ease-out), translate 360ms var(--ease-out);
+}
+.page-toast.is-shown {
+  opacity: 1;
+  translate: -50% 0;
+}
+/* Phones: above the menu button in the corner */
+@media (max-width: 56em) {
+  .page-toast {
+    bottom: calc(max(1.25rem, env(safe-area-inset-bottom)) + 4.5rem);
+  }
+}
 
 /* Looping decoration pauses while its section is off screen (main.js 9e).
    Named one by one, so marking a section costs the browser almost nothing. */

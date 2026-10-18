@@ -2,7 +2,6 @@
   "name": "movement-to-work",
   "private": true,
   "description": "Movement to Work, Skelmersdale Jobcentre Plus. Static site; this only builds the minified CSS and JS the pages load.",
-  "type": "module",
   "scripts": {
     "build": "node build.mjs"
   },

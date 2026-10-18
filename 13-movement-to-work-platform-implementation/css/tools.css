@@ -5093,13 +5093,110 @@
     min-height: 46px;
   }
 
-  /* List view on a phone: tighter cards, so more fit on screen. */
-  .ivq-list.is-list .ivq__tags {
+  /* Phones: grid is two compact tiles a row; list is one slim row per
+     question with a round button, so the two views really differ. */
+  .ivq-list.is-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .ivq-list.is-grid .ivq__card {
+    grid-template-rows: auto auto auto 1fr;
+    gap: 4px;
+    padding: 16px 14px 14px 22px;
+  }
+
+  .ivq-list.is-grid .ivq__card::before {
+    left: 11px;
+    top: 18px;
+    width: 3px;
+    height: 34px;
+  }
+
+  .ivq-list.is-grid .ivq__q {
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  .ivq-list.is-grid .ivq__time {
+    font-size: 13px;
+  }
+
+  .ivq-list.is-grid .ivtag:not(.ivtag--done) {
     display: none;
   }
 
+  .ivq-list.is-grid .ivbtn--try {
+    align-self: end;
+    justify-self: stretch;
+    min-width: 0;
+    min-height: 40px;
+    margin-top: 10px;
+    padding-inline: 10px;
+    font-size: 14.5px;
+  }
+
+  .ivq-list.is-grid .ivq__torn {
+    width: 70px;
+    height: 40px;
+  }
+
+  .ivq-list.is-list {
+    gap: 8px;
+  }
+
   .ivq-list.is-list .ivq__card {
-    padding-block: 16px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 14px;
+    row-gap: 2px;
+    padding: 12px 12px 12px 26px;
+  }
+
+  .ivq-list.is-list .ivq__card::before {
+    left: 13px;
+    top: 14px;
+    width: 3px;
+    height: calc(100% - 28px);
+  }
+
+  .ivq-list.is-list .ivq__q {
+    font-size: 15.5px;
+  }
+
+  .ivq-list.is-list .ivq__time {
+    font-size: 13px;
+  }
+
+  .ivq-list.is-list .ivq__tags {
+    margin: 0;
+  }
+
+  .ivq-list.is-list .ivtag:not(.ivtag--done) {
+    display: none;
+  }
+
+  /* The button keeps its label for screen readers (aria-label) and shows
+     just the arrow. */
+  .ivq-list.is-list .ivbtn--try {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    width: 46px;
+    min-width: 0;
+    height: 46px;
+    min-height: 46px;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    gap: 0;
+  }
+
+  .ivq-list.is-list .ivbtn--try svg {
+    margin: 0;
+  }
+
+  .ivq-list.is-list .ivq__torn {
+    display: none;
   }
 
   .ivl__filters {
@@ -6431,6 +6528,56 @@
   font-size: 15px;
 }
 
+/* Jobs to look at in each area: small chips under the reasons */
+.qnareas__roles {
+  display: grid;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.qnareas__roles > span:first-child {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--iv-muted);
+}
+
+.qnareas__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.qnareas__chips i {
+  padding: 3px 9px;
+  font-style: normal;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--iv-brand-ink);
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--iv-brand) 30%, transparent);
+  border-radius: 999px;
+}
+
+.qnideal__route {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.qnideal__route svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--iv-brand);
+}
+
 .qnlist {
   display: grid;
   gap: 10px;
@@ -6499,20 +6646,41 @@
   }
 
   .qng__progress .ivr {
-    width: 96px;
-    height: 96px;
+    width: 112px;
+    height: 112px;
   }
 
+  /* The ring stays large and sits beside the title; the text runs
+     full width underneath. */
   .qns__card {
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    gap: 14px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px 16px;
     padding: 18px 16px;
   }
 
+  .qns__card .ivs__body {
+    display: contents;
+  }
+
+  .qns__card .ivs__body > :not(.ivs__label) {
+    grid-column: 1 / -1;
+  }
+
   .qns__card .ivr {
-    width: 78px;
-    height: 78px;
+    width: 112px;
+    height: 112px;
+  }
+
+  .qns__card .ivr__num b,
+  .qng__progress .ivr__num b {
+    font-size: 24cqw;
+  }
+
+  .qns__card .ivr__num small,
+  .qng__progress .ivr__num small {
+    font-size: 12cqw;
   }
 
   .qns__card .ivs__label {
@@ -6686,25 +6854,40 @@
     grid-column: 1;
   }
 
+  /* All four tabs in view as a two-by-two grid, rather than a strip that
+     ran off the edge with no sign there was more. */
   .qntabs__list {
-    padding: 8px 8px 0;
-    overflow-x: auto;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 10px;
+    overflow: visible;
   }
 
   .qntabs__list button {
-    flex: none;
+    justify-content: flex-start;
+    min-height: 48px;
     padding: 10px 10px 14px;
     font-size: 14px;
+    line-height: 1.2;
+    text-align: left;
+    background: rgb(255 255 255 / 45%);
+    border-radius: 10px;
   }
 
   .qntabs__list svg {
+    flex: none;
     width: 20px;
     height: 20px;
   }
 
+  .qntabs__list button[aria-selected="true"] {
+    box-shadow: 0 1px 2px rgb(20 50 30 / 10%), 0 6px 12px -8px rgb(20 50 30 / 35%);
+  }
+
   .qntabs__list button[aria-selected="true"]::after {
     left: 38px;
+    bottom: 6px;
   }
 
   .qntabs__panel {

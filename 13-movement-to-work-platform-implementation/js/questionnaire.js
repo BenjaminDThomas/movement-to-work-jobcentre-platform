@@ -161,7 +161,9 @@
     try {
       window.localStorage.setItem(KEY, JSON.stringify({
         v: 1, answers: state.answers, actions: state.actions, name: state.name,
-        pos: { stage: state.stage, index: state.index }, saved: new Date().toISOString()
+        pos: { stage: state.stage, index: state.index }, saved: new Date().toISOString(),
+        // How far through, so the page can show it on the card.
+        done: P.progress(state.answers).done, total: D.STAGES.length
       }));
       flashSaved();
     } catch (e) {
@@ -741,8 +743,12 @@
         (id.consider.length ? '<div><dt>Would consider</dt><dd>' + esc(id.consider.join(', ')) + '</dd></div>' : '') +
       '</dl>' +
       (id.areas.length ? '<h4 class="qnideal__sub">Areas you could explore</h4><ul class="qnareas">' + id.areas.map(function (a) {
-        return '<li><b>' + esc(a.name) + '</b><span>Because ' + esc(a.why.slice(0, 3).join(', ')) + '.</span></li>';
-      }).join('') + '</ul>' : '') +
+        return '<li><b>' + esc(a.name) + '</b><span>Because ' + esc(a.why.slice(0, 3).join(', ')) + '.</span>' +
+          (a.roles && a.roles.length ? '<span class="qnareas__roles"><span>Jobs to look at</span>' +
+            '<span class="qnareas__chips">' + a.roles.map(function (r) { return '<i>' + esc(r) + '</i>'; }).join('') + '</span></span>' : '') +
+          '</li>';
+      }).join('') + '</ul>' +
+      (id.apprenticeship ? '<p class="qnideal__route">' + icon('i-key') + 'You said you would consider an apprenticeship: many of these jobs can start as one, so you earn while you train.</p>' : '') : '') +
       '<p class="qnpanel__note">A summary of your preferences to help you explore, not a judgement of what you’re suited to.</p>' +
       '<span class="ivq__torn" aria-hidden="true"></span>' +
     '</section>';
@@ -779,7 +785,10 @@
       sec('Work preferences', p.work ? '<p>' + esc(p.work.text) + '</p>' : '') +
       sec('Career interests', p.ideal ? (p.ideal.summary ? '<p>' + esc(p.ideal.summary) + '</p>' : '') +
         (p.ideal.interests.length ? '<p><b>Interested in:</b> ' + esc(p.ideal.interests.join(', ')) + '</p>' : '') +
-        ul(p.ideal.areas.map(function (a) { return '<b>' + esc(a.name) + '</b>: because ' + esc(a.why.join(', ')); })) : '') +
+        ul(p.ideal.areas.map(function (a) {
+          return '<b>' + esc(a.name) + '</b>: because ' + esc(a.why.join(', ')) + '.' +
+            (a.roles && a.roles.length ? ' <i>Jobs to look at: ' + esc(a.roles.join(', ')) + '.</i>' : '');
+        })) + (p.ideal.apprenticeship && p.ideal.areas.length ? '<p>Many of these jobs can start as an apprenticeship.</p>' : '') : '') +
       sec('Next steps', ul(p.steps.map(function (s) { return (state.actions[s.id] ? '&#10003; ' : '') + '<b>' + esc(s.title) + '</b>: ' + esc(s.step); })));
     return '<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<title>' + (name ? esc(name) + ': ' : '') + 'Movement to Work profile</title>' +

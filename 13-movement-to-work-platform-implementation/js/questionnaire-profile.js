@@ -441,15 +441,33 @@
     tech: { tasks: ['technical', 'computers'], env: ['office', 'remote'], w3: 'computer', s4: 'tech', skills: ['digital'] },
     business: { tasks: ['organising'], env: ['office'], s4: 'planning', skills: ['organisation', 'detail', 'time'], w5: 'structured' },
     creative: { tasks: ['creative'], s4: 'creating', skills: ['creativity'], prio: ['creative'] },
-    engineering: { tasks: ['technical', 'practical', 'problem'], env: ['workshop'], s4: 'fixing', w3: 'practical' },
+    engineering: { tasks: ['technical', 'practical', 'problem'], env: ['workshop', 'warehouse'], s4: 'fixing', w3: 'practical' },
     construction: { tasks: ['practical'], env: ['outdoors', 'workshop'], s4: 'fixing', w7: 'outdoors' },
     care: { tasks: ['helping'], env: ['community'], s4: 'helping', prio: ['helping'] },
     retail: { tasks: ['helping', 'team'], env: ['retail'], customers: true },
     hospitality: { tasks: ['team'], env: ['retail'], customers: true, w5: 'varied' },
     education: { tasks: ['helping'], env: ['community'], s4: 'explaining', prio: ['helping'] },
-    logistics: { tasks: ['practical', 'organising'], env: ['workshop'], w5: 'structured' },
+    logistics: { tasks: ['practical', 'organising'], env: ['warehouse', 'workshop'], w5: 'structured', w3: 'practical' },
     outdoor: { tasks: ['practical'], env: ['outdoors'], w7: 'outdoors' }
   };
+
+  // Entry-level roles to look at in each area: jobs people often start in
+  // without a degree, many of them open as apprenticeships. Ideas to
+  // research, not a match.
+  var ROLES = {
+    tech: ['IT support technician', 'Help desk adviser', 'Junior data assistant', 'Digital support apprentice', 'Software developer apprentice'],
+    business: ['Administrative assistant', 'Receptionist', 'Call centre adviser', 'Data entry clerk', 'Business administration apprentice'],
+    creative: ['Social media assistant', 'Junior graphic designer', 'Digital marketing apprentice', 'Content assistant', 'Photography assistant'],
+    engineering: ['Production operative', 'Machine operator', 'Engineering operative', 'Maintenance technician apprentice', 'Quality inspector'],
+    construction: ['Site labourer', 'Electrician apprentice', 'Bricklayer apprentice', 'Plumbing apprentice', 'Carpentry apprentice', 'Painter and decorator'],
+    care: ['Care assistant', 'Healthcare assistant', 'Support worker', 'Home carer', 'Pharmacy assistant'],
+    retail: ['Sales assistant', 'Checkout operator', 'Customer service assistant', 'Night-shift stock replenisher', 'Visual merchandiser', 'Team leader (with experience)'],
+    hospitality: ['Barista', 'Waiter or waitress', 'Kitchen porter', 'Front of house team member', 'Commis chef', 'Hotel receptionist'],
+    education: ['Teaching assistant', 'Nursery practitioner', 'Youth support worker', 'Sports coaching assistant', 'Lunchtime supervisor'],
+    logistics: ['Warehouse operative', 'Picker and packer', 'Forklift operator (with training)', 'Delivery driver (with a licence)', 'Stock controller', 'Postal worker'],
+    outdoor: ['Grounds maintenance operative', 'Landscaper', 'Horticulture apprentice', 'Assistant ranger', 'Farm worker']
+  };
+
 
   function ideal(a) {
     var scored = Object.keys(AREA_RULES).map(function (key) {
@@ -471,7 +489,7 @@
       var pr = (a.o4 || []).filter(function (p) { return (r.prio || []).indexOf(p) !== -1; });
       if (pr.length) { score += 1; why.push(lbl('o4', pr[0]).toLowerCase() + ' matters to you'); }
       if (r.customers && rating(a, 'w4') != null && a.w4 >= 4) { score += 1; why.push('you’re comfortable speaking with customers'); }
-      return { key: key, name: lbl('o2', key), score: score, why: why };
+      return { key: key, name: lbl('o2', key), score: score, why: why, roles: ROLES[key] || [] };
     }).filter(function (x) { return x.score >= 2 && x.why.length; }).sort(function (x, y) { return y.score - x.score; }).slice(0, 3);
 
     var parts = [];
@@ -489,6 +507,7 @@
       matters: (a.o4 || []).map(function (v) { return lbl('o4', v); }),
       workplace: a.o3 ? lbl('o3', a.o3) : null,
       consider: (a.o7 || []).map(function (v) { return lbl('o7', v); }),
+      apprenticeship: (a.o7 || []).indexOf('apprenticeship') !== -1,
       own: a.o1 || null,
       areas: scored
     };
