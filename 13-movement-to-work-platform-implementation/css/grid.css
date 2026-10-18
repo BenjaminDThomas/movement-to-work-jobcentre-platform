@@ -24,8 +24,9 @@
      the narrow, stacked arrangement from the mobile frames.
 
    Pinned scroll story
-     Only applied under `.js` and a motion-friendly, tall-enough screen:
-     (prefers-reduced-motion: no-preference) and (min-height: 30em).
+     Only applied under `.js` on a tall-enough screen, (min-height: 30em).
+     It is driven by the reader's own scrolling, so it stays on with
+     reduced motion.
      Otherwise every section is an ordinary block in reading order.
 
    Contents
@@ -47,6 +48,82 @@
     16.  Wide layout for Get to know, Skills and the sheet
    ========================================================================== */
 
+
+/* ==========================================================================
+   0. FONTS  (self-hosted, no third-party requests)
+   Each font comes in two parts: the characters this site uses, which load
+   straight away, and the rest of Latin (accents, symbols), which the
+   browser only fetches if a page actually shows one of them. Inter and
+   Caveat are variable fonts, so every weight comes from one file.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/inter-var.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0, U+00A3, U+00B7, U+00E9, U+2013-2014, U+2018-201D, U+2022, U+2026, U+2191-2192;
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/inter-var-ext.woff2") format("woff2");
+  unicode-range: U+00A1-00A2, U+00A4-00B6, U+00B8-00E8, U+00EA-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2010-2012, U+2015-2017, U+201E-2021, U+2023-2025, U+2027, U+2030-203A, U+20AC, U+2122, U+2190, U+2193, U+2212;
+}
+
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/caveat-var.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0, U+00A3, U+00B7, U+00E9, U+2013-2014, U+2018-201D, U+2022, U+2026, U+2191-2192;
+}
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/caveat-var-ext.woff2") format("woff2");
+  unicode-range: U+00A1-00A2, U+00A4-00B6, U+00B8-00E8, U+00EA-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2010-2012, U+2015-2017, U+201E-2021, U+2023-2025, U+2027, U+2030-203A, U+20AC, U+2122, U+2190, U+2193, U+2212;
+}
+
+@font-face {
+  font-family: "Caveat Brush";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/caveat-brush.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0, U+00A3, U+00B7, U+00E9, U+2013-2014, U+2018-201D, U+2022, U+2026, U+2191-2192;
+}
+@font-face {
+  font-family: "Caveat Brush";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/caveat-brush-ext.woff2") format("woff2");
+  unicode-range: U+00A1-00A2, U+00A4-00B6, U+00B8-00E8, U+00EA-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2010-2012, U+2015-2017, U+201E-2021, U+2023-2025, U+2027, U+2030-203A, U+20AC, U+2122, U+2190, U+2193, U+2212;
+}
+
+@font-face {
+  font-family: "Bebas Neue";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/bebas-neue.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0, U+00A3, U+00B7, U+00E9, U+2013-2014, U+2018-201D, U+2022, U+2026, U+2191-2192;
+}
+@font-face {
+  font-family: "Bebas Neue";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/bebas-neue-ext.woff2") format("woff2");
+  unicode-range: U+00A1-00A2, U+00A4-00B6, U+00B8-00E8, U+00EA-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2010-2012, U+2015-2017, U+201E-2021, U+2023-2025, U+2027, U+2030-203A, U+20AC, U+2122, U+2190, U+2193, U+2212;
+}
 
 /* ==========================================================================
    1. RESET
@@ -204,11 +281,11 @@ html:not(.js) .menu-toggle {
   display: none;
 }
 
-/* The cap's brim rests on the box's top rim, just tilted. */
+/* The cap's base rests on the box's yellow rim, not inside the box. */
 .menu-toggle__cap {
-  width: calc(38 * var(--u));
+  width: calc(36 * var(--u));
   height: auto;
-  margin-bottom: calc(-8 * var(--u));
+  margin-bottom: calc(-2 * var(--u));
   position: relative;
   z-index: 1;
 }
@@ -252,7 +329,6 @@ html:not(.js) .menu-toggle {
   inset: 0 0 auto auto;
   width: 100%;
   height: 100%;
-  min-height: calc(800 * var(--u));
   pointer-events: none;
 }
 
@@ -547,8 +623,8 @@ html:not(.js) .menu-toggle {
 .corner-cta {
   position: relative;
   display: block;
-  width: calc(118 * var(--u));
-  height: calc(54 * var(--u));
+  width: calc(140 * var(--u));
+  height: calc(64 * var(--u));
   text-decoration: none;
 }
 
@@ -557,26 +633,26 @@ html:not(.js) .menu-toggle {
 .brand__shape,
 .corner-cta__shape {
   position: absolute;
-  top: calc(-40 / 220 * calc(118 * var(--u)));
-  width: calc(300 / 220 * calc(118 * var(--u)));
+  top: calc(-40 / 220 * calc(140 * var(--u)));
+  width: calc(300 / 220 * calc(140 * var(--u)));
   height: auto;
   max-width: none;
   overflow: visible;
 }
 
-.brand__shape { left: calc(-40 / 220 * calc(118 * var(--u))); }
-.corner-cta__shape { right: calc(-40 / 220 * calc(118 * var(--u))); }
+.brand__shape { left: calc(-40 / 220 * calc(140 * var(--u))); }
+.corner-cta__shape { right: calc(-40 / 220 * calc(140 * var(--u))); }
 
 .brand__word {
   position: absolute;
-  left: calc(11 * var(--u));
-  top: calc(14 * var(--u));
+  left: calc(13 * var(--u));
+  top: calc(17 * var(--u));
 }
 
 .corner-cta__text {
   position: absolute;
-  right: calc(12 * var(--u));
-  top: calc(7 * var(--u));
+  right: calc(14 * var(--u));
+  top: calc(9 * var(--u));
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -588,10 +664,10 @@ html:not(.js) .menu-toggle {
 
 .corner-cta__arrow {
   position: absolute;
-  right: calc(11 * var(--u));
-  top: calc(35 * var(--u));
-  width: calc(52 * var(--u));
-  height: calc(10 * var(--u));
+  right: calc(13 * var(--u));
+  top: calc(41 * var(--u));
+  width: calc(60 * var(--u));
+  height: calc(11 * var(--u));
   overflow: visible;
 }
 
@@ -999,6 +1075,7 @@ html:not(.js) .menu-toggle {
 }
 
 .scene__label {
+  position: relative;
   margin-left: calc(6 * var(--u));
 }
 
@@ -1040,8 +1117,8 @@ html:not(.js) .menu-toggle {
   }
 
   .menu-toggle__cap {
-    width: calc(50 * var(--u));
-    margin-bottom: calc(-11 * var(--u));
+    width: calc(46 * var(--u));
+    margin-bottom: calc(-2.5 * var(--u));
   }
 
   .menu-toggle__box {
@@ -1308,8 +1385,22 @@ html:not(.js) .menu-toggle {
   .corner-cta__shape { right: calc(-40 / 220 * calc(210 * var(--u))); }
 
   .brand__word { left: calc(22 * var(--u)); top: calc(26 * var(--u)); }
-  .corner-cta__text { right: calc(20 * var(--u)); top: calc(14 * var(--u)); }
-  .corner-cta__arrow { right: calc(20 * var(--u)); top: calc(62 * var(--u)); width: calc(92 * var(--u)); height: calc(17 * var(--u)); }
+
+  /* The Join corner is a touch larger than the logo, and its words sit
+     well inside the curve rather than against it. */
+  .corner-cta {
+    width: calc(236 * var(--u));
+    height: calc(108 * var(--u));
+  }
+
+  .corner-cta__shape {
+    top: calc(-40 / 220 * calc(236 * var(--u)));
+    width: calc(300 / 220 * calc(236 * var(--u)));
+    right: calc(-40 / 220 * calc(236 * var(--u)));
+  }
+
+  .corner-cta__text { right: calc(20 * var(--u)); top: calc(13 * var(--u)); }
+  .corner-cta__arrow { right: calc(22 * var(--u)); top: calc(60 * var(--u)); width: calc(82 * var(--u)); height: calc(15 * var(--u)); }
 
   .hero__frame {
     position: absolute;
@@ -1610,6 +1701,7 @@ html:not(.js) .menu-toggle {
     width: calc(2 * var(--u));
   }
 
+
   .scene__marker {
     top: calc(50% - calc(364 * var(--u)) + calc(334 * var(--u)));
     left: calc(50% - calc(646 * var(--u)));
@@ -1674,10 +1766,16 @@ html:not(.js) .menu-toggle {
    lift away. The journey then pins, and each scene slides up over the last.
    ========================================================================== */
 
-@media (prefers-reduced-motion: no-preference) and (min-height: 30em) {
+@media (min-height: 30em) {
 
   .js .intro {
     height: calc(var(--screen) * 4.2);
+  }
+
+  /* Folded once the reader has reached About (main.js): the hero pins for
+     one screen while About slides over it, like an ordinary scroll. */
+  .js.is-intro-done .intro {
+    height: calc(var(--screen) * 2);
   }
 
   .js .intro__stage {
@@ -1721,13 +1819,15 @@ html:not(.js) .menu-toggle {
     inset: 0;
     height: 100%;
     min-height: 0;
-    transform: translate3d(0, calc(var(--enter, 0) * 100%), 0);
+    transform: translate3d(0, calc(var(--enter, 0) * 100% + var(--stack, 0px)), 0);
     will-change: transform;
   }
 
-  .js .scene:nth-child(2) { z-index: 2; }
-  .js .scene:nth-child(3) { z-index: 3; }
-  .js .scene:nth-child(4) { z-index: 4; }
+  /* Each card stops a little lower than the one before, so the earlier
+     cards peek out above it like a stack. */
+  .js .scene:nth-child(2) { z-index: 2; --stack: calc(14 * var(--u)); }
+  .js .scene:nth-child(3) { z-index: 3; --stack: calc(28 * var(--u)); }
+  .js .scene:nth-child(4) { z-index: 4; --stack: calc(42 * var(--u)); }
 }
 
 
@@ -1796,9 +1896,9 @@ html:not(.js) .menu-toggle {
 /* --- Crossword ----------------------------------------------------------- */
 .cw {
   position: relative;
-  width: calc(332 * var(--u));
-  margin: calc(26 * var(--u)) auto 0;
-  padding: calc(16 * var(--u)) calc(12 * var(--u));
+  width: calc(336 * var(--u));
+  margin: calc(34 * var(--u)) auto 0;
+  padding: calc(14 * var(--u)) calc(12 * var(--u)) calc(12 * var(--u));
 }
 
 .cw__wash {
@@ -1814,7 +1914,6 @@ html:not(.js) .menu-toggle {
   display: grid;
   grid-template-columns: repeat(16, minmax(0, 1fr));
   grid-auto-rows: auto;
-  gap: calc(1.6 * var(--u));
 }
 
 .cw__cell {
@@ -1838,15 +1937,17 @@ html:not(.js) .menu-toggle {
 
 .cw__star {
   position: absolute;
-  right: calc(-10 * var(--u));
-  top: calc(100% - calc(14 * var(--u)));
-  width: calc(62 * var(--u));
+  right: calc(4 * var(--u));
+  top: calc(-26 * var(--u));
+  width: calc(40 * var(--u));
+  z-index: 3;
 }
 
 /* --- Panel --------------------------------------------------------------- */
 .panel {
   position: relative;
-  margin-top: calc(64 * var(--u));
+  margin-top: calc(40 * var(--u));
+  padding: calc(18 * var(--u)) calc(8 * var(--u)) calc(22 * var(--u));
   overflow: hidden;
 }
 
@@ -1854,9 +1955,9 @@ html:not(.js) .menu-toggle {
   position: relative;
   display: grid;
   place-items: center;
-  width: max-content;
+  width: calc(100% - calc(20 * var(--u)));
   max-width: 100%;
-  min-height: calc(46 * var(--u));
+  min-height: calc(60 * var(--u));
   margin: 0 auto;
   padding: calc(6 * var(--u)) calc(18 * var(--u)) calc(8 * var(--u));
 }
@@ -2050,9 +2151,10 @@ html:not(.js) .menu-toggle {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "intro"
+    "hint"
     "stage"
     "pieces";
-  max-width: calc(600 * var(--u));
+  max-width: calc(400 * var(--u));
   margin: 0 auto;
   padding: 0 calc(14 * var(--u));
 }
@@ -2089,39 +2191,45 @@ html:not(.js) .menu-toggle {
   align-self: flex-start;
 }
 
+/* Phones: the hint is its own small row above the board, so it never
+   sits on the circle. */
 .skills__hint {
-  grid-area: stage;
+  grid-area: hint;
   position: relative;
   z-index: 3;
-  align-self: start;
-  justify-self: start;
-  width: calc(120 * var(--u));
-  margin-top: calc(26 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(10 * var(--u));
+  margin-top: calc(18 * var(--u));
   pointer-events: none;
 }
 
 .skills__hint-piece {
   height: auto;
   aspect-ratio: 1;
-  width: calc(50 * var(--u));
-  margin-left: calc(20 * var(--u));
+  width: calc(38 * var(--u));
+  flex: 0 0 auto;
 }
 
 .skills__hint-text {
-  margin-top: calc(6 * var(--u));
-  max-width: calc(108 * var(--u));
+  max-width: calc(170 * var(--u));
 }
 
 .skills__hint-arrow {
-  width: calc(30 * var(--u));
-  margin: calc(2 * var(--u)) 0 0 calc(44 * var(--u));
+  width: calc(22 * var(--u));
+  flex: 0 0 auto;
+  rotate: -30deg;
 }
 
 .board {
   grid-area: stage;
   position: relative;
-  height: calc(400 * var(--u));
-  margin: 0 calc(-14 * var(--u));
+  width: calc(372 * var(--u));
+  max-width: calc(100% + calc(28 * var(--u)));
+  height: calc(418 * var(--u));
+  margin: 0 auto;
+  justify-self: center;
 }
 
 .board__count {
@@ -2132,7 +2240,7 @@ html:not(.js) .menu-toggle {
   display: flex;
   flex-direction: column;
   align-items: center;
-  translate: calc(-50% + calc(50 * var(--u))) 0;
+  translate: -50% 0;
 }
 
 .board__scene {
@@ -2145,7 +2253,7 @@ html:not(.js) .menu-toggle {
 
 .board__disc {
   position: absolute;
-  left: calc(50% - calc(128 * var(--u)) + calc(46 * var(--u)));
+  left: calc(50% - calc(128 * var(--u)));
   top: calc(62 * var(--u));
   width: calc(256 * var(--u));
   height: calc(256 * var(--u));
@@ -2181,13 +2289,9 @@ html:not(.js) .menu-toggle {
 .board__slot:nth-child(11) { grid-area: 4 / 2; }
 .board__slot:nth-child(12) { grid-area: 4 / 3; }
 
-/* Corner slots of the 4 x 4 are cut off by the circle, so the empty
-   ones stretch out to fill the corners instead. */
-.board__slot:nth-child(1) { margin-left: -100%; }
-.board__slot:nth-child(2) { margin-right: -100%; }
-.board__slot:nth-child(11) { margin-left: -100%; }
-.board__slot:nth-child(12) { margin-right: -100%; }
-
+/* A strict 4 x 4 grid: every slot is exactly one cell, so tiles line up
+   with each other and with the guide lines drawn on the disc. The four
+   corner cells fall outside the circle and are simply left empty. */
 .board__tile {
   position: absolute;
   inset: 0;
@@ -2200,16 +2304,22 @@ html:not(.js) .menu-toggle {
 }
 
 /* Edge tiles keep their content inside the visible part of the circle. */
-.board__slot:nth-child(-n+2) .board__tile { justify-content: flex-end; padding-bottom: 10%; }
-.board__slot:nth-child(n+11) .board__tile { justify-content: flex-start; padding-top: 10%; }
+.board__slot:nth-child(-n+2) .board__tile { justify-content: flex-end; padding-bottom: 12%; }
+.board__slot:nth-child(n+11) .board__tile { justify-content: flex-start; padding-top: 12%; }
 .board__slot:nth-child(1) .board__tile,
-.board__slot:nth-child(11) .board__tile { padding-left: 50%; }
+.board__slot:nth-child(11) .board__tile { padding-left: 14%; }
 .board__slot:nth-child(2) .board__tile,
-.board__slot:nth-child(12) .board__tile { padding-right: 50%; }
+.board__slot:nth-child(12) .board__tile { padding-right: 14%; }
 .board__slot:nth-child(3) .board__tile,
-.board__slot:nth-child(7) .board__tile { padding-left: 22%; }
+.board__slot:nth-child(7) .board__tile { padding-left: 24%; }
 .board__slot:nth-child(6) .board__tile,
-.board__slot:nth-child(10) .board__tile { padding-right: 22%; }
+.board__slot:nth-child(10) .board__tile { padding-right: 24%; }
+
+.board__tile span {
+  max-width: 100%;
+  overflow-wrap: normal;
+  hyphens: manual;
+}
 
 .board__tile svg {
   width: 30%;
@@ -2232,11 +2342,13 @@ html:not(.js) .menu-toggle {
   width: 60%;
 }
 
+/* A snackbar at the foot of the window, so it never lands on the board,
+   the illustration or the circle callout. */
 .board__toast {
-  position: absolute;
+  position: fixed;
   left: 50%;
-  top: calc(330 * var(--u));
-  z-index: 4;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  z-index: 44;
   translate: -50% 0;
   display: flex;
   align-items: center;
@@ -2249,7 +2361,7 @@ html:not(.js) .menu-toggle {
 .board__blob {
   position: absolute;
   right: calc(4 * var(--u));
-  top: calc(296 * var(--u));
+  top: calc(332 * var(--u));
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -2446,8 +2558,10 @@ html:not(.js) .menu-toggle {
 @media (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
 
   /* --- Get to know ------------------------------------------------------ */
+  /* Taller than the 728 frame, so the taped crossword and its shadow
+     never run under the wavy top edge of the Skills section. */
   .explore {
-    min-height: calc(790 * var(--u));
+    min-height: calc(860 * var(--u));
     padding: 0;
   }
 
@@ -2495,11 +2609,11 @@ html:not(.js) .menu-toggle {
 
   .cw {
     position: absolute;
-    left: calc(206 * var(--u));
-    top: calc(372 * var(--u));
-    width: calc(530 * var(--u));
+    left: calc(214 * var(--u));
+    top: calc(344 * var(--u));
+    width: calc(494 * var(--u));
     margin: 0;
-    padding: calc(24 * var(--u)) calc(22 * var(--u));
+    padding: calc(14 * var(--u)) calc(18 * var(--u)) calc(12 * var(--u));
   }
 
   .cw__wash {
@@ -2515,35 +2629,37 @@ html:not(.js) .menu-toggle {
   .cw__streaks {
     display: block;
     position: absolute;
-    left: calc(-54 * var(--u));
-    top: calc(34 * var(--u));
+    left: calc(-58 * var(--u));
+    top: calc(250 * var(--u));
     width: calc(46 * var(--u));
   }
 
   .cw__star {
     left: auto;
-    right: calc(-66 * var(--u));
-    top: auto;
-    bottom: calc(-40 * var(--u));
-    width: calc(98 * var(--u));
+    right: calc(-54 * var(--u));
+    top: calc(-46 * var(--u));
+    bottom: auto;
+    width: calc(76 * var(--u));
   }
 
   .panel {
     position: absolute;
-    left: calc(796 * var(--u));
-    top: calc(140 * var(--u));
-    width: calc(456 * var(--u));
+    left: calc(812 * var(--u));
+    top: calc(150 * var(--u));
+    width: calc(436 * var(--u));
     max-height: calc(580 * var(--u));
     margin: 0;
+    padding: 0;
     overflow-x: hidden;
     overflow-y: auto;
     scrollbar-width: thin;
   }
 
   .panel__head {
-    min-height: calc(60 * var(--u));
-    margin-top: calc(30 * var(--u));
-    padding: calc(8 * var(--u)) calc(34 * var(--u)) calc(10 * var(--u));
+    width: calc(100% - calc(40 * var(--u)));
+    min-height: calc(92 * var(--u));
+    margin-top: calc(22 * var(--u));
+    padding: calc(10 * var(--u)) calc(30 * var(--u)) calc(14 * var(--u));
   }
 
   .panel__cards {
@@ -2666,8 +2782,13 @@ html:not(.js) .menu-toggle {
     position: absolute;
     left: calc(622 * var(--u));
     top: calc(92 * var(--u));
+    display: block;
     width: calc(170 * var(--u));
     margin: 0;
+  }
+
+  .skills__hint-arrow {
+    rotate: none;
   }
 
   .skills__hint-piece {
@@ -2718,18 +2839,14 @@ html:not(.js) .menu-toggle {
     height: calc(58 * var(--u));
   }
 
-  .board__toast {
-    left: calc(262 * var(--u));
-    top: calc(552 * var(--u));
-  }
 
   .board__blob {
-    left: calc(362 * var(--u));
+    left: calc(74 * var(--u));
     right: auto;
-    top: calc(448 * var(--u));
-    width: calc(244 * var(--u));
-    height: calc(154 * var(--u));
-    padding: calc(22 * var(--u)) calc(40 * var(--u)) calc(30 * var(--u));
+    top: calc(548 * var(--u));
+    width: calc(214 * var(--u));
+    height: calc(132 * var(--u));
+    padding: calc(20 * var(--u)) calc(36 * var(--u)) calc(26 * var(--u));
   }
 
   .pieces {
@@ -2803,4 +2920,2821 @@ html:not(.js) .menu-toggle {
     width: calc(520 * var(--u));
     min-height: calc(62 * var(--u));
   }
+}
+
+/* ==========================================================================
+   17. TABLET  (wider than a phone, squarer than the desktop frame)
+   Between 640px and the desktop layout the phone arrangement would just
+   be stretched, so the hero and menu get their own two-column layouts.
+   ========================================================================== */
+
+@media (min-width: 48em) and (not ((min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em))) {
+
+  /* --- Hero: message left, "What you'll get" right, tagline centred --- */
+  .intro__photo img {
+    object-position: 50% 28%;
+  }
+
+  .hero__frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    column-gap: calc(22 * var(--u));
+    align-items: start;
+    max-width: none;
+    padding: calc(78 * var(--u)) calc(24 * var(--u)) calc(110 * var(--u));
+  }
+
+  .hero__tagline {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(290 * var(--u));
+    margin: 0;
+  }
+
+  .hero__intro {
+    grid-column: 1;
+    margin-top: calc(26 * var(--u));
+  }
+
+  .hero__badge--narrow {
+    display: none;
+  }
+
+  .perks {
+    display: block;
+    grid-column: 2;
+    position: relative;
+    margin-top: calc(40 * var(--u));
+  }
+
+  .hero__badge--wide {
+    display: block;
+    position: absolute;
+    right: calc(4 * var(--u));
+    top: calc(-16 * var(--u));
+    width: calc(70 * var(--u));
+  }
+
+  .perks__tag {
+    display: inline-block;
+    padding: calc(2 * var(--u)) calc(12 * var(--u)) calc(4 * var(--u));
+  }
+
+  .perks__list {
+    display: flex;
+    flex-direction: column;
+    gap: calc(11 * var(--u));
+    margin-top: calc(16 * var(--u));
+  }
+
+  .perk {
+    column-gap: calc(9 * var(--u));
+    padding: calc(5 * var(--u)) calc(12 * var(--u)) calc(5 * var(--u)) calc(5 * var(--u));
+  }
+
+  .perk:nth-child(even) {
+    margin-left: calc(14 * var(--u));
+  }
+
+  .perk__icon {
+    width: calc(28 * var(--u));
+    height: calc(28 * var(--u));
+  }
+
+  .perk__icon svg {
+    width: calc(15 * var(--u));
+    height: calc(15 * var(--u));
+  }
+
+  /* --- Menu: list on the left, the photograph filling the right --- */
+  .menu__panel {
+    width: 62%;
+  }
+
+  .menu__art picture {
+    width: 42%;
+    height: 100%;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 18%);
+    mask-image: linear-gradient(to right, transparent 0, #000 18%);
+  }
+
+  .menu__photo {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: 72% 30%;
+  }
+}
+
+
+/* ==========================================================================
+   17. PROGRAMME  (narrow: a row of day cards you swipe through)
+   The skyline is a sticky layer one screen tall with a negative margin,
+   so it stays put while the content moves over it. The day row is the
+   same on every screen: phones swipe it (scroll snap), wide screens pin
+   it and main.js slides it as the page scrolls. --k scales everything
+   inside a day item; the heading and controls keep the page scale.
+   ========================================================================== */
+
+:root {
+  --screen-l: 100vh;
+}
+
+@supports (height: 100lvh) {
+  :root {
+    --screen-l: 100lvh;
+  }
+}
+
+.prog {
+  position: relative;
+  z-index: 7;
+  isolation: isolate;
+  --u-page: var(--u);
+  --k: 1;
+  /* Phones: a shorter card, so a whole day fits comfortably on screen. */
+  --card-top: calc(66 * var(--u));
+  --card-h: calc(300 * var(--u));
+  --band: calc(120 * var(--u));
+  --pk: 0.84;
+  --mile: calc(136 * var(--u));
+}
+
+.prog__edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  z-index: 3;
+  width: 100%;
+  height: calc(24 * var(--u));
+  max-width: none;
+  pointer-events: none;
+}
+
+.prog__sky {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: var(--screen-l);
+  margin-bottom: calc(var(--screen-l) * -1);
+  overflow: hidden;
+}
+
+.prog__photo,
+.prog__photo img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.prog__photo img {
+  object-fit: cover;
+  object-position: 50% 60%;
+}
+
+.prog__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ready-mask {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.ready-mask__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.ready-mask__svg--wide {
+  display: none;
+}
+
+.prog__track {
+  position: relative;
+  z-index: 1;
+}
+
+.prog__stage {
+  position: relative;
+  padding: calc(74 * var(--u)) 0 calc(34 * var(--u));
+}
+
+/* --- Heading ------------------------------------------------------------- */
+.prog__head {
+  position: relative;
+  isolation: isolate;
+  max-width: calc(360 * var(--u));
+  margin: 0 auto;
+  padding: calc(24 * var(--u)) calc(22 * var(--u)) calc(24 * var(--u));
+  margin-left: calc(14 * var(--u));
+  margin-right: calc(14 * var(--u));
+}
+
+@media (min-width: 25em) {
+  .prog__head {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* The heading sits on a sheet of paper taped to the skyline. */
+.prog__paper {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  rotate: -1.2deg;
+}
+
+.prog__paper i {
+  position: absolute;
+  top: calc(-10 * var(--u));
+  width: calc(70 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.prog__paper i:first-child {
+  left: calc(18 * var(--u));
+  rotate: -8deg;
+}
+
+.prog__paper i:last-child {
+  right: calc(18 * var(--u));
+  rotate: 6deg;
+}
+
+.prog__kicker {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: calc(4 * var(--u));
+}
+
+.prog__kicker-arrow {
+  width: calc(26 * var(--u));
+  height: calc(22 * var(--u));
+  margin-top: calc(6 * var(--u));
+}
+
+.prog__title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: calc(6 * var(--u));
+}
+
+.prog__title-b {
+  margin: calc(-4 * var(--u)) 0 0 calc(12 * var(--u));
+}
+
+.prog__hl {
+  position: relative;
+  display: inline-block;
+}
+
+.prog__hl::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: calc(-4 * var(--u));
+  bottom: calc(-9 * var(--u));
+  height: calc(8 * var(--u));
+}
+
+.prog__sub {
+  max-width: calc(290 * var(--u));
+  margin: calc(12 * var(--u)) 0 0;
+}
+
+/* Three stat tiles, like stickers on the paper. */
+.prog__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(10 * var(--u));
+  margin-top: calc(18 * var(--u));
+}
+
+.stat {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  padding: calc(12 * var(--u)) calc(10 * var(--u)) calc(10 * var(--u)) calc(12 * var(--u));
+  border-radius: calc(14 * var(--u));
+}
+
+.stat__icon {
+  position: absolute;
+  right: calc(8 * var(--u));
+  top: calc(8 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+  border-radius: 50%;
+}
+
+.stat__icon svg {
+  width: calc(15 * var(--u));
+  height: calc(15 * var(--u));
+}
+
+.stat__num {
+  margin-top: calc(2 * var(--u));
+}
+
+.stat__label {
+  margin-top: calc(2 * var(--u));
+}
+
+/* --- The day row ---------------------------------------------------------- */
+.prog__rail {
+  display: flex;
+  align-items: flex-start;
+  margin-top: calc(10 * var(--u));
+  padding: 0 calc(50% - calc(148 * var(--u)) * var(--k));
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.prog__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.prog__item {
+  --u: calc(var(--u-page) * var(--k));
+  position: relative;
+  flex: none;
+  height: calc(var(--card-top) + var(--card-h) + calc(70 * var(--u)));
+  padding: 0 calc(12 * var(--u));
+}
+
+/* The timeline runs along the foot of the row, one segment per item. */
+.prog__item::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  top: calc(var(--card-top) + var(--card-h) + calc(31 * var(--u)));
+  height: calc(5 * var(--u));
+}
+
+.prog__item:first-child::before {
+  left: 50%;
+}
+
+.prog__item--end::before {
+  right: 50%;
+}
+
+.prog__item--day {
+  scroll-snap-align: center;
+}
+
+.prog__item--week {
+  width: calc(var(--mile) + calc(24 * var(--u)));
+  padding: calc(var(--card-top) + var(--card-h) / 2 - var(--mile) / 2) calc(12 * var(--u)) 0;
+}
+
+/* Milestones: a stamped disc, like the hero's "2 weeks" badge. */
+.mile {
+  position: relative;
+  width: var(--mile);
+  height: var(--mile);
+  margin: 0;
+}
+
+.mile::after {
+  content: "";
+  position: absolute;
+  inset: calc(-9 * var(--u));
+  pointer-events: none;
+}
+
+.mile__disc {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mile__disc::before {
+  content: "";
+  position: absolute;
+  inset: calc(9 * var(--u));
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mile__icon {
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+  margin-bottom: calc(2 * var(--u));
+}
+
+.prog__node {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--card-top) + var(--card-h) + calc(25 * var(--u)));
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(5 * var(--u));
+  translate: -50% 0;
+}
+
+.prog__node::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - calc(2 * var(--u)));
+  left: 50%;
+  width: calc(2 * var(--u));
+  height: calc(22 * var(--u));
+  translate: -50% 0;
+}
+
+.prog__node i {
+  display: grid;
+  place-items: center;
+  width: calc(17 * var(--u));
+  height: calc(17 * var(--u));
+  border-radius: 50%;
+}
+
+.prog__node--end i {
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+  margin-top: calc(-6 * var(--u));
+}
+
+.prog__node--end svg {
+  width: calc(17 * var(--u));
+  height: calc(17 * var(--u));
+}
+
+/* --- Day card -------------------------------------------------------------- */
+.day {
+  position: relative;
+  width: calc(272 * var(--u));
+  height: var(--card-h);
+  margin-top: var(--card-top);
+  perspective: calc(1600 * var(--u));
+}
+
+.day__flip {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.day__face {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(18 * var(--u));
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.day__face::after {
+  content: "";
+  position: absolute;
+  inset: calc(7 * var(--u));
+  z-index: 3;
+  border-radius: calc(13 * var(--u));
+  pointer-events: none;
+}
+
+.day__face--back {
+  transform: rotateY(180deg);
+}
+
+.day__band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--band);
+  overflow: hidden;
+  border-radius: calc(18 * var(--u)) calc(18 * var(--u)) 0 0;
+}
+
+.day__week {
+  position: absolute;
+  left: calc(20 * var(--u));
+  top: calc(20 * var(--u));
+  z-index: 1;
+}
+
+.day__name {
+  position: absolute;
+  left: calc(17 * var(--u));
+  bottom: calc(-12 * var(--u));
+  z-index: 1;
+}
+
+.day__person {
+  position: absolute;
+  bottom: calc(100% - var(--band));
+  right: var(--pr, calc(12 * var(--u)));
+  z-index: 2;
+  width: calc(var(--pw, calc(150 * var(--u))) * var(--pk));
+  max-width: none;
+  transform-origin: 50% 100%;
+}
+
+.day__body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--band);
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: var(--body-pad, calc(15 * var(--u)) calc(18 * var(--u)) 0);
+}
+
+.day__text {
+  margin-top: calc(8 * var(--u));
+}
+
+.day__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(6 * var(--u));
+  margin-top: calc(12 * var(--u));
+}
+
+.day__facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
+  padding: calc(4 * var(--u)) calc(9 * var(--u)) calc(4 * var(--u)) calc(7 * var(--u));
+  border-radius: 999px;
+}
+
+.day__facts svg {
+  width: calc(12 * var(--u));
+  height: calc(12 * var(--u));
+}
+
+.day__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding: var(--foot-pad, calc(8 * var(--u)) 0 calc(12 * var(--u)));
+}
+
+.day__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  padding: calc(5 * var(--u)) calc(11 * var(--u)) calc(5 * var(--u)) calc(9 * var(--u));
+  border-radius: 999px;
+}
+
+.day__chip svg {
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+}
+
+/* Back: the day's timetable. */
+.day__head {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  height: var(--head-h, calc(44 * var(--u)));
+  padding: 0 calc(18 * var(--u));
+  border-radius: calc(18 * var(--u)) calc(18 * var(--u)) 0 0;
+}
+
+.day__head-back {
+  width: calc(16 * var(--u));
+  height: calc(16 * var(--u));
+  margin-left: auto;
+}
+
+.plan {
+  position: relative;
+  display: grid;
+  padding: calc(14 * var(--u)) calc(16 * var(--u)) 0 calc(14 * var(--u));
+}
+
+.plan::before {
+  content: "";
+  position: absolute;
+  left: calc(calc(14 * var(--u)) + calc(44 * var(--u)) + calc(10 * var(--u)) + calc(12 * var(--u)));
+  top: calc(30 * var(--u));
+  bottom: calc(40 * var(--u));
+  width: calc(2 * var(--u));
+  translate: -50% 0;
+}
+
+.plan__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: calc(44 * var(--u)) calc(24 * var(--u)) 1fr;
+  column-gap: calc(10 * var(--u));
+  align-items: start;
+  min-height: var(--row-h, calc(60 * var(--u)));
+}
+
+.plan__row--lunch {
+  min-height: var(--lunch-h, calc(40 * var(--u)));
+}
+
+.plan__time {
+  padding-top: calc(3 * var(--u));
+  text-align: right;
+}
+
+.plan__time b,
+.plan__time span,
+.plan__what b {
+  display: block;
+}
+
+.plan__node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  border-radius: 50%;
+}
+
+.plan__node svg {
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+}
+
+.plan__what {
+  padding-top: calc(2 * var(--u));
+}
+
+.day__meta {
+  position: absolute;
+  left: calc(12 * var(--u));
+  right: calc(12 * var(--u));
+  bottom: calc(12 * var(--u));
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  border-radius: calc(12 * var(--u));
+}
+
+.day__lead,
+.day__take {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  min-width: 0;
+  padding: calc(9 * var(--u)) calc(9 * var(--u)) calc(9 * var(--u)) calc(10 * var(--u));
+}
+
+.day__avatar,
+.day__take-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+  border-radius: 50%;
+}
+
+.day__take-icon {
+  border-radius: calc(8 * var(--u));
+}
+
+.day__take-icon svg {
+  width: calc(14 * var(--u));
+  height: calc(14 * var(--u));
+}
+
+.day__lead small,
+.day__lead b,
+.day__lead span span,
+.day__take small,
+.day__take b {
+  display: block;
+}
+
+/* The head that peeks over the top once the card is turned over. */
+.day__peek {
+  position: absolute;
+  left: calc(26 * var(--u));
+  bottom: calc(100% - 1px);
+  z-index: 0;
+  width: calc(var(--pw, calc(150 * var(--u))) * var(--pk));
+  height: calc(30 * var(--u));
+  clip-path: inset(calc(-80 * var(--u)) calc(-20 * var(--u)) 0 calc(-20 * var(--u)));
+  pointer-events: none;
+}
+
+.day__peek img {
+  width: 100%;
+  max-width: none;
+}
+
+.day__toggle {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(18 * var(--u));
+}
+
+/* Each photograph sized and placed as in the frames. */
+#w1-mon { --pw: calc(162 * var(--u)); --pr: calc(12 * var(--u)); }
+#w1-tue { --pw: calc(112 * var(--u)); --pr: calc(30 * var(--u)); }
+#w1-wed { --pw: calc(128 * var(--u)); --pr: calc(22 * var(--u)); }
+#w2-mon { --pw: calc(124 * var(--u)); --pr: calc(16 * var(--u)); }
+#w2-tue { --pw: calc(152 * var(--u)); --pr: calc(10 * var(--u)); }
+#w2-wed { --pw: calc(150 * var(--u)); --pr: calc(8 * var(--u)); }
+
+/* The certificate: a taller band with the graduate, no timetable. */
+.day--finish {
+  --band: calc(var(--card-h) * 0.52);
+  --pw: calc(212 * var(--u));
+  --pr: calc(30 * var(--u));
+}
+
+.day__shine {
+  position: absolute;
+  inset: 0;
+}
+
+.day__confetti {
+  position: absolute;
+  left: 50%;
+  top: calc(40 * var(--u));
+  z-index: 5;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.day__confetti i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(7 * var(--u));
+  height: calc(11 * var(--u));
+}
+
+/* --- Controls -------------------------------------------------------------- */
+.prog__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(12 * var(--u));
+  width: max-content;
+  margin: calc(6 * var(--u)) auto 0;
+  padding: calc(6 * var(--u));
+  border-radius: 999px;
+}
+
+.prog__step {
+  display: grid;
+  place-items: center;
+  width: calc(38 * var(--u));
+  height: calc(38 * var(--u));
+  border-radius: 50%;
+}
+
+.prog__step svg {
+  width: calc(16 * var(--u));
+  height: calc(16 * var(--u));
+}
+
+.prog__step[data-step="-1"] svg {
+  rotate: 180deg;
+}
+
+.prog__now {
+  display: grid;
+  gap: calc(7 * var(--u));
+  min-width: calc(170 * var(--u));
+  padding: 0 calc(4 * var(--u));
+}
+
+.prog__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(10 * var(--u));
+}
+
+.prog__bar {
+  display: flex;
+  align-items: center;
+  gap: calc(4 * var(--u));
+}
+
+.prog__bar button {
+  flex: 1;
+  height: calc(14 * var(--u));
+  padding: calc(5 * var(--u)) 0;
+}
+
+.prog__bar i {
+  display: block;
+  height: calc(4 * var(--u));
+  border-radius: 999px;
+}
+
+.prog__bar-gap {
+  width: calc(6 * var(--u));
+}
+
+.prog__outro {
+  display: none;
+}
+
+/* Tablets take the phone layout, with the cards a little smaller so a
+   card and a half fit across. */
+@media (min-width: 48em) {
+  .prog {
+    --k: 0.8;
+  }
+}
+
+
+/* ==========================================================================
+   18. GET JOB READY  (narrow: the mobile frame, then the tools stacked)
+   ========================================================================== */
+
+.ready {
+  position: relative;
+  z-index: 8;
+  isolation: isolate;
+  padding: 0 0 calc(36 * var(--u));
+}
+
+.ready__edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 1px;
+  z-index: 0;
+  width: 100%;
+  height: calc(26 * var(--u));
+  max-width: none;
+  translate: 0 -100%;
+  pointer-events: none;
+}
+
+.ready__paint {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ready__dab {
+  position: absolute;
+}
+
+.ready__dab--mint { left: calc(-60 * var(--u)); top: calc(520 * var(--u)); width: calc(260 * var(--u)); height: calc(160 * var(--u)); }
+.ready__dab--mint-side { right: calc(-90 * var(--u)); top: calc(860 * var(--u)); width: calc(200 * var(--u)); height: calc(260 * var(--u)); }
+.ready__dab--yellow { left: calc(-70 * var(--u)); bottom: calc(-40 * var(--u)); width: calc(250 * var(--u)); height: calc(120 * var(--u)); }
+.ready__dab--green { right: calc(-40 * var(--u)); bottom: calc(-36 * var(--u)); width: calc(300 * var(--u)); height: calc(130 * var(--u)); }
+
+.ready__frame {
+  position: relative;
+  max-width: calc(600 * var(--u));
+  margin: 0 auto;
+  padding: calc(66 * var(--u)) calc(16 * var(--u)) 0;
+}
+
+.ready__title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ready__script {
+  margin-left: calc(2 * var(--u));
+  rotate: -5deg;
+  transform-origin: 0 100%;
+}
+
+.ready__main {
+  margin-top: calc(-6 * var(--u));
+  rotate: -3.5deg;
+  transform-origin: 0 100%;
+  white-space: nowrap;
+}
+
+.ready__hl {
+  position: relative;
+  display: inline-block;
+}
+
+.ready__hl::after {
+  content: "";
+  position: absolute;
+  left: calc(2 * var(--u));
+  right: calc(4 * var(--u));
+  bottom: calc(-5 * var(--u));
+  height: calc(7 * var(--u));
+}
+
+.ready__student {
+  position: absolute;
+  right: 0;
+  top: calc(128 * var(--u));
+  width: calc(188 * var(--u));
+  height: calc(210 * var(--u));
+}
+
+.ready__student img {
+  position: absolute;
+  left: calc(4 * var(--u));
+  top: 0;
+  width: calc(180 * var(--u));
+  max-width: none;
+  border-radius: 0 0 calc(18 * var(--u)) calc(18 * var(--u));
+}
+
+.ready__student-blob {
+  position: absolute;
+  left: calc(-4 * var(--u));
+  right: calc(-4 * var(--u));
+  top: calc(70 * var(--u));
+  bottom: 0;
+}
+
+.ready__star {
+  position: absolute;
+  right: calc(18 * var(--u));
+  top: calc(10 * var(--u));
+  width: calc(38 * var(--u));
+  height: calc(38 * var(--u));
+}
+
+.ready__lead {
+  position: relative;
+  z-index: 1;
+  width: calc(142 * var(--u));
+  margin: calc(30 * var(--u)) 0 0 calc(6 * var(--u));
+  min-height: calc(190 * var(--u));
+}
+
+.ready__lead-wide {
+  display: none;
+}
+
+/* The tools stand on one shared board, rather than floating on the page.
+   Phones: the list itself is the board. */
+.ready__tools {
+  position: relative;
+  display: grid;
+  gap: calc(22 * var(--u));
+  margin: calc(30 * var(--u)) calc(-6 * var(--u)) 0;
+  padding: calc(16 * var(--u)) calc(12 * var(--u));
+  border-radius: calc(26 * var(--u));
+}
+
+.ready__board {
+  display: none;
+}
+
+.tool__card {
+  position: relative;
+  min-height: calc(300 * var(--u));
+  padding: calc(22 * var(--u)) calc(20 * var(--u)) calc(24 * var(--u));
+}
+
+.tool__time {
+  display: grid;
+  place-items: center;
+  width: calc(124 * var(--u));
+  height: calc(60 * var(--u));
+  margin: 0 0 calc(6 * var(--u)) calc(-6 * var(--u));
+}
+
+.tool--cv .tool__time {
+  width: calc(164 * var(--u));
+  height: calc(80 * var(--u));
+}
+
+.tool__title {
+  position: relative;
+  display: inline-block;
+  padding-bottom: calc(6 * var(--u));
+  rotate: -5deg;
+  transform-origin: 0 100%;
+}
+
+.tool__title::after {
+  content: "";
+  position: absolute;
+  left: calc(-2 * var(--u));
+  right: calc(-10 * var(--u));
+  bottom: calc(-2 * var(--u));
+  height: calc(6 * var(--u));
+}
+
+.tool__text {
+  max-width: calc(270 * var(--u));
+  margin-top: calc(14 * var(--u));
+  rotate: -1.5deg;
+}
+
+.tool__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  min-height: calc(40 * var(--u));
+  margin-top: calc(16 * var(--u));
+  padding: 0 calc(22 * var(--u));
+}
+
+.tool__btn svg {
+  width: calc(15 * var(--u));
+  height: calc(15 * var(--u));
+}
+
+.tool__btn .tool__upload {
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+}
+
+.tool__file {
+  margin: calc(8 * var(--u)) 0 0 calc(6 * var(--u));
+}
+
+.tool__art {
+  position: relative;
+  margin: calc(18 * var(--u)) 0 0 auto;
+  width: calc(220 * var(--u));
+}
+
+.tool__art img {
+  position: relative;
+  width: 100%;
+}
+
+.tool__halo {
+  position: absolute;
+  left: 8%;
+  top: 22%;
+  width: 70%;
+  height: 78%;
+  border-radius: 50%;
+}
+
+.tool__doodle {
+  position: absolute;
+  width: calc(28 * var(--u));
+  height: calc(28 * var(--u));
+  overflow: visible;
+}
+
+.tool__doodle--ticks { left: calc(-18 * var(--u)); top: calc(30 * var(--u)); }
+.tool__doodle--chat { right: calc(34 * var(--u)); top: calc(16 * var(--u)); width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+.tool__doodle--dash { left: calc(-28 * var(--u)); top: calc(90 * var(--u)); }
+.tool__doodle--marks-a { right: calc(120 * var(--u)); top: calc(14 * var(--u)); }
+.tool__doodle--marks-b { right: calc(20 * var(--u)); top: calc(8 * var(--u)); }
+
+.tool--interview .tool__art {
+  width: calc(200 * var(--u));
+  margin: calc(18 * var(--u)) 0 0 0;
+}
+
+.tool__note {
+  position: absolute;
+}
+
+.note__arrow {
+  position: absolute;
+  width: calc(54 * var(--u));
+  height: calc(40 * var(--u));
+  overflow: visible;
+}
+
+.tool__note--interview { right: calc(26 * var(--u)); bottom: calc(64 * var(--u)); rotate: -8deg; }
+.tool__note--interview .note__arrow { left: 0; top: 100%; }
+
+.tool__note--cv { position: relative; display: inline-block; margin: calc(18 * var(--u)) 0 0 calc(6 * var(--u)); rotate: -8deg; }
+.tool__note--cv .note__arrow { left: 100%; top: 0; }
+
+.tool__note--impact { position: relative; display: block; width: max-content; margin: calc(22 * var(--u)) 0 0 auto; rotate: -7deg; }
+.tool__note--impact .note__arrow { right: 100%; top: calc(6 * var(--u)); }
+
+.tool__note--strengths { left: calc(22 * var(--u)); bottom: calc(40 * var(--u)); rotate: -6deg; }
+.tool__note--strengths .note__arrow { left: 80%; top: 70%; }
+
+.tool--strengths .tool__art {
+  width: calc(200 * var(--u));
+  margin-top: calc(10 * var(--u));
+}
+
+/* The sample CV with its feedback cards laid over its right side. */
+.cvx {
+  position: relative;
+  margin-top: calc(26 * var(--u));
+  padding-right: calc(96 * var(--u));
+}
+
+.cvx__paper {
+  width: calc(210 * var(--u));
+}
+
+.cvx__tips {
+  position: absolute;
+  right: calc(-4 * var(--u));
+  top: calc(30 * var(--u));
+  display: grid;
+  gap: calc(14 * var(--u));
+  width: calc(172 * var(--u));
+}
+
+.tip {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(8 * var(--u));
+  padding: calc(9 * var(--u)) calc(10 * var(--u)) calc(9 * var(--u)) calc(8 * var(--u));
+  border-radius: calc(10 * var(--u));
+}
+
+.tip__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(28 * var(--u));
+  height: calc(28 * var(--u));
+}
+
+.tip__icon svg {
+  width: calc(16 * var(--u));
+  height: calc(16 * var(--u));
+}
+
+.tip__copy b {
+  display: block;
+  margin-bottom: calc(2 * var(--u));
+}
+
+.ready__tagline {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: calc(250 * var(--u));
+  height: calc(100 * var(--u));
+  margin: calc(34 * var(--u)) 0 0 auto;
+  rotate: -7deg;
+}
+
+
+/* ==========================================================================
+   19. WIDE LAYOUT FOR THE PROGRAMME AND GET JOB READY
+   ========================================================================== */
+
+@media (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+
+  /* --- Programme: the row runs sideways (main.js moves it) --------------- */
+  .prog {
+    --k: 1.08;
+    --card-top: calc(52 * var(--u));
+    --card-h: calc(336 * var(--u));
+    --band: calc(150 * var(--u));
+    --pk: 1;
+    --mile: calc(148 * var(--u));
+    --body-pad: calc(20 * var(--u)) calc(20 * var(--u)) 0;
+    --foot-pad: calc(11 * var(--u)) 0 calc(16 * var(--u));
+    --head-h: calc(52 * var(--u));
+    --row-h: calc(66 * var(--u));
+    --lunch-h: calc(46 * var(--u));
+  }
+
+  .js .prog__track {
+    height: calc(var(--screen) + var(--prog-dist, 0px));
+  }
+
+  .js .prog__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: var(--screen);
+    padding: 0;
+    overflow: hidden;
+    overflow: clip;
+  }
+
+  .js .prog__belt {
+    display: flex;
+    align-items: flex-start;
+    width: max-content;
+    padding-right: calc(180 * var(--u));
+    margin-top: calc(-30 * var(--u));
+    will-change: transform;
+  }
+
+  .js .prog__head {
+    flex: none;
+    width: calc(470 * var(--u));
+    max-width: none;
+    margin: calc(40 * var(--u)) calc(70 * var(--u)) 0 calc(70 * var(--u));
+    padding: calc(34 * var(--u)) calc(34 * var(--u)) calc(32 * var(--u));
+  }
+
+  .js .prog__title-b {
+    margin: calc(-10 * var(--u)) 0 0 calc(22 * var(--u));
+  }
+
+  .js .prog__sub {
+    max-width: calc(380 * var(--u));
+    margin-top: calc(16 * var(--u));
+  }
+
+  .js .prog__stats {
+    gap: calc(12 * var(--u));
+    margin-top: calc(22 * var(--u));
+  }
+
+  .js .stat {
+    padding: calc(14 * var(--u)) calc(12 * var(--u)) calc(12 * var(--u)) calc(14 * var(--u));
+  }
+
+  .js .stat__icon {
+    width: calc(30 * var(--u));
+    height: calc(30 * var(--u));
+  }
+
+  .js .prog__item {
+    padding: 0 calc(22 * var(--u));
+  }
+
+  .js .prog__item--week {
+    padding: calc(var(--card-top) + var(--card-h) / 2 - var(--mile) / 2) calc(12 * var(--u)) 0;
+  }
+
+  .js .prog__rail {
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .js .prog__controls {
+    position: absolute;
+    left: 50%;
+    bottom: max(calc(20 * var(--u)), (var(--screen) - calc(728 * var(--u))) / 2 + calc(20 * var(--u)));
+    margin: 0;
+    translate: -50% 0;
+  }
+
+  .js .prog__stage.is-dragging {
+    cursor: grabbing;
+  }
+
+  .ready-mask__svg--wide {
+    display: block;
+  }
+
+  .ready-mask__svg--tall {
+    display: none;
+  }
+
+  /* --- Get job ready: the 1292 x 728 frame ------------------------------- */
+  .ready {
+    padding: 0;
+  }
+
+  .ready__frame {
+    overflow: hidden;
+    overflow: clip;
+    width: calc(1292 * var(--u));
+    max-width: none;
+    /* The 728 design, plus room below the board before the next section. */
+    height: calc(max(calc(728 * var(--u)), var(--screen)) + calc(72 * var(--u)));
+    min-height: calc(800 * var(--u));
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  .ready__frame > * {
+    position: absolute;
+  }
+
+  .ready {
+    --top: max(0px, (var(--screen) - calc(728 * var(--u))) / 2);
+  }
+
+  .ready__title { left: calc(58 * var(--u)); top: calc(var(--top) + calc(90 * var(--u))); }
+  .ready__main { margin-top: calc(-10 * var(--u)); }
+
+  .ready__student { left: calc(822 * var(--u)); right: auto; top: calc(var(--top) + calc(26 * var(--u))); width: calc(380 * var(--u)); height: calc(290 * var(--u)); }
+  .ready__student img { left: calc(18 * var(--u)); width: calc(338 * var(--u)); border-radius: 0; }
+  .ready__student-blob { left: calc(-30 * var(--u)); right: 0; top: calc(92 * var(--u)); bottom: calc(-10 * var(--u)); }
+  .ready__star { left: calc(390 * var(--u)); right: auto; top: calc(104 * var(--u)); width: calc(80 * var(--u)); height: calc(80 * var(--u)); }
+
+  .ready__lead { left: calc(410 * var(--u)); top: calc(var(--top) + calc(650 * var(--u))); width: calc(440 * var(--u)); margin: 0; padding-left: calc(26 * var(--u)); min-height: 0; }
+  .ready__lead-wide { display: inline; }
+  .ready__lead-narrow { display: none; }
+
+  .ready__tools { inset: 0; margin: 0; padding: 0; display: block; border-radius: 0; }
+
+  .ready__board {
+    display: block;
+    left: calc(14 * var(--u));
+    top: calc(var(--top) + calc(262 * var(--u)));
+    width: calc(1264 * var(--u));
+    height: calc(452 * var(--u));
+    border-radius: calc(40 * var(--u));
+  }
+
+  .ready__board::after {
+    content: "";
+    position: absolute;
+    inset: calc(12 * var(--u));
+    border-radius: calc(30 * var(--u));
+    pointer-events: none;
+  }
+  .tool { position: absolute; }
+  .tool__card { min-height: 0; height: 100%; padding: 0; }
+  .tool__card > * { position: absolute; margin: 0; }
+
+  .tool--interview { left: calc(29 * var(--u)); top: calc(var(--top) + calc(287 * var(--u))); width: calc(384 * var(--u)); height: calc(330 * var(--u)); z-index: 1; }
+  .tool--cv { left: calc(317 * var(--u)); top: calc(var(--top) + calc(229 * var(--u))); width: calc(662 * var(--u)); height: calc(404 * var(--u)); z-index: 2; }
+  .tool--strengths { left: calc(963 * var(--u)); top: calc(var(--top) + calc(284 * var(--u))); width: calc(300 * var(--u)); height: calc(340 * var(--u)); z-index: 1; }
+
+  /* Practise interviews */
+  .tool--interview .tool__time { left: calc(22 * var(--u)); top: calc(2 * var(--u)); width: calc(126 * var(--u)); height: calc(62 * var(--u)); }
+  .tool--interview .tool__title { left: calc(30 * var(--u)); top: calc(70 * var(--u)); }
+  .tool--interview .tool__text { left: calc(44 * var(--u)); top: calc(110 * var(--u)); width: calc(232 * var(--u)); }
+  .tool--interview .tool__btn { left: calc(46 * var(--u)); top: calc(166 * var(--u)); min-height: calc(38 * var(--u)); width: calc(176 * var(--u)); justify-content: space-between; white-space: nowrap; }
+  .tool--interview .tool__art { left: calc(22 * var(--u)); top: calc(192 * var(--u)); width: calc(182 * var(--u)); }
+  .tool__note--interview { left: calc(180 * var(--u)); top: calc(222 * var(--u)); right: auto; bottom: auto; }
+  .tool__note--interview .note__arrow { left: calc(30 * var(--u)); top: 100%; }
+
+  /* Build your CV */
+  .tool--cv .tool__time { left: calc(22 * var(--u)); top: calc(30 * var(--u)); width: calc(172 * var(--u)); height: calc(84 * var(--u)); }
+  .tool--cv .tool__title { left: calc(46 * var(--u)); top: calc(116 * var(--u)); }
+  .tool--cv .tool__text { left: calc(42 * var(--u)); top: calc(172 * var(--u)); width: calc(206 * var(--u)); }
+  .tool--cv .tool__btn { left: calc(44 * var(--u)); top: calc(268 * var(--u)); min-height: calc(42 * var(--u)); justify-content: space-between; padding: 0 calc(18 * var(--u)); white-space: nowrap; }
+  .tool--cv .tool__file { left: calc(50 * var(--u)); top: calc(318 * var(--u)); }
+  .tool__note--cv { left: calc(50 * var(--u)); top: calc(344 * var(--u)); }
+  .tool__note--cv .note__arrow { left: 100%; top: calc(-14 * var(--u)); width: calc(60 * var(--u)); }
+  .cvx { left: calc(255 * var(--u)); top: calc(28 * var(--u)); width: calc(390 * var(--u)); padding: 0; }
+  .cvx__paper { width: calc(234 * var(--u)); }
+  .cvx__tips { left: calc(212 * var(--u)); right: auto; top: calc(44 * var(--u)); width: calc(182 * var(--u)); gap: calc(16 * var(--u)); }
+  .tool__note--impact { left: calc(518 * var(--u)); top: calc(340 * var(--u)); margin: 0; }
+  .tool__note--impact .note__arrow { right: 100%; top: calc(14 * var(--u)); }
+  .tool__doodle--marks-a { left: calc(228 * var(--u)); top: calc(14 * var(--u)); right: auto; }
+  .tool__doodle--marks-b { left: calc(586 * var(--u)); top: 0; right: auto; }
+
+  /* Discover your strengths */
+  .tool--strengths .tool__time { left: calc(16 * var(--u)); top: calc(18 * var(--u)); width: calc(132 * var(--u)); height: calc(64 * var(--u)); }
+  .tool--strengths .tool__title { left: calc(22 * var(--u)); top: calc(82 * var(--u)); white-space: nowrap; }
+  .tool--strengths .tool__text { left: calc(32 * var(--u)); top: calc(138 * var(--u)); width: calc(230 * var(--u)); }
+  .tool--strengths .tool__btn { left: calc(30 * var(--u)); top: calc(208 * var(--u)); min-height: calc(38 * var(--u)); justify-content: space-between; padding: 0 calc(16 * var(--u)); white-space: nowrap; }
+  .tool--strengths .tool__art { left: calc(150 * var(--u)); top: calc(222 * var(--u)); width: calc(144 * var(--u)); }
+  .tool__note--strengths { left: calc(34 * var(--u)); top: calc(272 * var(--u)); bottom: auto; }
+  .tool__note--strengths .note__arrow { left: calc(72 * var(--u)); top: calc(30 * var(--u)); }
+
+  .ready__paint { inset: 0; }
+  .ready__dab--mint { left: calc(50% - calc(103 * var(--u))); top: calc(var(--top) - calc(50 * var(--u))); width: calc(440 * var(--u)); height: calc(160 * var(--u)); }
+  .ready__dab--mint-side { right: calc(-60 * var(--u)); left: auto; top: calc(var(--top) + calc(236 * var(--u))); width: calc(190 * var(--u)); height: calc(200 * var(--u)); }
+  .ready__dab--yellow { left: calc(-40 * var(--u)); bottom: auto; top: calc(var(--top) + calc(628 * var(--u))); width: calc(360 * var(--u)); height: calc(160 * var(--u)); }
+  .ready__dab--green { right: calc(-60 * var(--u)); bottom: auto; top: calc(var(--top) + calc(600 * var(--u))); width: calc(520 * var(--u)); height: calc(200 * var(--u)); }
+  .ready__tagline { left: auto; right: calc(130 * var(--u)); bottom: auto; top: calc(var(--top) + calc(614 * var(--u))); width: calc(300 * var(--u)); height: calc(104 * var(--u)); margin: 0; }
+}
+
+
+/* ==========================================================================
+   20. PINNED: THE GET JOB READY HAND-OVER
+   Like the intro: the programme ends with three screens of room in which
+   the field fades in over the skyline and the words settle, while Get job
+   ready (pulled up one screen) slides over the end. main.js plays it on
+   the way down and then folds the room away, so going back up is an
+   ordinary scroll with no mask.
+   ========================================================================== */
+
+@media (min-height: 30em) {
+  .js .prog__outro {
+    display: block;
+    height: calc(var(--screen) * 3);
+  }
+
+  .js.is-ready-done .prog__outro {
+    height: var(--screen);
+  }
+
+  .js .ready-mask {
+    display: block;
+  }
+
+  .js .ready {
+    margin-top: calc(var(--screen) * -1);
+  }
+}
+
+
+/* ==========================================================================
+   21. FAQ, JOIN NOW AND FOOTER  (narrow first)
+   ========================================================================== */
+
+.ready::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -3px;
+  height: 4px;
+}
+
+/* --- FAQ ------------------------------------------------------------------ */
+.faq {
+  position: relative;
+  z-index: 7;
+  padding: calc(44 * var(--u)) 0 calc(56 * var(--u));
+}
+
+.faq__edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  width: 100%;
+  height: calc(26 * var(--u));
+  max-width: none;
+  pointer-events: none;
+}
+
+.faq__frame {
+  max-width: calc(600 * var(--u));
+  margin: 0 auto;
+  padding: 0 calc(20 * var(--u));
+}
+
+.faq__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.faq__kicker::before {
+  content: "";
+  width: calc(40 * var(--u));
+  height: calc(9 * var(--u));
+}
+
+.faq__title {
+  margin-top: calc(2 * var(--u));
+  rotate: -3deg;
+  transform-origin: 0 100%;
+}
+
+.faq__sub {
+  max-width: calc(300 * var(--u));
+  margin-top: calc(8 * var(--u));
+  rotate: -2deg;
+  transform-origin: 0 100%;
+}
+
+.faq__help {
+  display: grid;
+  gap: calc(6 * var(--u));
+  margin-top: calc(24 * var(--u));
+  padding: calc(18 * var(--u)) calc(18 * var(--u)) calc(16 * var(--u));
+  border-radius: calc(16 * var(--u));
+}
+
+.faq__help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  justify-self: start;
+  margin-top: calc(6 * var(--u));
+  padding: calc(9 * var(--u)) calc(16 * var(--u));
+  border-radius: 999px;
+}
+
+.faq__help-link svg {
+  width: calc(15 * var(--u));
+  height: calc(15 * var(--u));
+}
+
+.faq__list {
+  margin-top: calc(28 * var(--u));
+}
+
+.qa__q {
+  margin: 0;
+}
+
+.qa__btn {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: calc(12 * var(--u));
+  width: 100%;
+  min-height: calc(64 * var(--u));
+  padding: calc(12 * var(--u)) 0;
+  text-align: left;
+}
+
+.qa__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+}
+
+.qa__icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.qa__icon i,
+.qa__icon i::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(14 * var(--u));
+  height: calc(2 * var(--u));
+  translate: -50% -50%;
+}
+
+.qa__icon i::after {
+  content: "";
+  rotate: 90deg;
+}
+
+.qa__a {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+
+.qa__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.qa__inner p {
+  max-width: calc(640 * var(--u));
+  padding: 0 calc(44 * var(--u)) calc(20 * var(--u)) 0;
+}
+
+.qa.is-open .qa__a {
+  grid-template-rows: 1fr;
+}
+
+/* --- The next-step hand-over ---------------------------------------------- */
+.next {
+  position: relative;
+  z-index: 7;
+}
+
+.next__stage {
+  position: relative;
+  display: grid;
+  place-items: start center;
+  padding: calc(40 * var(--u)) calc(20 * var(--u)) calc(30 * var(--u));
+  overflow: hidden;
+  overflow: clip;
+}
+
+.next__set {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  max-width: calc(600 * var(--u));
+}
+
+.next__box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(296 * var(--u));
+  height: calc(150 * var(--u));
+}
+
+.next__paint {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+}
+
+.next__title {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  rotate: -3deg;
+}
+
+.next__under {
+  position: absolute;
+  left: 22%;
+  right: 16%;
+  bottom: calc(24 * var(--u));
+  height: calc(9 * var(--u));
+}
+
+.next__dash {
+  position: absolute;
+  width: calc(40 * var(--u));
+  height: calc(9 * var(--u));
+}
+
+.next__dash--a { left: 0; top: calc(40 * var(--u)); rotate: 14deg; }
+.next__dash--b { left: calc(-4 * var(--u)); top: calc(74 * var(--u)); rotate: -6deg; }
+.next__dash--c { right: 0; top: calc(44 * var(--u)); rotate: -10deg; }
+.next__dash--d { right: calc(-4 * var(--u)); top: calc(78 * var(--u)); rotate: 6deg; }
+
+.next__lead {
+  max-width: calc(290 * var(--u));
+  margin-top: calc(22 * var(--u));
+  padding-left: calc(14 * var(--u));
+}
+
+.next__arrow {
+  display: block;
+  width: calc(60 * var(--u));
+  height: calc(130 * var(--u));
+  margin-top: calc(10 * var(--u));
+  overflow: visible;
+}
+
+/* No pinning: the block scrolls like the rest of the page, and the green
+   patch grows with the scroll until it fills the block, meeting Join
+   now's matching background below (main.js sets --grow). */
+.next__stage {
+  padding-bottom: 0;
+}
+
+/* --- Join now -------------------------------------------------------------- */
+.join {
+  position: relative;
+  z-index: 7;
+  padding: calc(30 * var(--u)) 0 calc(46 * var(--u));
+}
+
+.join__frame {
+  position: relative;
+  max-width: calc(600 * var(--u));
+  margin: 0 auto;
+  padding: 0 calc(18 * var(--u));
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "head"
+    "person"
+    "ways"
+    "coach";
+}
+
+.join__head { grid-area: head; }
+.join__person { grid-area: person; }
+.join__ways-wrap { grid-area: ways; }
+.join__coach { grid-area: coach; }
+
+.join__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.join__kicker::before {
+  content: "";
+  width: calc(40 * var(--u));
+  height: calc(9 * var(--u));
+}
+
+.join__title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: calc(4 * var(--u));
+}
+
+.join__script {
+  margin-top: calc(-2 * var(--u));
+}
+
+.join__lead {
+  max-width: calc(420 * var(--u));
+  margin-top: calc(10 * var(--u));
+}
+
+/* Phones: the note sits beside the photo, inside the screen. */
+.join__person {
+  position: relative;
+  display: grid;
+  grid-template-columns: calc(128 * var(--u)) 1fr;
+  align-items: center;
+  margin: calc(18 * var(--u)) 0 0;
+}
+
+.join__person img {
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+}
+
+.join__note {
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  margin-right: calc(-14 * var(--u));
+  padding: calc(16 * var(--u)) calc(12 * var(--u)) calc(12 * var(--u));
+  rotate: -5deg;
+}
+
+.join__tape {
+  position: absolute;
+  left: 50%;
+  top: calc(-9 * var(--u));
+  width: calc(58 * var(--u));
+  height: calc(18 * var(--u));
+  translate: -50% 0;
+  rotate: 4deg;
+}
+
+.join__tag {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: calc(-6 * var(--u)) calc(4 * var(--u)) 0 0;
+  rotate: -5deg;
+}
+
+.join__how {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: calc(4 * var(--u)) calc(14 * var(--u));
+  margin: calc(28 * var(--u)) 0 calc(26 * var(--u));
+}
+
+.join__ways {
+  display: grid;
+  gap: calc(50 * var(--u));
+}
+
+/* A paper note for each way to sign up. */
+.way {
+  position: relative;
+  isolation: isolate;
+  padding: calc(30 * var(--u)) calc(20 * var(--u)) calc(20 * var(--u));
+}
+
+.way::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.way__num {
+  position: absolute;
+  left: calc(-6 * var(--u));
+  top: calc(-18 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(48 * var(--u));
+  height: calc(48 * var(--u));
+}
+
+.way__head {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--u));
+  padding-left: calc(30 * var(--u));
+}
+
+.way__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(38 * var(--u));
+  height: calc(38 * var(--u));
+}
+
+.way__icon svg {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+.way__title {
+  position: relative;
+  padding-bottom: calc(4 * var(--u));
+}
+
+.way__title::after {
+  content: "";
+  position: absolute;
+  left: calc(-2 * var(--u));
+  right: calc(-6 * var(--u));
+  bottom: calc(-3 * var(--u));
+  height: calc(6 * var(--u));
+}
+
+.way__text {
+  margin-top: calc(12 * var(--u));
+}
+
+.way__demo {
+  position: relative;
+  margin-top: calc(14 * var(--u));
+}
+
+.way__or {
+  position: absolute;
+  left: 50%;
+  top: calc(-46 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(44 * var(--u));
+  height: calc(44 * var(--u));
+  translate: -50% 0;
+}
+
+/* Journal: a lined page that writes itself, then gets stamped. */
+.dj {
+  padding: calc(10 * var(--u)) calc(14 * var(--u)) calc(14 * var(--u)) calc(30 * var(--u));
+  min-height: calc(104 * var(--u));
+}
+
+.dj__to {
+  display: block;
+  margin-bottom: calc(2 * var(--u));
+}
+
+.dj__msg {
+  min-height: 2.6em;
+  padding-right: calc(52 * var(--u));
+}
+
+.dj__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -0.1em;
+}
+
+.dj__stamp {
+  position: absolute;
+  right: calc(10 * var(--u));
+  bottom: calc(10 * var(--u));
+  display: inline-flex;
+  align-items: center;
+  gap: calc(4 * var(--u));
+  padding: calc(3 * var(--u)) calc(8 * var(--u));
+}
+
+.dj__stamp svg {
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+}
+
+/* In person: two hand-drawn speech bubbles. */
+.dc {
+  display: grid;
+  gap: calc(10 * var(--u));
+  padding: calc(4 * var(--u)) 0 0;
+  min-height: calc(104 * var(--u));
+}
+
+.dc__row {
+  display: flex;
+}
+
+.dc__row--you {
+  justify-content: flex-end;
+}
+
+.dc__bubble {
+  position: relative;
+  max-width: 82%;
+  padding: calc(7 * var(--u)) calc(12 * var(--u));
+}
+
+.dc__bubble::after {
+  content: "";
+  position: absolute;
+  bottom: calc(-7 * var(--u));
+  width: calc(12 * var(--u));
+  height: calc(10 * var(--u));
+}
+
+.dc__row--you .dc__bubble::after { right: calc(14 * var(--u)); }
+.dc__row--coach .dc__bubble::after { left: calc(14 * var(--u)); }
+
+.dc__pin {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  justify-self: start;
+  margin-top: calc(2 * var(--u));
+}
+
+.dc__pin svg {
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+}
+
+.join__coach {
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  margin-top: calc(30 * var(--u));
+  padding: calc(16 * var(--u)) calc(18 * var(--u));
+}
+
+.join__star {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(42 * var(--u));
+  height: calc(42 * var(--u));
+  border-radius: 50%;
+}
+
+.join__star svg {
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+}
+
+/* --- Footer ---------------------------------------------------------------- */
+.foot {
+  position: relative;
+  z-index: 7;
+  isolation: isolate;
+  overflow: hidden;
+  overflow: clip;
+  padding-top: calc(70 * var(--u));
+}
+
+.foot__edge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: 100%;
+  height: calc(70 * var(--u));
+  max-width: none;
+}
+
+.foot__glow {
+  position: absolute;
+  inset: calc(60 * var(--u)) 0 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.foot__frame {
+  position: relative;
+  max-width: calc(600 * var(--u));
+  margin: 0 auto;
+  padding: calc(36 * var(--u)) calc(22 * var(--u)) calc(10 * var(--u));
+  display: grid;
+  gap: calc(32 * var(--u));
+}
+
+.foot__eyebrow {
+  margin-bottom: calc(8 * var(--u));
+}
+
+.foot__title {
+  position: relative;
+  display: inline-block;
+  padding-bottom: calc(6 * var(--u));
+}
+
+.foot__title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: calc(-4 * var(--u));
+  bottom: calc(-2 * var(--u));
+  height: calc(7 * var(--u));
+}
+
+.foot__text {
+  max-width: calc(300 * var(--u));
+  margin-top: calc(14 * var(--u));
+}
+
+.foot__for {
+  display: flex;
+  gap: calc(26 * var(--u));
+  margin-top: calc(20 * var(--u));
+}
+
+.foot__for li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  width: calc(90 * var(--u));
+  text-align: center;
+}
+
+.foot__badge {
+  display: grid;
+  place-items: center;
+  width: calc(50 * var(--u));
+  height: calc(50 * var(--u));
+}
+
+.foot__badge svg {
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+}
+
+.foot__nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(30 * var(--u)) calc(16 * var(--u));
+}
+
+.foot__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.foot__icon {
+  width: calc(34 * var(--u));
+  height: calc(34 * var(--u));
+}
+
+.foot__head {
+  position: relative;
+  margin: calc(8 * var(--u)) 0 calc(12 * var(--u));
+  padding-bottom: calc(6 * var(--u));
+}
+
+.foot__head::after {
+  content: "";
+  position: absolute;
+  left: calc(-8 * var(--u));
+  right: calc(-8 * var(--u));
+  bottom: calc(-2 * var(--u));
+  height: calc(5 * var(--u));
+}
+
+.foot__col ul {
+  display: grid;
+  gap: calc(6 * var(--u));
+}
+
+.foot__col a {
+  display: inline-block;
+  padding: calc(2 * var(--u)) calc(4 * var(--u));
+}
+
+.foot__arrows {
+  position: absolute;
+  right: calc(18 * var(--u));
+  top: calc(14 * var(--u));
+  width: calc(80 * var(--u));
+  height: calc(46 * var(--u));
+  overflow: visible;
+}
+
+.foot__word {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin-top: calc(20 * var(--u));
+  margin-bottom: -1px;
+}
+
+.foot__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(6 * var(--u)) calc(18 * var(--u));
+  padding: calc(12 * var(--u)) calc(20 * var(--u)) calc(16 * var(--u));
+}
+
+.foot__bar ul {
+  display: flex;
+  gap: calc(18 * var(--u));
+}
+
+.foot__dot {
+  display: inline-block;
+  width: calc(5 * var(--u));
+  height: calc(5 * var(--u));
+  margin: 0 calc(6 * var(--u));
+  vertical-align: middle;
+  border-radius: 50%;
+}
+
+
+/* ==========================================================================
+   22. WIDE LAYOUT FOR THE FAQ, JOIN NOW AND FOOTER
+   ========================================================================== */
+
+@media (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  .faq {
+    padding: calc(110 * var(--u)) 0 calc(90 * var(--u));
+  }
+
+  /* Two columns: the heading and a help card stay in view on the left,
+     the questions use the full width on the right. */
+  .faq__frame {
+    display: grid;
+    grid-template-columns: calc(380 * var(--u)) 1fr;
+    column-gap: calc(70 * var(--u));
+    align-items: start;
+    max-width: none;
+    width: calc(1180 * var(--u));
+    padding: 0;
+  }
+
+  .faq__head {
+    position: sticky;
+    top: calc(110 * var(--u));
+  }
+
+  .faq__sub {
+    max-width: calc(340 * var(--u));
+  }
+
+  .faq__list {
+    width: auto;
+    margin: calc(6 * var(--u)) 0 0;
+  }
+
+  .qa__btn {
+    column-gap: calc(20 * var(--u));
+    min-height: calc(72 * var(--u));
+  }
+
+  .qa__icon {
+    width: calc(42 * var(--u));
+    height: calc(42 * var(--u));
+  }
+
+  .qa__icon i,
+  .qa__icon i::after {
+    width: calc(18 * var(--u));
+    height: calc(2.5 * var(--u));
+  }
+
+  .qa__inner p {
+    max-width: none;
+    padding: 0 calc(70 * var(--u)) calc(22 * var(--u)) calc(46 * var(--u));
+  }
+
+  /* Next step: bigger, with room for the arrow to sweep down. */
+  .next__box {
+    width: calc(560 * var(--u));
+    height: calc(250 * var(--u));
+  }
+
+  .next__under {
+    bottom: calc(46 * var(--u));
+    height: calc(12 * var(--u));
+  }
+
+  .next__dash { width: calc(92 * var(--u)); height: calc(14 * var(--u)); }
+  .next__dash--a { left: calc(70 * var(--u)); top: calc(70 * var(--u)); }
+  .next__dash--b { left: calc(60 * var(--u)); top: calc(122 * var(--u)); }
+  .next__dash--c { right: calc(70 * var(--u)); top: calc(64 * var(--u)); }
+  .next__dash--d { right: calc(60 * var(--u)); top: calc(118 * var(--u)); }
+
+  .next__set {
+    max-width: none;
+    width: calc(900 * var(--u));
+  }
+
+  .next__lead {
+    max-width: calc(420 * var(--u));
+    margin-top: calc(26 * var(--u));
+  }
+
+  .next__arrow {
+    width: calc(70 * var(--u));
+    height: calc(150 * var(--u));
+  }
+
+  /* Join: copy and the two ways on the left; the student, her note and
+     the coach line on the right, so the whole section fits one screen. */
+  .join {
+    padding: calc(34 * var(--u)) 0 calc(60 * var(--u));
+  }
+
+  .join__frame {
+    max-width: none;
+    width: calc(1180 * var(--u));
+    padding: 0;
+    grid-template-columns: 1fr calc(400 * var(--u));
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "head  person"
+      "ways  person"
+      "ways  coach";
+    column-gap: calc(50 * var(--u));
+  }
+
+  .join__person {
+    display: block;
+    align-self: start;
+    width: calc(400 * var(--u));
+    margin: 0;
+  }
+
+  .join__person img {
+    width: calc(340 * var(--u));
+    margin-left: auto;
+  }
+
+  .join__note {
+    position: absolute;
+    left: calc(-30 * var(--u));
+    top: calc(30 * var(--u));
+    width: calc(160 * var(--u));
+    margin: 0;
+  }
+
+  .join__tag {
+    margin: calc(-14 * var(--u)) 0 0;
+    align-items: center;
+  }
+
+  .join__coach {
+    align-self: end;
+    margin: calc(18 * var(--u)) 0 0;
+  }
+
+  .join__how {
+    margin: calc(24 * var(--u)) 0 calc(30 * var(--u));
+  }
+
+  .join__ways {
+    grid-template-columns: 1fr 1fr;
+    gap: calc(56 * var(--u));
+    align-items: stretch;
+  }
+
+  .way__or {
+    left: calc(-28 * var(--u));
+    top: 50%;
+    translate: -50% -50%;
+  }
+
+  /* Footer: brand on the left, four columns, arrows in the corner. */
+  .foot {
+    padding-top: calc(90 * var(--u));
+  }
+
+  .foot__edge {
+    height: calc(110 * var(--u));
+  }
+
+  .foot__frame {
+    max-width: none;
+    width: calc(1240 * var(--u));
+    grid-template-columns: calc(300 * var(--u)) 1fr;
+    gap: calc(50 * var(--u));
+    padding: calc(40 * var(--u)) 0 0;
+  }
+
+  .foot__nav {
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+    gap: calc(50 * var(--u));
+    padding-top: calc(30 * var(--u));
+  }
+
+  .foot__arrows {
+    right: calc(10 * var(--u));
+    top: calc(30 * var(--u));
+    width: calc(160 * var(--u));
+    height: calc(88 * var(--u));
+  }
+
+  .foot__word {
+    margin-top: calc(-10 * var(--u));
+  }
+
+  .foot__bar {
+    padding: calc(14 * var(--u)) calc(40 * var(--u)) calc(18 * var(--u));
+  }
+}
+
+
+/* ==========================================================================
+   23. PROGRAMME ON PHONES AND TABLETS: one column, read top to bottom
+   The timeline runs down the left, a node beside each card. The wide
+   layout (above) is untouched.
+   ========================================================================== */
+
+@media not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  .prog {
+    --k: 1;
+  }
+
+  .prog__stage {
+    padding: calc(70 * var(--u)) 0 calc(40 * var(--u));
+  }
+
+  .prog__rail {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: calc(360 * var(--u));
+    margin: calc(14 * var(--u)) auto 0;
+    padding: 0 calc(12 * var(--u)) 0 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .prog__item {
+    height: auto;
+    padding: 0 0 calc(26 * var(--u)) calc(46 * var(--u));
+  }
+
+  .prog__item::before {
+    left: calc(21 * var(--u));
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: calc(4 * var(--u));
+    height: auto;
+  }
+
+  .prog__item:first-child::before {
+    left: calc(21 * var(--u));
+    top: 50%;
+  }
+
+  .prog__item--end::before {
+    right: auto;
+    bottom: 50%;
+  }
+
+  .prog__item--end {
+    padding-bottom: 0;
+  }
+
+  .prog__item--week {
+    display: flex;
+    justify-content: center;
+    width: auto;
+    padding: calc(34 * var(--u)) 0 calc(34 * var(--u)) calc(46 * var(--u));
+  }
+
+  .day {
+    width: calc(272 * var(--u));
+    max-width: 100%;
+  }
+
+  .prog__node {
+    left: calc(23 * var(--u));
+    top: calc(var(--card-top) + var(--card-h) / 2);
+    flex-direction: row;
+    translate: -50% -50%;
+  }
+
+  .prog__node::before {
+    left: calc(50% + calc(6 * var(--u)));
+    bottom: auto;
+    top: 50%;
+    width: calc(20 * var(--u));
+    height: calc(2 * var(--u));
+    translate: 0 -50%;
+  }
+
+  .prog__node b {
+    display: none;
+  }
+
+  .prog__node--end i {
+    margin-top: 0;
+  }
+
+  .prog__controls {
+    display: none;
+  }
+}
+
+
+/* Phones: Build your CV keeps the sample CV, at a size that fits beside
+   two of its feedback notes; the extra doodles step aside. */
+@media not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  .tool--cv .tool__time {
+    width: calc(132 * var(--u));
+    height: calc(66 * var(--u));
+  }
+
+  .cvx {
+    margin-top: calc(18 * var(--u));
+    padding-right: 0;
+  }
+
+  .cvx__paper {
+    width: calc(150 * var(--u));
+  }
+
+  .cvx__tips {
+    right: calc(-6 * var(--u));
+    top: calc(18 * var(--u));
+    width: calc(168 * var(--u));
+    gap: calc(10 * var(--u));
+  }
+
+  .tip:nth-child(3),
+  .tool__note--impact,
+  .tool--cv .tool__doodle {
+    display: none;
+  }
+
+  .tool__note--cv {
+    margin-top: calc(12 * var(--u));
+  }
+
+  .tool__card {
+    min-height: 0;
+  }
+
+  .stat__icon {
+    width: calc(22 * var(--u));
+    height: calc(22 * var(--u));
+    right: calc(6 * var(--u));
+    top: calc(6 * var(--u));
+  }
+
+  .stat__icon svg {
+    width: calc(12 * var(--u));
+    height: calc(12 * var(--u));
+  }
+}
+
+
+/* Phones: the tool buttons are full, finger-sized buttons with room
+   around them, so they read clearly as buttons. */
+@media not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  .tool__btn {
+    min-height: calc(48 * var(--u));
+    margin-top: calc(18 * var(--u));
+    padding: 0 calc(26 * var(--u));
+  }
+
+  .tool__file {
+    margin-top: calc(12 * var(--u));
+  }
+
+  .tool__note--cv {
+    margin-top: calc(16 * var(--u));
+  }
+}
+
+
+/* ==========================================================================
+   24. PHONE REFINEMENTS
+   ========================================================================== */
+
+@media not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+
+  /* Programme heading: more room inside the paper and around it. */
+  .prog__head {
+    margin: 0 calc(12 * var(--u));
+    padding: calc(30 * var(--u)) calc(20 * var(--u)) calc(30 * var(--u));
+  }
+
+  .prog__sub {
+    margin-top: calc(16 * var(--u));
+  }
+
+  .prog__stats {
+    gap: calc(8 * var(--u));
+    margin-top: calc(22 * var(--u));
+  }
+
+  .stat {
+    padding: calc(12 * var(--u)) calc(8 * var(--u)) calc(10 * var(--u)) calc(10 * var(--u));
+  }
+
+  /* Timeline: a pale track the full length of the fortnight, with a
+     coloured line that fills down it as you scroll (main.js sets --fill).
+     Each week badge hangs off the track by a short tie. */
+  .prog__rail {
+    position: relative;
+    margin-top: calc(30 * var(--u));
+  }
+
+  .prog__rail::before,
+  .prog__rail::after {
+    content: "";
+    position: absolute;
+    left: calc(20 * var(--u));
+    top: calc(102 * var(--u));
+    width: calc(6 * var(--u));
+    border-radius: calc(3 * var(--u));
+  }
+
+  .prog__rail::before {
+    bottom: calc(150 * var(--u));
+  }
+
+  .prog__rail::after {
+    height: calc((100% - calc(252 * var(--u))) * var(--fill, 0));
+  }
+
+  .prog__item::before {
+    display: none;
+  }
+
+  .prog__item--week {
+    justify-content: flex-start;
+    padding: calc(34 * var(--u)) 0 calc(34 * var(--u)) calc(64 * var(--u));
+  }
+
+  .prog__wknode {
+    position: absolute;
+    left: calc(23 * var(--u));
+    top: calc(calc(34 * var(--u)) + var(--mile) / 2);
+    z-index: 1;
+    width: calc(18 * var(--u));
+    height: calc(18 * var(--u));
+    translate: -50% -50%;
+    border-radius: 50%;
+  }
+
+  .prog__wknode::after {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    width: calc(30 * var(--u));
+    height: 0;
+    translate: 0 -50%;
+  }
+
+  /* Build the skills: the tools board rides up over the student, so he
+     peeks out above the first card. */
+  .ready__student {
+    z-index: 1;
+  }
+
+  .ready__lead {
+    min-height: calc(150 * var(--u));
+  }
+
+  .ready__tools {
+    z-index: 2;
+    margin-top: calc(6 * var(--u));
+  }
+
+  /* Join: the journal page is white paper, set apart from the card. */
+  .way__demo.dj {
+    margin: calc(18 * var(--u)) calc(2 * var(--u)) calc(4 * var(--u));
+  }
+}
+
+.prog__wknode {
+  display: none;
+}
+
+@media not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  .prog__wknode {
+    display: block;
+  }
+}
+
+
+/* ==========================================================================
+   25. GET JOB READY ON PHONES: header, then one tool at a time
+   ========================================================================== */
+
+.ready__tabs {
+  display: none;
+}
+
+@media not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  .ready__frame {
+    display: grid;
+    grid-template-columns: 1fr calc(168 * var(--u));
+    grid-template-areas:
+      "title  title"
+      "lead   student"
+      "tabs   tabs"
+      "tools  tools"
+      "tag    tag";
+    column-gap: calc(6 * var(--u));
+  }
+
+  .ready__title { grid-area: title; }
+  .ready__lead { grid-area: lead; }
+  .ready__tabs { grid-area: tabs; }
+  .ready__tools { grid-area: tools; }
+  .ready__tagline { grid-area: tag; }
+
+  .ready__lead {
+    align-self: center;
+    width: auto;
+    min-height: 0;
+    margin: calc(14 * var(--u)) 0 calc(30 * var(--u)) calc(2 * var(--u));
+  }
+
+  /* The student stands on the card: his photo ends where the tabs begin. */
+  .ready__student {
+    grid-area: student;
+    position: relative;
+    right: auto;
+    top: auto;
+    z-index: 1;
+    align-self: end;
+    width: calc(168 * var(--u));
+    height: auto;
+    margin: calc(10 * var(--u)) calc(-8 * var(--u)) calc(-2 * var(--u)) 0;
+  }
+
+  .ready__student img {
+    position: relative;
+    left: auto;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .ready__student-blob {
+    display: none;
+  }
+
+  .ready__star {
+    right: auto;
+    left: calc(-14 * var(--u));
+    top: calc(8 * var(--u));
+    width: calc(30 * var(--u));
+    height: calc(30 * var(--u));
+  }
+
+  /* Tabs: the top of the board. */
+  .js .ready__tabs {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: calc(6 * var(--u));
+    margin: 0 calc(-6 * var(--u));
+    padding: calc(10 * var(--u)) calc(10 * var(--u)) 0;
+    border-radius: calc(24 * var(--u)) calc(24 * var(--u)) 0 0;
+  }
+
+  .ready__tabs button {
+    display: grid;
+    justify-items: center;
+    gap: calc(1 * var(--u));
+    min-height: calc(54 * var(--u));
+    padding: calc(7 * var(--u)) calc(4 * var(--u)) calc(8 * var(--u));
+    border-radius: calc(14 * var(--u));
+  }
+
+  .js .ready__tools {
+    z-index: 2;
+    margin: 0 calc(-6 * var(--u));
+    padding: calc(12 * var(--u)) calc(10 * var(--u)) calc(14 * var(--u));
+    border-radius: 0 0 calc(24 * var(--u)) calc(24 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .tool:not(.is-active) {
+    display: none;
+  }
+
+  /* A compact card: badge and title side by side, the button, then the
+     picture tucked into the corner. */
+  .js .ready__tools.has-tabs .tool__card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: calc(4 * var(--u));
+    min-height: calc(330 * var(--u));
+    padding: calc(18 * var(--u)) calc(18 * var(--u)) calc(18 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .tool__card > * {
+    grid-column: 1 / -1;
+  }
+
+  .js .ready__tools.has-tabs .tool__time {
+    grid-column: 1;
+    width: calc(92 * var(--u));
+    height: calc(46 * var(--u));
+    margin: 0 0 0 calc(-4 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .tool__title {
+    grid-column: 2;
+    justify-self: start;
+    align-self: center;
+  }
+
+  .js .ready__tools.has-tabs .tool__text {
+    max-width: none;
+    margin-top: calc(12 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .tool__btn {
+    justify-self: start;
+  }
+
+  .js .ready__tools.has-tabs .tool__art {
+    justify-self: end;
+    width: calc(150 * var(--u));
+    margin: calc(8 * var(--u)) calc(-6 * var(--u)) calc(-18 * var(--u)) 0;
+  }
+
+  .js .ready__tools.has-tabs .tool__note {
+    position: absolute;
+    left: calc(20 * var(--u));
+    right: auto;
+    top: auto;
+    bottom: calc(34 * var(--u));
+    width: max-content;
+    margin: 0;
+  }
+
+  .js .ready__tools.has-tabs .tool__note--cv,
+  .js .ready__tools.has-tabs .tool__doodle {
+    display: none;
+  }
+
+  .js .ready__tools.has-tabs .tool__note .note__arrow {
+    left: 100%;
+    top: 0;
+    width: calc(40 * var(--u));
+  }
+
+  /* CV: the sample CV and two notes beside the copy. */
+  .js .ready__tools.has-tabs .tool--cv .tool__card {
+    min-height: calc(330 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .cvx {
+    margin-top: calc(14 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .cvx__paper {
+    width: calc(132 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .cvx__tips {
+    left: calc(108 * var(--u));
+    right: calc(-8 * var(--u));
+    width: auto;
+    top: calc(10 * var(--u));
+  }
+
+  .js .ready__tools.has-tabs .tool--cv .tool__time {
+    width: calc(92 * var(--u));
+    height: calc(46 * var(--u));
+  }
+
+  .ready__tagline {
+    justify-self: end;
+    margin-top: calc(26 * var(--u));
+  }
+}
+
+/* The growing patch stays behind the lead and the arrow. */
+.next__box {
+  z-index: 0;
+}
+
+.next__lead,
+.next__arrow {
+  position: relative;
+  z-index: 1;
 }

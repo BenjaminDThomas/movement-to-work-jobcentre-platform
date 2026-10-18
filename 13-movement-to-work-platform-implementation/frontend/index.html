@@ -1,94 +1,95 @@
 <!DOCTYPE html>
-<!--
-  =========================================================================
-  MOVEMENT TO WORK: SKELMERSDALE JOBCENTRE PLUS
-  Hero · menu · "Movement to Work" mask transition · About · Journey scenes
-  =========================================================================
-  Stage 13: Platform implementation
-
-  Scroll story (desktop and mobile)
-    1. Hero          split classroom / office photograph, pinned
-    2. Transition    the photograph is masked down into the letters
-                     MOVEMENT TO WORK, then the words lift away as About
-                     slides up over them
-    3. About         "From education to employment" and the six-step path
-    4. Journey       four full-screen scenes that pin and stack:
-                     Discover · Develop · Prepare · Employment
-    5. Get to know   crossword of the three key words, with a panel that
-                     explains whichever word is chosen
-    6. Skills        twelve puzzle pieces to click or drag onto a round
-                     board, each opening a sheet on why it matters
-    (The programme timeline follows in the next build stage.)
-
-  Accessibility notes for this document
-    - Landmarks: banner (fixed logo and Join corner) + main (hero, about,
-      journey, get to know, skills)
-      + modal menu dialog + skill sheet (native <dialog>)
-    - One <h1>; About and Journey use <h2>, each scene an <h3>
-    - The mask transition and every brush, leaf and spark are decorative
-      and hidden from assistive technology
-    - Text baked into supplied artwork carries the same words as alt text
-    - The menu is a modal dialog: focus moves in, is trapped, Esc closes,
-      and focus returns to the toggle
-    - Without JavaScript, or with reduced motion, nothing is pinned and the
-      page reads top to bottom as ordinary sections
-
-  File map
-    css/grid.css   reset, scale unit, layout and breakpoints
-    css/style.css  tokens, typography, components, motion
-    js/main.js     menu, scroll choreography, reveals
-    ../images/     photography, brand artwork, decoration (WebP)
-  =========================================================================
--->
 <html lang="en-GB">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!--
+    =========================================================================
+    MOVEMENT TO WORK: SKELMERSDALE JOBCENTRE PLUS
+    Hero · menu · "Movement to Work" mask transition · About · Journey scenes
+    =========================================================================
+    Stage 13: Platform implementation
+
+    Scroll story (desktop and mobile)
+      1. Hero          split classroom / office photograph, pinned
+      2. Transition    the photograph is masked down into the letters
+                       MOVEMENT TO WORK, then the words lift away as About
+                       slides up over them
+      3. About         "From education to employment" and the six-step path
+      4. Journey       four full-screen scenes that pin and stack:
+                       Discover · Develop · Prepare · Employment
+      5. Get to know   crossword of the three key words, with a panel that
+                       explains whichever word is chosen
+      6. Skills        twelve puzzle pieces to click or drag onto a round
+                       board, each opening a sheet on why it matters
+      (The programme timeline follows in the next build stage.)
+
+    Accessibility notes for this document
+      - Landmarks: banner (fixed logo and Join corner) + main (hero, about,
+        journey, get to know, skills)
+        + modal menu dialog + skill sheet (native <dialog>)
+      - One <h1>; About and Journey use <h2>, each scene an <h3>
+      - The mask transition and every brush, leaf and spark are decorative
+        and hidden from assistive technology
+      - Text baked into supplied artwork carries the same words as alt text
+      - The menu is a modal dialog: focus moves in, is trapped, Esc closes,
+        and focus returns to the toggle
+      - Without JavaScript, or with reduced motion, nothing is pinned and the
+        page reads top to bottom as ordinary sections
+
+    File map
+      css/grid.css   reset, fonts, scale unit, layout and breakpoints
+      css/style.css  tokens, typography, components, motion
+      css/tools.css  CV review, interview practice, strengths profile
+      css/*.min.css  the minified copies the pages load (built from the above)
+      js/main.js     menu, scroll choreography, reveals, loads the tools
+      js/*.min.js    the minified copies the pages load
+      ../fonts/      self-hosted Inter, Caveat, Caveat Brush, Bebas Neue
+      ../images/     photography, brand artwork, decoration (WebP, with
+                     smaller widths named -640, -960 and so on for srcset)
+    =========================================================================
+  -->
+
 
   <!-- ===================================================================
        1. DOCUMENT META
        =================================================================== -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
   <title>Movement to Work | Skelmersdale Jobcentre Plus</title>
   <meta name="description"
     content="Movement to Work is a free two-week programme from Skelmersdale Jobcentre Plus for young people aged 18-30, with real work experience, CV and interview preparation, and a local team supporting you every step.">
   <meta name="theme-color" content="#033D23">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../images/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../images/apple-touch-icon.png">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Movement to Work | Skelmersdale Jobcentre Plus">
   <meta property="og:description" content="Your first step from education into a real job.">
   <meta property="og:image" content="../images/hero-bg-desktop.webp">
   <meta property="og:locale" content="en_GB">
+  <meta property="og:site_name" content="Movement to Work">
+  <meta name="twitter:card" content="summary_large_image">
 
   <!-- ===================================================================
-       2. FONTS
+       2. FONTS  (self-hosted in ../fonts, declared in css/grid.css)
        Inter         body, navigation and UI text (matches the Figma file)
        Caveat        handwritten notes, numbers and labels
        Caveat Brush  bold brush headings ("to Work", menu titles, steps)
+       Bebas Neue    programme poster numbers
+       The two used in the first screen are fetched straight away.
        =================================================================== -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Caveat+Brush&family=Inter:wght@400..900&display=swap">
+  <link rel="preload" href="../fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/caveat-brush.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- ===================================================================
-       3. PRELOAD  (first paint artwork)
+       4. STYLESHEET  (grid.css then style.css, minified into one file;
+          the tools' styles load with the tools, see js/main.js)
        =================================================================== -->
-  <link rel="preload" as="image" href="../images/hero-bg-desktop.webp"
-    media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
-  <link rel="preload" as="image" href="../images/hero-bg-mobile.webp"
-    media="not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
-  <link rel="preload" as="image" href="../images/hero-figure-desktop.webp"
-    media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
-  <link rel="preload" as="image" href="../images/hero-figure-mobile.webp"
-    media="not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)">
-
-  <!-- ===================================================================
-       4. STYLESHEETS  (layout first, then skin)
-       =================================================================== -->
-  <link rel="stylesheet" href="../css/grid.css">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/site.min.css">
 
   <!-- ===================================================================
        5. SCRIPTING FLAG  (before first paint, so CSS can stage motion only
@@ -110,6 +111,48 @@
        =================================================================== -->
   <svg class="svg-sprite" aria-hidden="true" focusable="false" width="0" height="0">
     <defs>
+      <!-- Programme and Get job ready -->
+      <symbol id="i-journal" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M5 7H3.5M5 12H3.5M5 17H3.5M9 8h6M9 12h6M9 16h4" /></symbol>
+      <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.3" /><path d="M3 19.5c0-3.4 2.7-5.6 6-5.6s6 2.2 6 5.6" /><circle cx="16.8" cy="9" r="2.6" /><path d="M16 13.9c2.9 0 5 1.9 5 4.9" /></symbol>
+      <symbol id="i-f-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" /><path d="M12 2.8l1.6 2.3 2.7-.7.6 2.7 2.6 1-.9 2.6 1.9 2-1.9 2 .9 2.6-2.6 1-.6 2.7-2.7-.7L12 21.2l-1.6-2.3-2.7.7-.6-2.7-2.6-1 .9-2.6-1.9-2 1.9-2-.9-2.6 2.6-1 .6-2.7 2.7.7z" /></symbol>
+      <symbol id="i-f-support" viewBox="0 0 24 24"><path d="M5 13v-1a7 7 0 0 1 14 0v1" /><rect x="3.5" y="12.5" width="4" height="6" rx="1.6" /><rect x="16.5" y="12.5" width="4" height="6" rx="1.6" /><path d="M18.5 18.5c0 1.6-1.6 2.5-4 2.5h-2" /></symbol>
+      <symbol id="i-f-bag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M9 7V5.3A1.3 1.3 0 0 1 10.3 4h3.4A1.3 1.3 0 0 1 15 5.3V7M8.5 13.5c1 1 2.2 1.5 3.5 1.5s2.5-.5 3.5-1.5" /></symbol>
+      <symbol id="i-f-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4.1l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2" /><path d="M14 10a4.5 4.5 0 0 0-6.4-.1l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2" /></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></symbol>
+      <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z" /><path d="M14 3.5V8h4.5" /></symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="m4 7 8 6 8-6" /></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5h3l1.5 4-2 1.3a11 11 0 0 0 6.1 6.1l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z" /></symbol>
+      <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r="1" /></symbol>
+      <symbol id="i-bars" viewBox="0 0 24 24"><path d="M5 20v-6M10 20V9M15 20v-9M20 20V4" /></symbol>
+      <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 11A7.5 7.5 0 0 0 6 6.5L4.5 8M4.5 13A7.5 7.5 0 0 0 18 17.5l1.5-1.5" /><path d="M4.5 4v4h4M19.5 20v-4h-4" /></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9.5" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></symbol>
+      <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11" /><circle cx="4.6" cy="6.5" r="1" /><circle cx="4.6" cy="12" r="1" /><circle cx="4.6" cy="17.5" r="1" /></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.6" height="6.6" rx="1.8" /><rect x="13.4" y="4" width="6.6" height="6.6" rx="1.8" /><rect x="4" y="13.4" width="6.6" height="6.6" rx="1.8" /><rect x="13.4" y="13.4" width="6.6" height="6.6" rx="1.8" /></symbol>
+      <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" /></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6" /><path d="m15 15 5 5" /></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10.5 11v5.5M13.5 11v5.5" /></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" /></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><path d="M12 4c4.7 0 8.5 3 8.5 6.8s-3.8 6.8-8.5 6.8c-.9 0-1.8-.1-2.6-.3L5 19.5l1.2-3.6C4.5 14.6 3.5 12.8 3.5 10.8 3.5 7 7.3 4 12 4z" /></symbol>
+      <symbol id="i-muscle" viewBox="0 0 24 24"><path d="M5 17.5c0-4.5 1.2-8.6 3.6-12.1.6-.9 1.9-.9 2.6-.2l1.3 1.3c.6.6.5 1.6-.2 2.1L10.6 9.8c.4 1.6 1.4 2.6 3 3 1.7-1.6 4.4-1.8 6.1-.3 1.4 1.3 1.4 3.5 0 4.8-1.5 1.4-3.6 1.7-5.4 1.7H7.2c-1.2 0-2.2-.5-2.2-1.5z" /></symbol>
+      <symbol id="i-medal" viewBox="0 0 24 24"><path d="M8 3h8l-2.4 6.2M8 3l2.4 6.2" /><circle cx="12" cy="15" r="5.5" /><path d="m12 12.4.9 1.8 2 .3-1.4 1.4.3 2-1.8-.9-1.8.9.3-2-1.4-1.4 2-.3z" /></symbol>
+      <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15.5" r="4.5" /><path d="m11.2 12.3 8.3-8.3M16.5 7l2.5 2.5M14 9.5l2 2" /></symbol>
+      <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9M7 17.5H4.5v-7A1.5 1.5 0 0 1 6 9h12a1.5 1.5 0 0 1 1.5 1.5v7H17" /><rect x="7" y="14" width="10" height="7" rx="1" /></symbol>
+      <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.2" /><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2" /></symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" /></symbol>
+      <symbol id="i-shrink" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4M10 14l-7 7M14 10l7-7" /></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" /></symbol>
+      <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4.5 9h12v5a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z" /><path d="M16.5 10.5h1.2a2.6 2.6 0 0 1 0 5.2h-1.6M8 3.5c-.8 1 .8 1.8 0 3M12 3.5c-.8 1 .8 1.8 0 3" /></symbol>
+      <symbol id="i-sunset" viewBox="0 0 24 24"><path d="M3 18.5h18M6.5 18.5a5.5 5.5 0 0 1 11 0M12 6.5v3M4.6 10.6l2 1.4M19.4 10.6l-2 1.4M8.5 21h7" /></symbol>
+      <symbol id="i-flip" viewBox="0 0 24 24"><path d="M4.5 9.5a8 8 0 0 1 14.2-2.6M19.5 14.5a8 8 0 0 1-14.2 2.6" /><path d="M19.2 3.8v3.6h-3.6M4.8 20.2v-3.6h3.6" /></symbol>
+      <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="5" y="5.5" width="14" height="9.5" rx="1.2" /><path d="M3 18.5h18" /></symbol>
+      <symbol id="i-cap" viewBox="0 0 24 24"><path d="M12 5 2.5 9.5 12 14l9.5-4.5z" /><path d="M6.5 11.6V16c1.6 1.6 3.4 2.3 5.5 2.3s3.9-.7 5.5-2.3v-4.4M21.5 9.5v5" /></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M7 18.5H6a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.5-1.4A5 5 0 0 1 18 18.5h-1" /><path d="M12 20V11m0 0-3.5 3.5M12 11l3.5 3.5" /></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 5.5v8.5M12 18.2v.3" /></symbol>
+      <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.6 10.8c.6.5.9 1.2.9 1.9v.3h5.4v-.3c0-.7.3-1.4.9-1.9A6 6 0 0 0 12 3.5z" /></symbol>
       <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m0 0-6-6m6 6-6 6" /></symbol>
       <symbol id="i-check" viewBox="0 0 24 24"><path d="m6.5 12.5 3.6 3.6 7.4-8.2" /></symbol>
 
@@ -185,8 +228,8 @@
         <path d="M8.8 7V5.4A1.6 1.6 0 0 1 10.4 3.8h3.2a1.6 1.6 0 0 1 1.6 1.6V7M2.6 12.6c6 2.6 12.8 2.6 18.8 0" />
       </symbol>
       <symbol id="i-step-rocket" viewBox="0 0 24 24">
-        <path class="solid" style="fill: currentColor; stroke: none" d="M20.6 3.4c-4.6-.3-8.6 1.7-11.4 5.6l-2.6.2-3 3.2 3.6.9 3.6 3.6.9 3.6 3.2-3 .2-2.6c3.9-2.8 5.9-6.8 5.5-11.5zM15.2 10.6a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z" />
-        <path class="solid" style="fill: currentColor; stroke: none" d="M6.4 15.4c-1.6.4-2.6 2-2.8 5.2 3.2-.2 4.8-1.2 5.2-2.8z" />
+        <path class="solid" d="M20.6 3.4c-4.6-.3-8.6 1.7-11.4 5.6l-2.6.2-3 3.2 3.6.9 3.6 3.6.9 3.6 3.2-3 .2-2.6c3.9-2.8 5.9-6.8 5.5-11.5zM15.2 10.6a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z" />
+        <path class="solid" d="M6.4 15.4c-1.6.4-2.6 2-2.8 5.2 3.2-.2 4.8-1.2 5.2-2.8z" />
       </symbol>
 
       <!-- Get to know: words and notes -->
@@ -211,7 +254,7 @@
         <path d="m7.8 12.3 2.8 2.8 5.6-6" />
       </symbol>
       <symbol id="i-walk" viewBox="0 0 24 24">
-        <circle cx="13.6" cy="3.8" r="1.9" class="solid" style="fill: currentColor; stroke: none" />
+        <circle cx="13.6" cy="3.8" r="1.9" class="solid" />
         <path d="m10.4 21 2.2-6.4 2.6 2.4V21M8.4 11.4l2.8-3.2c.8-.9 2.2-1 3-.2l1.4 1.4 2.6 1.4M12.6 14.6l1-4.6M8.6 15.4l1.6-3" />
       </symbol>
 
@@ -227,7 +270,7 @@
       <symbol id="i-sk-target" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="9.2" />
         <circle cx="12" cy="12" r="5" />
-        <circle cx="12" cy="12" r="1.6" class="solid" style="fill: currentColor; stroke: none" />
+        <circle cx="12" cy="12" r="1.6" class="solid" />
       </symbol>
       <symbol id="i-sk-team" viewBox="0 0 24 24">
         <circle cx="7.4" cy="7" r="2.3" />
@@ -263,12 +306,12 @@
       <symbol id="i-sk-cv" viewBox="0 0 24 24">
         <path d="M14.2 2.6H6.4a1.8 1.8 0 0 0-1.8 1.8v15.2a1.8 1.8 0 0 0 1.8 1.8h11.2a1.8 1.8 0 0 0 1.8-1.8V7.8z" />
         <path d="M14.2 2.6v5.2h5.2M8 15.2h8M8 18h8" />
-        <circle cx="9.8" cy="9.2" r="1.7" class="solid" style="fill: currentColor; stroke: none" />
+        <circle cx="9.8" cy="9.2" r="1.7" class="solid" />
         <path d="M7.4 13.2c.3-1.2 1.2-1.9 2.4-1.9s2.1.7 2.4 1.9" />
       </symbol>
       <symbol id="i-sk-comm" viewBox="0 0 24 24">
-        <path class="solid" style="fill: currentColor; stroke: none" d="M12 2.6C6.4 2.6 2 6.4 2 11c0 2.5 1.3 4.7 3.3 6.2l-.8 4.2 4.4-2.6c1 .3 2 .4 3.1.4 5.6 0 10-3.8 10-8.4S17.6 2.6 12 2.6z" />
-        <path class="cut" style="stroke: var(--piece, #fff); stroke-width: 2.2" d="M7.4 9h9.2M7.4 13h6" />
+        <path class="solid" d="M12 2.6C6.4 2.6 2 6.4 2 11c0 2.5 1.3 4.7 3.3 6.2l-.8 4.2 4.4-2.6c1 .3 2 .4 3.1.4 5.6 0 10-3.8 10-8.4S17.6 2.6 12 2.6z" />
+        <path class="cut" d="M7.4 9h9.2M7.4 13h6" />
       </symbol>
       <symbol id="i-sk-time" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="9.4" />
@@ -308,13 +351,14 @@
     <div class="menu__art" aria-hidden="true">
       <picture>
         <source media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)"
-          srcset="../images/nav-photo-desktop.webp" width="1921" height="1085">
+          srcset="../images/nav-photo-desktop-800.webp 800w, ../images/nav-photo-desktop-1200.webp 1200w, ../images/nav-photo-desktop-1600.webp 1600w, ../images/nav-photo-desktop.webp 1921w" sizes="64vw" width="1921" height="1085">
+        <source media="(min-width: 48em)" srcset="../images/nav-photo-desktop-800.webp 800w, ../images/nav-photo-desktop-1200.webp 1200w, ../images/nav-photo-desktop-1600.webp 1600w, ../images/nav-photo-desktop.webp 1921w" sizes="43vw" width="1921" height="1085">
         <img class="menu__photo" src="../images/nav-photo-mobile.webp" alt="" width="410" height="564"
           loading="lazy" decoding="async">
       </picture>
 
       <p class="menu__slogan">
-        <img class="menu__slogan-sparks" src="../images/tagline-sparks-start.webp" alt="" width="96" height="146">
+        <img class="menu__slogan-sparks" src="../images/tagline-sparks-start.webp" alt="" width="96" height="146" loading="lazy" decoding="async">
         <span>Real skills</span>
         <span>Better futures</span>
         <svg class="menu__slogan-line" viewBox="0 0 220 14" preserveAspectRatio="none">
@@ -338,14 +382,14 @@
         <svg class="menu__brand-line" viewBox="0 0 400 40" aria-hidden="true">
           <path d="M6 34C120 18 260 8 394 6" />
         </svg>
-        <img class="menu__brand-sparks" src="../images/tagline-sparks-end.webp" alt="" width="96" height="143">
+        <img class="menu__brand-sparks" src="../images/tagline-sparks-end.webp" alt="" width="96" height="143" loading="lazy" decoding="async">
       </p>
 
       <p class="menu__guide">Your step by step guide to getting job ready.</p>
 
       <nav class="menu__nav" aria-label="Main" data-menu-nav>
         <ol class="menu__list">
-          <li class="menu__item" style="--i: 0">
+          <li class="menu__item v-i0">
             <a class="menu__link" href="#home" data-menu-link="home">
               <span class="menu__num">01</span>
               <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-home" /></svg>
@@ -353,7 +397,7 @@
               <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
             </a>
           </li>
-          <li class="menu__item" style="--i: 1">
+          <li class="menu__item v-i1">
             <a class="menu__link" href="#about" data-menu-link="about">
               <span class="menu__num">02</span>
               <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-about" /></svg>
@@ -361,7 +405,7 @@
               <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
             </a>
           </li>
-          <li class="menu__item" style="--i: 2">
+          <li class="menu__item v-i2">
             <a class="menu__link" href="#skills" data-menu-link="skills">
               <span class="menu__num">03</span>
               <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-skills" /></svg>
@@ -369,7 +413,7 @@
               <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
             </a>
           </li>
-          <li class="menu__item" style="--i: 3">
+          <li class="menu__item v-i3">
             <a class="menu__link" href="#programme" data-menu-link="programme">
               <span class="menu__num">04</span>
               <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-programme" /></svg>
@@ -377,7 +421,7 @@
               <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
             </a>
           </li>
-          <li class="menu__item" style="--i: 4">
+          <li class="menu__item v-i4">
             <a class="menu__link" href="#job-ready" data-menu-link="job-ready">
               <span class="menu__num">05</span>
               <svg class="menu__icon" aria-hidden="true" focusable="false"><use href="#i-jobready" /></svg>
@@ -387,13 +431,13 @@
           </li>
         </ol>
 
-        <a class="menu__link menu__link--faq" href="#faq" style="--i: 5">
+        <a class="menu__link menu__link--faq v-i5" href="#faq">
           <span class="menu__num menu__num--faq" aria-hidden="true">?</span>
           <span class="menu__text"><span class="menu__title">FAQ</span><span class="menu__sub">Quick answers, helpful info.</span></span>
           <span class="menu__go" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span>
         </a>
 
-        <a class="menu__join" href="#join" style="--i: 6">
+        <a class="menu__join v-i6" href="#join">
           <svg class="menu__join-icon" aria-hidden="true" focusable="false"><use href="#i-user" /></svg>
           <span class="menu__join-title">Join Now</span>
           <span class="menu__join-sub">Be part of the journey</span>
@@ -402,7 +446,7 @@
       </nav>
     </div>
 
-    <img class="menu__leaves" src="../images/nav-leaves.webp" alt="" width="170" height="138">
+    <img class="menu__leaves" src="../images/nav-leaves.webp" alt="" width="170" height="138" loading="lazy" decoding="async">
 
     <button class="menu__close" type="button" data-menu-close>
       <svg class="menu__close-x" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
@@ -461,17 +505,21 @@
 
         <!-- Two layers rather than one flattened photo: the classroom /
              office background, and the student as her own cut-out, so she
-             stays sharp and can move a touch independently (main.js). -->
+             stays sharp and can move a touch independently (main.js).
+             On phones they load at low priority, so the headline, which
+             needs only the stylesheet and fonts, paints first. -->
         <picture class="intro__photo">
           <source media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)"
-            srcset="../images/hero-bg-desktop.webp" width="2400" height="1352">
-          <img src="../images/hero-bg-mobile.webp" alt="" width="694" height="1352" fetchpriority="high"
+            srcset="../images/hero-bg-desktop-1024.webp 1024w, ../images/hero-bg-desktop-1280.webp 1280w, ../images/hero-bg-desktop-1440.webp 1440w, ../images/hero-bg-desktop-1600.webp 1600w, ../images/hero-bg-desktop-1920.webp 1920w, ../images/hero-bg-desktop.webp 2400w" sizes="100vw" width="2400" height="1352">
+          <source media="(min-width: 48em)" srcset="../images/hero-bg-desktop-1024.webp 1024w, ../images/hero-bg-desktop-1280.webp 1280w, ../images/hero-bg-desktop-1440.webp 1440w, ../images/hero-bg-desktop-1600.webp 1600w, ../images/hero-bg-desktop-1920.webp 1920w, ../images/hero-bg-desktop.webp 2400w" sizes="100vw" width="2400" height="1352">
+          <img fetchpriority="low" src="../images/hero-bg-mobile.webp" alt="" width="694" height="1352"
             decoding="async">
         </picture>
         <picture class="intro__photo intro__figure" data-figure>
           <source media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)"
-            srcset="../images/hero-figure-desktop.webp" width="2400" height="1352">
-          <img src="../images/hero-figure-mobile.webp" alt="" width="694" height="1352" fetchpriority="high"
+            srcset="../images/hero-figure-desktop-1024.webp 1024w, ../images/hero-figure-desktop-1280.webp 1280w, ../images/hero-figure-desktop-1440.webp 1440w, ../images/hero-figure-desktop-1600.webp 1600w, ../images/hero-figure-desktop-1920.webp 1920w, ../images/hero-figure-desktop.webp 2400w" sizes="100vw" width="2400" height="1352">
+          <source media="(min-width: 48em)" srcset="../images/hero-figure-desktop-1024.webp 1024w, ../images/hero-figure-desktop-1280.webp 1280w, ../images/hero-figure-desktop-1440.webp 1440w, ../images/hero-figure-desktop-1600.webp 1600w, ../images/hero-figure-desktop-1920.webp 1920w, ../images/hero-figure-desktop.webp 2400w" sizes="100vw" width="2400" height="1352">
+          <img fetchpriority="low" src="../images/hero-figure-mobile.webp" alt="" width="694" height="1352"
             decoding="async">
         </picture>
 
@@ -484,36 +532,36 @@
 
           <div class="hero__frame">
 
-            <p class="hero__tagline" data-enter style="--d: 2">
-              <img src="../images/tagline-education-employment.webp" alt="From education to employment" width="540"
+            <p class="hero__tagline v-d2" data-enter>
+              <img fetchpriority="low" src="../images/tagline-education-employment.webp" srcset="../images/tagline-education-employment-400.webp 400w, ../images/tagline-education-employment-540.webp 540w, ../images/tagline-education-employment-640.webp 640w, ../images/tagline-education-employment-810.webp 810w, ../images/tagline-education-employment.webp 1080w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 44vw, (min-width: 48em) 56vw, 90vw" alt="From education to employment" width="540"
                 height="78">
             </p>
 
             <div class="hero__intro">
 
               <h1 class="hero__title" id="hero-title">
-                <span class="hero__title-main" data-enter style="--d: 0">Movement</span>
-                <span class="hero__title-script" data-enter style="--d: 1">to Work</span>
+                <span class="hero__title-main v-d0" data-enter>Movement</span>
+                <span class="hero__title-script v-d1" data-enter>to Work</span>
                 <svg class="hero__title-line" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true"
                   focusable="false">
                   <path d="M10 31C120 22 260 12 420 8C480 6 540 5 592 6C598 7 599 12 594 14C540 15 480 16 420 18C270 22 140 30 16 38C6 38 3 33 10 31Z" />
                 </svg>
               </h1>
 
-              <img class="hero__badge hero__badge--narrow" src="../images/badge-two-weeks.webp"
-                alt="2 weeks to job-ready" width="135" height="135" data-enter style="--d: 3">
+              <img fetchpriority="low" class="hero__badge hero__badge--narrow v-d3" src="../images/badge-two-weeks.webp" srcset="../images/badge-two-weeks-140.webp 140w, ../images/badge-two-weeks-200.webp 200w, ../images/badge-two-weeks.webp 270w" sizes="24vw"
+                alt="2 weeks to job-ready" width="135" height="135" data-enter>
 
-              <p class="hero__lead" data-enter style="--d: 3">Your first step from education into a real job.</p>
+              <p class="hero__lead v-d3" data-enter>Your first step from education into a real job.</p>
 
-              <p class="hero__body" data-enter style="--d: 4">Gain workplace experience, sharpen your CV and interview
+              <p class="hero__body v-d4" data-enter>Gain workplace experience, sharpen your CV and interview
                 skills, and build the confidence employers look for, with a local team supporting you every step.</p>
 
-              <div class="hero__actions" data-enter style="--d: 5">
+              <div class="hero__actions v-d5" data-enter>
                 <a class="btn-brush" href="#join">Join the programme <span aria-hidden="true">&rarr;</span></a>
                 <a class="link-sketch" href="#about">See how it works <span aria-hidden="true">&rarr;</span></a>
               </div>
 
-              <ul class="hero__chips" aria-label="At a glance" data-enter style="--d: 6">
+              <ul class="hero__chips v-d6" aria-label="At a glance" data-enter>
                 <li class="chip"><svg class="chip__tick" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>Free to join</li>
                 <li class="chip"><svg class="chip__tick" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>Just 2 weeks</li>
                 <li class="chip"><svg class="chip__tick" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>Local Support</li>
@@ -522,26 +570,26 @@
             </div>
 
             <section class="perks" aria-labelledby="perks-title">
-              <h2 class="perks__tag" id="perks-title" data-enter style="--d: 4">What you&rsquo;ll get</h2>
-              <img class="hero__badge hero__badge--wide" src="../images/badge-two-weeks.webp"
-                alt="2 weeks to job-ready" width="135" height="135" data-enter style="--d: 4">
+              <h2 class="perks__tag v-d4" id="perks-title" data-enter>What you&rsquo;ll get</h2>
+              <img fetchpriority="low" class="hero__badge hero__badge--wide v-d4" src="../images/badge-two-weeks.webp" srcset="../images/badge-two-weeks-140.webp 140w, ../images/badge-two-weeks-200.webp 200w, ../images/badge-two-weeks.webp 270w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 10vw, 15vw"
+                alt="2 weeks to job-ready" width="135" height="135" data-enter loading="lazy">
               <ul class="perks__list">
-                <li class="perk perk--yellow" data-enter style="--d: 5">
+                <li class="perk perk--yellow v-d5" data-enter>
                   <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-briefcase" /></svg></span>
                   <span class="perk__name">Real work experience</span>
                   <span class="perk__desc">Time in a real workplace</span>
                 </li>
-                <li class="perk perk--green" data-enter style="--d: 6">
+                <li class="perk perk--green v-d6" data-enter>
                   <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-doc" /></svg></span>
                   <span class="perk__name">CV and interview prep</span>
                   <span class="perk__desc">Stand out and succeed</span>
                 </li>
-                <li class="perk perk--yellow" data-enter style="--d: 7">
+                <li class="perk perk--yellow v-d7" data-enter>
                   <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-star" /></svg></span>
                   <span class="perk__name">Confidence and skills</span>
                   <span class="perk__desc">What employers look for</span>
                 </li>
-                <li class="perk perk--green" data-enter style="--d: 8">
+                <li class="perk perk--green v-d8" data-enter>
                   <span class="perk__icon"><svg aria-hidden="true" focusable="false"><use href="#i-pin" /></svg></span>
                   <span class="perk__name">A local team</span>
                   <span class="perk__desc">Skelmersdale Jobcentre</span>
@@ -646,7 +694,7 @@
             </svg>
           </p>
 
-          <h2 class="about__title" id="about-title" data-rise style="--d: 1">
+          <h2 class="about__title v-d1" id="about-title" data-rise>
             <span class="about__title-script">From education
               <svg class="about__title-arrow" viewBox="0 0 70 52" aria-hidden="true" focusable="false">
                 <path d="M4 20c16-12 38-12 54 4 3 3 5 7 6 11m0 0 2-13m-2 13-12-6" />
@@ -655,48 +703,48 @@
             <span class="about__title-main">to employment</span>
           </h2>
 
-          <p class="about__text" data-rise style="--d: 2">Movement to Work is a short, practical programme that helps
+          <p class="about__text v-d2" data-rise>Movement to Work is a short, practical programme that helps
             young people aged 18-30 build the skills, confidence and support they need to get into work.</p>
         </div>
 
-        <img class="about__art" src="../images/about-education-to-employment.webp"
+        <img class="about__art v-d1" src="../images/about-education-to-employment.webp" srcset="../images/about-education-to-employment-640.webp 640w, ../images/about-education-to-employment-960.webp 960w, ../images/about-education-to-employment-1280.webp 1280w, ../images/about-education-to-employment.webp 1704w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 64vw, 100vw"
           alt="A smiling young woman in a green hoodie holding her books, standing between a school on one side and a glass office building on the other."
-          width="1704" height="988" loading="lazy" decoding="async" data-rise style="--d: 1">
+          width="1704" height="988" loading="lazy" decoding="async" data-rise>
 
         <img class="about__skyline" src="../images/decor-skyline.webp" alt="" width="214" height="94" loading="lazy">
 
         <ol class="steps" aria-label="Your path through Movement to Work">
-          <li class="step step--green" style="--i: 0">
+          <li class="step step--green v-i0">
             <span class="step__num">1</span>
             <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-cap" /></svg></span>
             <span class="step__label">Education</span>
             <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
           </li>
-          <li class="step step--yellow" style="--i: 1">
+          <li class="step step--yellow v-i1">
             <span class="step__num">2</span>
             <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-bulb" /></svg></span>
             <span class="step__label">Discover</span>
             <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
           </li>
-          <li class="step step--green" style="--i: 2">
+          <li class="step step--green v-i2">
             <span class="step__num">3</span>
             <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-gear" /></svg></span>
             <span class="step__label">Develop</span>
             <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
           </li>
-          <li class="step step--yellow" style="--i: 3">
+          <li class="step step--yellow v-i3">
             <span class="step__num">4</span>
             <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-doc" /></svg></span>
             <span class="step__label">Prepare</span>
             <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
           </li>
-          <li class="step step--green" style="--i: 4">
+          <li class="step step--green v-i4">
             <span class="step__num">5</span>
             <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-bag" /></svg></span>
             <span class="step__label">Employment</span>
             <svg class="step__arrow" viewBox="0 0 110 40" aria-hidden="true" focusable="false"><path d="M4 30C34 6 70 6 100 20m0 0-12-12m12 12-16 4" /></svg>
           </li>
-          <li class="step step--yellow" style="--i: 5">
+          <li class="step step--yellow v-i5">
             <span class="step__num">6</span>
             <span class="step__disc"><svg aria-hidden="true" focusable="false"><use href="#i-step-rocket" /></svg></span>
             <span class="step__label">Next Steps</span>
@@ -724,7 +772,7 @@
       <ol class="journey__list">
 
         <li class="scene" data-scene>
-          <div class="scene__media"><img class="scene__img" src="../images/timeline-discover.webp" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
+          <div class="scene__media"><img class="scene__img" src="../images/timeline-discover.webp" srcset="../images/timeline-discover-960.webp 960w, ../images/timeline-discover-1280.webp 1280w, ../images/timeline-discover-1600.webp 1600w, ../images/timeline-discover.webp 1925w" sizes="100vw" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
           <span class="scene__rail" aria-hidden="true"></span>
           <div class="scene__marker">
             <span class="scene__num" aria-hidden="true">01</span>
@@ -739,7 +787,7 @@
         </li>
 
         <li class="scene" data-scene>
-          <div class="scene__media"><img class="scene__img" src="../images/timeline-develop.webp" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
+          <div class="scene__media"><img class="scene__img" src="../images/timeline-develop.webp" srcset="../images/timeline-develop-960.webp 960w, ../images/timeline-develop-1280.webp 1280w, ../images/timeline-develop-1600.webp 1600w, ../images/timeline-develop.webp 1925w" sizes="100vw" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
           <span class="scene__rail" aria-hidden="true"></span>
           <div class="scene__marker">
             <span class="scene__num" aria-hidden="true">02</span>
@@ -754,7 +802,7 @@
         </li>
 
         <li class="scene" data-scene>
-          <div class="scene__media"><img class="scene__img" src="../images/timeline-prepare.webp" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
+          <div class="scene__media"><img class="scene__img" src="../images/timeline-prepare.webp" srcset="../images/timeline-prepare-960.webp 960w, ../images/timeline-prepare-1280.webp 1280w, ../images/timeline-prepare-1600.webp 1600w, ../images/timeline-prepare.webp 1925w" sizes="100vw" alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
           <span class="scene__rail" aria-hidden="true"></span>
           <div class="scene__marker">
             <span class="scene__num" aria-hidden="true">03</span>
@@ -769,7 +817,7 @@
         </li>
 
         <li class="scene" data-scene>
-          <div class="scene__media"><img class="scene__img scene__img--employment" src="../images/timeline-employment.webp"
+          <div class="scene__media"><img class="scene__img scene__img--employment" src="../images/timeline-employment.webp" srcset="../images/timeline-employment-960.webp 960w, ../images/timeline-employment-1280.webp 1280w, ../images/timeline-employment-1600.webp 1600w, ../images/timeline-employment.webp 1925w" sizes="100vw"
               alt="" width="1925" height="1085" loading="lazy" decoding="async"></div>
           <span class="scene__rail" aria-hidden="true"></span>
           <div class="scene__marker">
@@ -784,6 +832,7 @@
               employment.</p>
           </div>
         </li>
+
 
       </ol>
     </section>
@@ -816,112 +865,174 @@
               </svg>
             </span>
           </h2>
-          <p class="explore__text" data-rise style="--d: 1">Click on the words below to find out more about the
+          <p class="explore__text v-d1" data-rise>Click on the words below to find out more about the
             programme and how it can help you.</p>
         </div>
 
         <div class="cw" aria-hidden="true" data-cw>
-          <svg class="cw__wash" viewBox="0 0 560 350" preserveAspectRatio="none" focusable="false">
-            <defs>
-              <filter id="cw-paint" x="-10%" y="-10%" width="120%" height="120%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n" />
-                <feDisplacementMap in="SourceGraphic" in2="n" scale="16" />
-              </filter>
-              <radialGradient id="cw-wash-fill" cx="45%" cy="45%" r="65%">
-                <stop offset="0" stop-color="#E4F0D6" />
-                <stop offset=".7" stop-color="#CFE3BD" />
-                <stop offset="1" stop-color="#B9D7A4" />
-              </radialGradient>
-            </defs>
-            <path class="cw__wash-shadow"
-              d="M24 84C70 40 150 22 236 30c62 6 96-22 168-14 70 8 128 18 142 62 12 40-10 70 2 112 14 48-6 92-58 112-44 18-104 6-150 26-48 20-112 22-164 6-46-14-74-50-118-62C28 260 4 228 12 186 18 150-6 116 24 84z" />
-            <path class="cw__wash-base"
-              d="M24 84C70 40 150 22 236 30c62 6 96-22 168-14 70 8 128 18 142 62 12 40-10 70 2 112 14 48-6 92-58 112-44 18-104 6-150 26-48 20-112 22-164 6-46-14-74-50-118-62C28 260 4 228 12 186 18 150-6 116 24 84z" />
-          </svg>
+          <span class="cw__tape"></span>
+          <svg class="cw__point" viewBox="0 0 78 70"><path d="M6 6c8 26 26 44 58 52m0 0-12-12m12 12-16 4" /></svg>
+
+          <header class="cw__mast">
+            <p class="cw__paper">The Movement to Work Daily</p>
+            <p class="cw__name">Crossword <span>No. 01</span></p>
+            <p class="cw__hint"><svg viewBox="0 0 16 16"><path d="M4 2.5v9l2.6-2.4 1.8 4 1.8-.8-1.8-4H12z" /></svg>Tap a word</p>
+          </header>
 
           <div class="cw__grid">
-            <span class="cw__cell" style="--r:1;--c:5;--k:3"></span>
-            <span class="cw__cell" style="--r:1;--c:12;--k:9"></span>
-            <span class="cw__cell cw__cell--letter" data-word="purpose" data-num="2" style="--r:1;--c:15;--k:0">P</span>
-            <span class="cw__cell" style="--r:2;--c:1;--k:8"></span>
-            <span class="cw__cell" style="--r:2;--c:2;--k:2"></span>
-            <span class="cw__cell" style="--r:2;--c:5;--k:5"></span>
-            <span class="cw__cell" style="--r:2;--c:6;--k:9"></span>
-            <span class="cw__cell" style="--r:2;--c:7;--k:7"></span>
-            <span class="cw__cell" style="--r:2;--c:10;--k:10"></span>
-            <span class="cw__cell" style="--r:2;--c:11;--k:9"></span>
-            <span class="cw__cell" style="--r:2;--c:12;--k:1"></span>
-            <span class="cw__cell" style="--r:2;--c:13;--k:9"></span>
-            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:2;--c:15;--k:1">U</span>
-            <span class="cw__cell" style="--r:2;--c:16;--k:0"></span>
-            <span class="cw__cell" style="--r:3;--c:2;--k:7"></span>
-            <span class="cw__cell" style="--r:3;--c:3;--k:4"></span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" data-num="1" style="--r:3;--c:4;--k:0">M</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:5;--k:1">O</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:6;--k:2">V</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:7;--k:3">E</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:8;--k:4">M</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:9;--k:5">E</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:10;--k:6">N</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:11;--k:7">T</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:12;--k:8">O</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:13;--k:9">W</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:14;--k:10">O</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw purpose" style="--r:3;--c:15;--k:11">R</span>
-            <span class="cw__cell cw__cell--letter" data-word="mtw" style="--r:3;--c:16;--k:12">K</span>
-            <span class="cw__cell" style="--r:4;--c:2;--k:8"></span>
-            <span class="cw__cell" style="--r:4;--c:3;--k:3"></span>
-            <span class="cw__cell" style="--r:4;--c:5;--k:3"></span>
-            <span class="cw__cell" style="--r:4;--c:6;--k:11"></span>
-            <span class="cw__cell" style="--r:4;--c:9;--k:7"></span>
-            <span class="cw__cell" style="--r:4;--c:10;--k:8"></span>
-            <span class="cw__cell" style="--r:4;--c:11;--k:8"></span>
-            <span class="cw__cell" style="--r:4;--c:12;--k:7"></span>
-            <span class="cw__cell" style="--r:4;--c:13;--k:6"></span>
-            <span class="cw__cell" style="--r:4;--c:14;--k:10"></span>
-            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:4;--c:15;--k:3">P</span>
-            <span class="cw__cell" style="--r:4;--c:16;--k:2"></span>
-            <span class="cw__cell" style="--r:5;--c:3;--k:3"></span>
-            <span class="cw__cell" style="--r:5;--c:6;--k:10"></span>
-            <span class="cw__cell" style="--r:5;--c:7;--k:2"></span>
-            <span class="cw__cell" style="--r:5;--c:9;--k:8"></span>
-            <span class="cw__cell" style="--r:5;--c:10;--k:6"></span>
-            <span class="cw__cell" style="--r:5;--c:11;--k:11"></span>
-            <span class="cw__cell" style="--r:5;--c:14;--k:0"></span>
-            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:5;--c:15;--k:4">O</span>
-            <span class="cw__cell" style="--r:5;--c:16;--k:10"></span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" data-num="3" style="--r:6;--c:3;--k:0">E</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:4;--k:1">L</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:5;--k:2">I</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:6;--k:3">G</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:7;--k:4">I</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:8;--k:5">B</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:9;--k:6">I</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:10;--k:7">L</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:11;--k:8">I</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:12;--k:9">T</span>
-            <span class="cw__cell cw__cell--letter" data-word="eligibility" style="--r:6;--c:13;--k:10">Y</span>
-            <span class="cw__cell" style="--r:6;--c:14;--k:12"></span>
-            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:6;--c:15;--k:5">S</span>
-            <span class="cw__cell" style="--r:7;--c:4;--k:1"></span>
-            <span class="cw__cell" style="--r:7;--c:5;--k:2"></span>
-            <span class="cw__cell" style="--r:7;--c:6;--k:12"></span>
-            <span class="cw__cell" style="--r:7;--c:9;--k:9"></span>
-            <span class="cw__cell" style="--r:7;--c:10;--k:0"></span>
-            <span class="cw__cell" style="--r:7;--c:11;--k:4"></span>
-            <span class="cw__cell" style="--r:7;--c:12;--k:12"></span>
-            <span class="cw__cell" style="--r:7;--c:14;--k:0"></span>
-            <span class="cw__cell cw__cell--letter" data-word="purpose" style="--r:7;--c:15;--k:6">E</span>
-            <span class="cw__cell" style="--r:8;--c:5;--k:4"></span>
-            <span class="cw__cell" style="--r:8;--c:8;--k:7"></span>
-            <span class="cw__cell" style="--r:8;--c:9;--k:9"></span>
-            <span class="cw__cell" style="--r:8;--c:12;--k:11"></span>
-            <span class="cw__cell" style="--r:8;--c:14;--k:6"></span>
-            <span class="cw__cell" style="--r:9;--c:5;--k:11"></span>
-            <span class="cw__cell" style="--r:9;--c:6;--k:12"></span>
-            <span class="cw__cell" style="--r:9;--c:7;--k:6"></span>
-            <span class="cw__cell" style="--r:9;--c:8;--k:6"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose" data-num="2">P</span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose">U</span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw" data-num="1">M</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">O</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">V</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">E</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">M</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">E</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">N</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">T</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">O</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">W</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">O</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw purpose">R</span>
+            <span class="cw__cell cw__cell--letter" data-word="mtw">K</span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose">P</span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose">O</span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility" data-num="3">E</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">L</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">G</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">B</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">L</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">I</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">T</span>
+            <span class="cw__cell cw__cell--letter" data-word="eligibility">Y</span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose">S</span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--letter" data-word="purpose">E</span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
+            <span class="cw__cell cw__cell--block"></span>
           </div>
+
+          <ul class="cw__clues">
+            <li><button type="button" tabindex="-1" class="cw__clue" data-clue="mtw"><b>1</b><i>Across</i> The programme</button></li>
+            <li><button type="button" tabindex="-1" class="cw__clue" data-clue="purpose"><b>2</b><i>Down</i> Why it exists</button></li>
+            <li><button type="button" tabindex="-1" class="cw__clue" data-clue="eligibility"><b>3</b><i>Across</i> Who it&rsquo;s for</button></li>
+          </ul>
+
+          <span class="cw__tip" data-cw-tip></span>
 
           <svg class="cw__bulb" viewBox="0 0 90 90" focusable="false">
             <path d="M45 30c-11 0-19 8-19 18 0 7 4 12 8 16 2 2 3 4 3 7v3h16v-3c0-3 1-5 3-7 4-4 8-9 8-16 0-10-8-18-19-18z" />
@@ -1083,7 +1194,7 @@
               <svg class="skills__sparks skills__sparks--r" viewBox="0 0 40 34" aria-hidden="true" focusable="false"><path d="M36 6l-22 8M38 20H12M34 32l-20-8" /></svg>
             </span>
           </h2>
-          <p class="skills__text" data-rise style="--d: 1">Discover the 12 key skills you&rsquo;ll develop through the
+          <p class="skills__text v-d1" data-rise>Discover the 12 key skills you&rsquo;ll develop through the
             programme. Click or drag the puzzle pieces to learn more about each one.</p>
         </div>
 
@@ -1102,7 +1213,7 @@
             <span class="board__num"><span data-count>0</span> / 12</span>
             <span class="board__label">skills added</span>
           </p>
-          <img class="board__scene" src="../images/skills-scene.webp" alt="" width="682" height="342" loading="lazy">
+          <img class="board__scene" src="../images/skills-scene.webp" srcset="../images/skills-scene-640.webp 640w, ../images/skills-scene-960.webp 960w, ../images/skills-scene.webp 1364w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 54vw, (min-width: 48em) 71vw, 100vw" alt="" width="682" height="342" loading="lazy">
           <div class="board__disc" data-board-disc>
             <ol class="board__slots" aria-label="Your skills board">
               <li class="board__slot" data-slot="0"><span class="board__plus" aria-hidden="true">+</span></li>
@@ -1125,74 +1236,74 @@
         </div>
 
         <ul class="pieces" aria-label="Skills to explore" data-pieces>
-          <li class="pieces__item" style="--i: 0">
-            <button class="piece" type="button" data-skill="confidence" style="--piece: #318E31; --ink: #FFFFFF">
+          <li class="pieces__item v-i0">
+            <button class="piece" type="button" data-skill="confidence">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-confidence" /></svg>
               <span class="piece__label">Confidence</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 1">
-            <button class="piece" type="button" data-skill="problem-solving" style="--piece: #FDD114; --ink: #1D2B17">
+          <li class="pieces__item v-i1">
+            <button class="piece" type="button" data-skill="problem-solving">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-gear" /></svg>
               <span class="piece__label">Problem-Solving</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 2">
-            <button class="piece" type="button" data-skill="goal-setting" style="--piece: #1096E4; --ink: #FFFFFF">
+          <li class="pieces__item v-i2">
+            <button class="piece" type="button" data-skill="goal-setting">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-target" /></svg>
               <span class="piece__label">Goal Setting</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 3">
-            <button class="piece" type="button" data-skill="teamwork" style="--piece: #953ECC; --ink: #FFFFFF">
+          <li class="pieces__item v-i3">
+            <button class="piece" type="button" data-skill="teamwork">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-team" /></svg>
               <span class="piece__label">Teamwork</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 4">
-            <button class="piece" type="button" data-skill="adaptability" style="--piece: #02AFA6; --ink: #FFFFFF">
+          <li class="pieces__item v-i4">
+            <button class="piece" type="button" data-skill="adaptability">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-adapt" /></svg>
               <span class="piece__label">Adaptability</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 5">
-            <button class="piece" type="button" data-skill="interview-skills" style="--piece: #FD3A99; --ink: #FFFFFF">
+          <li class="pieces__item v-i5">
+            <button class="piece" type="button" data-skill="interview-skills">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-interview" /></svg>
               <span class="piece__label">Interview Skills</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 6">
-            <button class="piece" type="button" data-skill="personal-development" style="--piece: #3AC33A; --ink: #FFFFFF">
+          <li class="pieces__item v-i6">
+            <button class="piece" type="button" data-skill="personal-development">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-personal" /></svg>
               <span class="piece__label">Personal Development</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 7">
-            <button class="piece" type="button" data-skill="employability" style="--piece: #F7801E; --ink: #FFFFFF">
+          <li class="pieces__item v-i7">
+            <button class="piece" type="button" data-skill="employability">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-employ" /></svg>
               <span class="piece__label">Employability</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 8">
-            <button class="piece" type="button" data-skill="digital-skills" style="--piece: #8C3AC9; --ink: #FFFFFF">
+          <li class="pieces__item v-i8">
+            <button class="piece" type="button" data-skill="digital-skills">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-digital" /></svg>
               <span class="piece__label">Digital Skills</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 9">
-            <button class="piece" type="button" data-skill="cv-applications" style="--piece: #025375; --ink: #FFFFFF">
+          <li class="pieces__item v-i9">
+            <button class="piece" type="button" data-skill="cv-applications">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-cv" /></svg>
               <span class="piece__label">CV &amp; Applications</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 10">
-            <button class="piece" type="button" data-skill="communication" style="--piece: #2D3830; --ink: #FFFFFF">
+          <li class="pieces__item v-i10">
+            <button class="piece" type="button" data-skill="communication">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-comm" /></svg>
               <span class="piece__label">Communication</span>
             </button>
           </li>
-          <li class="pieces__item" style="--i: 11">
-            <button class="piece" type="button" data-skill="time-management" style="--piece: #E52337; --ink: #FFFFFF">
+          <li class="pieces__item v-i11">
+            <button class="piece" type="button" data-skill="time-management">
               <svg class="piece__icon" aria-hidden="true" focusable="false"><use href="#i-sk-time" /></svg>
               <span class="piece__label">Time Management</span>
             </button>
@@ -1202,10 +1313,820 @@
       </div>
     </section>
 
-    <!-- Next build stage: "How it works: your journey through the
-         programme" continues from here. -->
+
+    <!-- =================================================================
+         HOW IT WORKS: THE PROGRAMME
+         The fortnight as a row of day cards on a timeline. Wide screens
+         pin the stage and move the belt sideways as the reader scrolls
+         (or drags, or presses the arrow keys); phones swipe through the
+         same row. Each card turns over to show that day's timetable. The
+         skyline stays fixed behind, and at the end GET JOB READY is cut
+         out of a green field over it before Get job ready slides up.
+         ================================================================= -->
+    <section class="prog" id="programme" aria-labelledby="prog-title" data-prog>
+
+      <svg class="prog__edge" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M0 0V26C40 26 60 31 100 31S170 22 230 22 300 33 360 33 450 24 520 24 600 35 680 35 760 25 840 25 930 32 1000 32 1080 22 1160 22 1250 34 1320 34 1400 27 1440 27V0Z" />
+      </svg>
+
+      <div class="prog__sky" aria-hidden="true">
+        <picture class="prog__photo">
+          <source media="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)" srcset="../images/programme-bg-desktop-1280.webp 1280w, ../images/programme-bg-desktop-1600.webp 1600w, ../images/programme-bg-desktop-1920.webp 1920w, ../images/programme-bg-desktop.webp 2584w" sizes="100vw" width="2584" height="1456">
+          <source media="(min-width: 48em)" srcset="../images/programme-bg-desktop-1280.webp 1280w, ../images/programme-bg-desktop-1600.webp 1600w, ../images/programme-bg-desktop-1920.webp 1920w, ../images/programme-bg-desktop.webp 2584w" sizes="100vw" width="2584" height="1456">
+          <img src="../images/programme-bg-mobile.webp" srcset="../images/programme-bg-mobile-720.webp 720w, ../images/programme-bg-mobile.webp 1080w" sizes="100vw" alt="" width="1080" height="2400" loading="lazy" decoding="async">
+        </picture>
+        <span class="prog__veil"></span>
+        <div class="ready-mask" data-ready-mask>
+          <svg class="ready-mask__svg ready-mask__svg--wide" viewBox="0 0 1292 728" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <defs>
+              <linearGradient id="rm-field-wide" x1="0" y1="0" x2="1" y2=".35">
+                <stop offset="0" stop-color="#05706C" />
+                <stop offset=".4" stop-color="#027A46" />
+                <stop offset="1" stop-color="#079A2C" />
+              </linearGradient>
+              <linearGradient id="rm-low-wide" x1="0" y1="0" x2=".3" y2="1">
+                <stop offset="0" stop-color="#16944A" />
+                <stop offset="1" stop-color="#3F9862" />
+              </linearGradient>
+              <mask id="rm-mask-wide" maskUnits="userSpaceOnUse" x="-2000" y="-2000" width="5292" height="4728">
+                <rect x="-2000" y="-2000" width="5292" height="4728" fill="#fff" />
+                <g class="ready-mask__words" data-ready-words>
+                  <text x="646" y="316" text-anchor="middle" textLength="402" lengthAdjust="spacingAndGlyphs" font-size="200">GET</text>
+                  <text x="644" y="559" text-anchor="middle" textLength="1140" lengthAdjust="spacingAndGlyphs" font-size="200">JOB READY</text>
+                </g>
+              </mask>
+            </defs>
+            <g mask="url(#rm-mask-wide)">
+              <rect x="-2000" y="-2000" width="5292" height="4728" fill="url(#rm-field-wide)" />
+              <path fill="url(#rm-low-wide)" d="M-20 380C120 360 260 300 420 250S640 214 760 222 1000 300 1110 340 1260 372 1312 368V1748H-20z" />
+              <path fill="#ffffff" fill-opacity=".05" d="M-20 748V600c260-60 540 30 800-10s400-90 532-50V748z" />
+            </g>
+          </svg>
+          <svg class="ready-mask__svg ready-mask__svg--tall" viewBox="0 0 360 800" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <defs>
+              <linearGradient id="rm-field-tall" x1="0" y1="0" x2=".7" y2="1">
+                <stop offset="0" stop-color="#03706A" />
+                <stop offset=".45" stop-color="#058A3A" />
+                <stop offset="1" stop-color="#2F9C58" />
+              </linearGradient>
+              <mask id="rm-mask-tall" maskUnits="userSpaceOnUse" x="-1000" y="-1000" width="2360" height="2800">
+                <rect x="-1000" y="-1000" width="2360" height="2800" fill="#fff" />
+                <g class="ready-mask__words" data-ready-words>
+                  <text x="180" y="322" text-anchor="middle" textLength="176" lengthAdjust="spacingAndGlyphs" font-size="104">GET</text>
+                  <text x="180" y="438" text-anchor="middle" textLength="180" lengthAdjust="spacingAndGlyphs" font-size="104">JOB</text>
+                  <text x="180" y="554" text-anchor="middle" textLength="280" lengthAdjust="spacingAndGlyphs" font-size="104">READY</text>
+                </g>
+              </mask>
+            </defs>
+            <g mask="url(#rm-mask-tall)">
+              <rect x="-1000" y="-1000" width="2360" height="2800" fill="url(#rm-field-tall)" />
+              <path fill="#2E9A57" fill-opacity=".55" d="M-10 420c80-40 150-90 220-80s110 50 160 40V900H-10z" />
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="prog__track" data-prog-track>
+        <div class="prog__stage" data-prog-stage>
+          <div class="prog__belt" data-prog-belt>
+
+            <header class="prog__head">
+              <span class="prog__paper" aria-hidden="true"><i></i><i></i></span>
+              <p class="prog__kicker" data-rise>How it works
+                <svg class="prog__kicker-arrow" viewBox="0 0 60 50" aria-hidden="true" focusable="false"><path d="M3 12C18 3 40 2 47 14c5 9 0 20-6 30m0 0-8-9m8 9 9-6" /></svg>
+              </p>
+              <h2 class="prog__title v-d1" id="prog-title" data-rise><span class="prog__title-a">your journey</span> <span class="prog__title-b">through the <span class="prog__hl">programme</span></span></h2>
+              <p class="prog__sub v-d2" data-rise>A clear path with the right support, at every step.</p>
+              <ul class="prog__stats v-d3" data-rise aria-label="The programme at a glance">
+                <li class="stat stat--weeks"><span class="stat__icon" aria-hidden="true"><svg focusable="false"><use href="#i-cal" /></svg></span><b class="stat__num">2</b><span class="stat__label">weeks</span></li>
+                <li class="stat stat--sessions"><span class="stat__icon" aria-hidden="true"><svg focusable="false"><use href="#i-people" /></svg></span><b class="stat__num">6</b><span class="stat__label">sessions</span></li>
+                <li class="stat stat--cert"><span class="stat__icon" aria-hidden="true"><svg focusable="false"><use href="#i-cap" /></svg></span><b class="stat__num">1</b><span class="stat__label">certificate</span></li>
+              </ul>
+            </header>
+
+            <ol class="prog__rail" data-prog-rail aria-label="The fortnight, day by day">
+
+          <li class="prog__item prog__item--week" id="week-1">
+            <span class="prog__wknode" aria-hidden="true"></span>
+            <h3 class="mile mile--1"><span class="mile__disc"><span class="mile__top">Week</span><span class="mile__num">1</span><span class="mile__days"><span class="visually-hidden">Monday to Wednesday</span><span aria-hidden="true">Mon to Wed</span></span></span></h3>
+          </li>
+          <li class="prog__item prog__item--day prog__item--w1-mon">
+            <article class="day" id="w1-mon" data-day>
+              <div class="day__peek" aria-hidden="true"><img src="../images/programme-mon-1.webp" srcset="../images/programme-mon-1-450.webp 450w, ../images/programme-mon-1.webp 900w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 15vw, (min-width: 48em) 27vw, 39vw" alt="" width="900" height="1029" loading="lazy" decoding="async"></div>
+              <div class="day__flip">
+                <div class="day__face day__face--front">
+                  <div class="day__band">
+                    <span class="day__week" aria-hidden="true">Week 1</span>
+                    <span class="day__name" aria-hidden="true">MON</span>
+                  </div>
+                  <img class="day__person" src="../images/programme-mon-1.webp" srcset="../images/programme-mon-1-450.webp 450w, ../images/programme-mon-1.webp 900w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 15vw, (min-width: 48em) 27vw, 39vw" alt="" width="900" height="1029" loading="lazy" decoding="async">
+                  <div class="day__body">
+                    <h3 class="day__title" id="w1-mon-title"><span class="visually-hidden">Week 1, Monday: </span>Welcome &amp; induction</h3>
+                    <p class="day__text">Settle in, meet your team and start your first research project.</p>
+                    <ul class="day__facts" aria-label="At a glance"><li><svg aria-hidden="true" focusable="false"><use href="#i-clock" /></svg>10:00 to 15:00</li><li><svg aria-hidden="true" focusable="false"><use href="#i-user" /></svg>Your line manager</li></ul>
+                    <p class="day__foot" aria-hidden="true"><span class="day__count">Day 1</span><span class="day__chip"><svg focusable="false"><use href="#i-flip" /></svg>Timetable</span></p>
+                  </div>
+                </div>
+                <div class="day__face day__face--back" id="w1-mon-plan">
+                  <div class="day__head" aria-hidden="true"><span class="day__head-name">MON</span><span class="day__head-week">Week 1 timetable</span><svg class="day__head-back" focusable="false"><use href="#i-flip" /></svg></div>
+                  <ol class="plan" aria-label="Week 1, Monday timetable">
+                    <li class="plan__row plan__row--am">
+                      <span class="plan__time" aria-label="10:00 to 12:30"><b>10:00</b><span>12:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sun" /></svg></span>
+                      <span class="plan__what"><b>Morning</b> Welcome, icebreakers, induction &amp; a tour of the Jobcentre</span>
+                    </li>
+                    <li class="plan__row plan__row--lunch">
+                      <span class="plan__time" aria-label="12:30 to 13:30"><b>12:30</b><span>13:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-cup" /></svg></span>
+                      <span class="plan__what"><b>Lunch</b> Break</span>
+                    </li>
+                    <li class="plan__row plan__row--pm">
+                      <span class="plan__time" aria-label="13:30 to 15:00"><b>13:30</b><span>15:00</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sunset" /></svg></span>
+                      <span class="plan__what"><b>Afternoon</b> Laptops, staying safe online &amp; Project&nbsp;1 research</span>
+                    </li>
+                  </ol>
+                  <div class="day__meta">
+                    <p class="day__lead"><span class="day__avatar" aria-hidden="true">M</span><span><small>Led by</small> <b>Your line manager</b> <span>Induction &amp; placement</span></span></p>
+                    <p class="day__take"><span class="day__take-icon" aria-hidden="true"><svg focusable="false"><use href="#i-laptop" /></svg></span><span><small>Provided for you</small> <b>Computer</b></span></p>
+                  </div>
+                </div>
+              </div>
+              <button class="day__toggle" type="button" aria-expanded="false" aria-controls="w1-mon-plan" data-day-toggle>
+                <span class="visually-hidden">Show the timetable for week 1, Monday</span>
+              </button>
+            </article>
+            <span class="prog__node" aria-hidden="true"><i></i><b>MON</b></span>
+          </li>
+          <li class="prog__item prog__item--day prog__item--w1-tue">
+            <article class="day" id="w1-tue" data-day>
+              <div class="day__peek" aria-hidden="true"><img src="../images/programme-tue-1.webp" srcset="../images/programme-tue-1-320.webp 320w, ../images/programme-tue-1.webp 639w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 11vw, (min-width: 48em) 19vw, 28vw" alt="" width="639" height="1060" loading="lazy" decoding="async"></div>
+              <div class="day__flip">
+                <div class="day__face day__face--front">
+                  <div class="day__band">
+                    <span class="day__week" aria-hidden="true">Week 1</span>
+                    <span class="day__name" aria-hidden="true">TUE</span>
+                  </div>
+                  <img class="day__person" src="../images/programme-tue-1.webp" srcset="../images/programme-tue-1-320.webp 320w, ../images/programme-tue-1.webp 639w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 11vw, (min-width: 48em) 19vw, 28vw" alt="" width="639" height="1060" loading="lazy" decoding="async">
+                  <div class="day__body">
+                    <h3 class="day__title" id="w1-tue-title"><span class="visually-hidden">Week 1, Tuesday: </span>Know the job market</h3>
+                    <p class="day__text">Meet your adviser and explore local opportunities.</p>
+                    <ul class="day__facts" aria-label="At a glance"><li><svg aria-hidden="true" focusable="false"><use href="#i-clock" /></svg>10:15 to 14:45</li><li><svg aria-hidden="true" focusable="false"><use href="#i-user" /></svg>Sarah</li></ul>
+                    <p class="day__foot" aria-hidden="true"><span class="day__count">Day 2</span><span class="day__chip"><svg focusable="false"><use href="#i-flip" /></svg>Timetable</span></p>
+                  </div>
+                </div>
+                <div class="day__face day__face--back" id="w1-tue-plan">
+                  <div class="day__head" aria-hidden="true"><span class="day__head-name">TUE</span><span class="day__head-week">Week 1 timetable</span><svg class="day__head-back" focusable="false"><use href="#i-flip" /></svg></div>
+                  <ol class="plan" aria-label="Week 1, Tuesday timetable">
+                    <li class="plan__row plan__row--am">
+                      <span class="plan__time" aria-label="10:15 to 12:30"><b>10:15</b><span>12:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sun" /></svg></span>
+                      <span class="plan__what"><b>Morning</b> Meet your Employment Advisor &bull; present Project&nbsp;1</span>
+                    </li>
+                    <li class="plan__row plan__row--lunch">
+                      <span class="plan__time" aria-label="12:30 to 13:30"><b>12:30</b><span>13:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-cup" /></svg></span>
+                      <span class="plan__what"><b>Lunch</b> Break</span>
+                    </li>
+                    <li class="plan__row plan__row--pm">
+                      <span class="plan__time" aria-label="13:30 to 14:45"><b>13:30</b><span>14:45</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sunset" /></svg></span>
+                      <span class="plan__what"><b>Afternoon</b> CV workshop: what makes a good CV? (early finish)</span>
+                    </li>
+                  </ol>
+                  <div class="day__meta">
+                    <p class="day__lead"><span class="day__avatar" aria-hidden="true">S</span><span><small>Led by</small> <b>Sarah</b> <span>Employment Advisor</span></span></p>
+                    <p class="day__take"><span class="day__take-icon" aria-hidden="true"><svg focusable="false"><use href="#i-doc" /></svg></span><span><small>You&rsquo;ll take away</small> <b>CV checklist</b></span></p>
+                  </div>
+                </div>
+              </div>
+              <button class="day__toggle" type="button" aria-expanded="false" aria-controls="w1-tue-plan" data-day-toggle>
+                <span class="visually-hidden">Show the timetable for week 1, Tuesday</span>
+              </button>
+            </article>
+            <span class="prog__node" aria-hidden="true"><i></i><b>TUE</b></span>
+          </li>
+          <li class="prog__item prog__item--day prog__item--w1-wed">
+            <article class="day" id="w1-wed" data-day>
+              <div class="day__peek" aria-hidden="true"><img src="../images/programme-wed-1.webp" srcset="../images/programme-wed-1-360.webp 360w, ../images/programme-wed-1.webp 724w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 12vw, (min-width: 48em) 22vw, 31vw" alt="" width="724" height="1049" loading="lazy" decoding="async"></div>
+              <div class="day__flip">
+                <div class="day__face day__face--front">
+                  <div class="day__band">
+                    <span class="day__week" aria-hidden="true">Week 1</span>
+                    <span class="day__name" aria-hidden="true">WED</span>
+                  </div>
+                  <img class="day__person" src="../images/programme-wed-1.webp" srcset="../images/programme-wed-1-360.webp 360w, ../images/programme-wed-1.webp 724w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 12vw, (min-width: 48em) 22vw, 31vw" alt="" width="724" height="1049" loading="lazy" decoding="async">
+                  <div class="day__body">
+                    <h3 class="day__title" id="w1-wed-title"><span class="visually-hidden">Week 1, Wednesday: </span>Your strengths</h3>
+                    <p class="day__text">Discover your transferable skills and meet the teams.</p>
+                    <ul class="day__facts" aria-label="At a glance"><li><svg aria-hidden="true" focusable="false"><use href="#i-clock" /></svg>10:00 to 15:30</li><li><svg aria-hidden="true" focusable="false"><use href="#i-user" /></svg>Sarah</li></ul>
+                    <p class="day__foot" aria-hidden="true"><span class="day__count">Day 3</span><span class="day__chip"><svg focusable="false"><use href="#i-flip" /></svg>Timetable</span></p>
+                  </div>
+                </div>
+                <div class="day__face day__face--back" id="w1-wed-plan">
+                  <div class="day__head" aria-hidden="true"><span class="day__head-name">WED</span><span class="day__head-week">Week 1 timetable</span><svg class="day__head-back" focusable="false"><use href="#i-flip" /></svg></div>
+                  <ol class="plan" aria-label="Week 1, Wednesday timetable">
+                    <li class="plan__row plan__row--am">
+                      <span class="plan__time" aria-label="10:00 to 12:30"><b>10:00</b><span>12:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sun" /></svg></span>
+                      <span class="plan__what"><b>Morning</b> Personality test &amp; recognising transferable skills</span>
+                    </li>
+                    <li class="plan__row plan__row--lunch">
+                      <span class="plan__time" aria-label="12:30 to 13:30"><b>12:30</b><span>13:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-cup" /></svg></span>
+                      <span class="plan__what"><b>Lunch</b> Break</span>
+                    </li>
+                    <li class="plan__row plan__row--pm">
+                      <span class="plan__time" aria-label="13:30 to 15:30"><b>13:30</b><span>15:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sunset" /></svg></span>
+                      <span class="plan__what"><b>Afternoon</b> Meet the Jobcentre roles &bull; four taster sessions</span>
+                    </li>
+                  </ol>
+                  <div class="day__meta">
+                    <p class="day__lead"><span class="day__avatar" aria-hidden="true">E</span><span><small>Led by</small> <b>Sarah</b> <span>Skills Coach</span></span></p>
+                    <p class="day__take"><span class="day__take-icon" aria-hidden="true"><svg focusable="false"><use href="#i-star" /></svg></span><span><small>You&rsquo;ll take away</small> <b>Skills profile</b></span></p>
+                  </div>
+                </div>
+              </div>
+              <button class="day__toggle" type="button" aria-expanded="false" aria-controls="w1-wed-plan" data-day-toggle>
+                <span class="visually-hidden">Show the timetable for week 1, Wednesday</span>
+              </button>
+            </article>
+            <span class="prog__node" aria-hidden="true"><i></i><b>WED</b></span>
+          </li>
+          <li class="prog__item prog__item--week" id="week-2">
+            <span class="prog__wknode" aria-hidden="true"></span>
+            <h3 class="mile mile--2"><span class="mile__disc"><span class="mile__top">Week</span><span class="mile__num">2</span><span class="mile__days"><span class="visually-hidden">Monday to Wednesday</span><span aria-hidden="true">Mon to Wed</span></span></span></h3>
+          </li>
+          <li class="prog__item prog__item--day prog__item--w2-mon">
+            <article class="day" id="w2-mon" data-day>
+              <div class="day__peek" aria-hidden="true"><img src="../images/programme-mon-2.webp" srcset="../images/programme-mon-2-360.webp 360w, ../images/programme-mon-2.webp 719w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 12vw, (min-width: 48em) 21vw, 30vw" alt="" width="719" height="1044" loading="lazy" decoding="async"></div>
+              <div class="day__flip">
+                <div class="day__face day__face--front">
+                  <div class="day__band">
+                    <span class="day__week" aria-hidden="true">Week 2</span>
+                    <span class="day__name" aria-hidden="true">MON</span>
+                  </div>
+                  <img class="day__person" src="../images/programme-mon-2.webp" srcset="../images/programme-mon-2-360.webp 360w, ../images/programme-mon-2.webp 719w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 12vw, (min-width: 48em) 21vw, 30vw" alt="" width="719" height="1044" loading="lazy" decoding="async">
+                  <div class="day__body">
+                    <h3 class="day__title" id="w2-mon-title"><span class="visually-hidden">Week 2, Monday: </span>Wellbeing &amp; applying</h3>
+                    <p class="day__text">Look after yourself and turn your CV into strong applications.</p>
+                    <ul class="day__facts" aria-label="At a glance"><li><svg aria-hidden="true" focusable="false"><use href="#i-clock" /></svg>10:00 to 15:00</li><li><svg aria-hidden="true" focusable="false"><use href="#i-user" /></svg>MtW team</li></ul>
+                    <p class="day__foot" aria-hidden="true"><span class="day__count">Day 4</span><span class="day__chip"><svg focusable="false"><use href="#i-flip" /></svg>Timetable</span></p>
+                  </div>
+                </div>
+                <div class="day__face day__face--back" id="w2-mon-plan">
+                  <div class="day__head" aria-hidden="true"><span class="day__head-name">MON</span><span class="day__head-week">Week 2 timetable</span><svg class="day__head-back" focusable="false"><use href="#i-flip" /></svg></div>
+                  <ol class="plan" aria-label="Week 2, Monday timetable">
+                    <li class="plan__row plan__row--am">
+                      <span class="plan__time" aria-label="10:00 to 12:30"><b>10:00</b><span>12:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sun" /></svg></span>
+                      <span class="plan__what"><b>Morning</b> Project&nbsp;2: wellbeing, diversity &amp; inclusion</span>
+                    </li>
+                    <li class="plan__row plan__row--lunch">
+                      <span class="plan__time" aria-label="12:30 to 13:30"><b>12:30</b><span>13:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-cup" /></svg></span>
+                      <span class="plan__what"><b>Lunch</b> Break</span>
+                    </li>
+                    <li class="plan__row plan__row--pm">
+                      <span class="plan__time" aria-label="13:30 to 15:00"><b>13:30</b><span>15:00</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sunset" /></svg></span>
+                      <span class="plan__what"><b>Afternoon</b> Situational judgement, STAR &amp; personal statement</span>
+                    </li>
+                  </ol>
+                  <div class="day__meta">
+                    <p class="day__lead"><span class="day__avatar" aria-hidden="true">+</span><span><small>Led by</small> <b>MtW team</b> <span>Wellbeing &amp; applications</span></span></p>
+                    <p class="day__take"><span class="day__take-icon" aria-hidden="true"><svg focusable="false"><use href="#i-laptop" /></svg></span><span><small>Provided for you</small> <b>Candidate pack</b></span></p>
+                  </div>
+                </div>
+              </div>
+              <button class="day__toggle" type="button" aria-expanded="false" aria-controls="w2-mon-plan" data-day-toggle>
+                <span class="visually-hidden">Show the timetable for week 2, Monday</span>
+              </button>
+            </article>
+            <span class="prog__node" aria-hidden="true"><i></i><b>MON</b></span>
+          </li>
+          <li class="prog__item prog__item--day prog__item--w2-tue">
+            <article class="day" id="w2-tue" data-day>
+              <div class="day__peek" aria-hidden="true"><img src="../images/programme-tue-2.webp" srcset="../images/programme-tue-2-440.webp 440w, ../images/programme-tue-2.webp 882w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 14vw, (min-width: 48em) 26vw, 37vw" alt="" width="882" height="989" loading="lazy" decoding="async"></div>
+              <div class="day__flip">
+                <div class="day__face day__face--front">
+                  <div class="day__band">
+                    <span class="day__week" aria-hidden="true">Week 2</span>
+                    <span class="day__name" aria-hidden="true">TUE</span>
+                  </div>
+                  <img class="day__person" src="../images/programme-tue-2.webp" srcset="../images/programme-tue-2-440.webp 440w, ../images/programme-tue-2.webp 882w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 14vw, (min-width: 48em) 26vw, 37vw" alt="" width="882" height="989" loading="lazy" decoding="async">
+                  <div class="day__body">
+                    <h3 class="day__title" id="w2-tue-title"><span class="visually-hidden">Week 2, Tuesday: </span>Interview ready</h3>
+                    <p class="day__text">Prepare for questions and practise answers that show your best self.</p>
+                    <ul class="day__facts" aria-label="At a glance"><li><svg aria-hidden="true" focusable="false"><use href="#i-clock" /></svg>10:00 to 14:45</li><li><svg aria-hidden="true" focusable="false"><use href="#i-user" /></svg>Sarah</li></ul>
+                    <p class="day__foot" aria-hidden="true"><span class="day__count">Day 5</span><span class="day__chip"><svg focusable="false"><use href="#i-flip" /></svg>Timetable</span></p>
+                  </div>
+                </div>
+                <div class="day__face day__face--back" id="w2-tue-plan">
+                  <div class="day__head" aria-hidden="true"><span class="day__head-name">TUE</span><span class="day__head-week">Week 2 timetable</span><svg class="day__head-back" focusable="false"><use href="#i-flip" /></svg></div>
+                  <ol class="plan" aria-label="Week 2, Tuesday timetable">
+                    <li class="plan__row plan__row--am">
+                      <span class="plan__time" aria-label="10:00 to 12:30"><b>10:00</b><span>12:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sun" /></svg></span>
+                      <span class="plan__what"><b>Morning</b> Interview support &bull; research &amp; prepare STAR answers</span>
+                    </li>
+                    <li class="plan__row plan__row--lunch">
+                      <span class="plan__time" aria-label="12:30 to 13:30"><b>12:30</b><span>13:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-cup" /></svg></span>
+                      <span class="plan__what"><b>Lunch</b> Break</span>
+                    </li>
+                    <li class="plan__row plan__row--pm">
+                      <span class="plan__time" aria-label="13:45 to 14:45"><b>13:45</b><span>14:45</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sunset" /></svg></span>
+                      <span class="plan__what"><b>Afternoon</b> Using AI for job search &bull; prep with your line manager</span>
+                    </li>
+                  </ol>
+                  <div class="day__meta">
+                    <p class="day__lead"><span class="day__avatar" aria-hidden="true">S</span><span><small>Led by</small> <b>Sarah</b> <span>Application Support</span></span></p>
+                    <p class="day__take"><span class="day__take-icon" aria-hidden="true"><svg focusable="false"><use href="#i-doc" /></svg></span><span><small>You&rsquo;ll take away</small> <b>Interview prep</b></span></p>
+                  </div>
+                </div>
+              </div>
+              <button class="day__toggle" type="button" aria-expanded="false" aria-controls="w2-tue-plan" data-day-toggle>
+                <span class="visually-hidden">Show the timetable for week 2, Tuesday</span>
+              </button>
+            </article>
+            <span class="prog__node" aria-hidden="true"><i></i><b>TUE</b></span>
+          </li>
+          <li class="prog__item prog__item--day prog__item--w2-wed">
+            <article class="day" id="w2-wed" data-day>
+              <div class="day__peek" aria-hidden="true"><img src="../images/programme-wed-2.webp" srcset="../images/programme-wed-2-440.webp 440w, ../images/programme-wed-2.webp 873w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 14vw, (min-width: 48em) 25vw, 37vw" alt="" width="873" height="956" loading="lazy" decoding="async"></div>
+              <div class="day__flip">
+                <div class="day__face day__face--front">
+                  <div class="day__band">
+                    <span class="day__week" aria-hidden="true">Week 2</span>
+                    <span class="day__name" aria-hidden="true">WED</span>
+                  </div>
+                  <img class="day__person" src="../images/programme-wed-2.webp" srcset="../images/programme-wed-2-440.webp 440w, ../images/programme-wed-2.webp 873w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 14vw, (min-width: 48em) 25vw, 37vw" alt="" width="873" height="956" loading="lazy" decoding="async">
+                  <div class="day__body">
+                    <h3 class="day__title" id="w2-wed-title"><span class="visually-hidden">Week 2, Wednesday: </span>Reflect &amp; finish</h3>
+                    <p class="day__text">Pull it all into practice and review how far you have come.</p>
+                    <ul class="day__facts" aria-label="At a glance"><li><svg aria-hidden="true" focusable="false"><use href="#i-clock" /></svg>From 10:00</li><li><svg aria-hidden="true" focusable="false"><use href="#i-user" /></svg>Your line manager</li></ul>
+                    <p class="day__foot" aria-hidden="true"><span class="day__count">Day 6</span><span class="day__chip"><svg focusable="false"><use href="#i-flip" /></svg>Timetable</span></p>
+                  </div>
+                </div>
+                <div class="day__face day__face--back" id="w2-wed-plan">
+                  <div class="day__head" aria-hidden="true"><span class="day__head-name">WED</span><span class="day__head-week">Week 2 timetable</span><svg class="day__head-back" focusable="false"><use href="#i-flip" /></svg></div>
+                  <ol class="plan" aria-label="Week 2, Wednesday timetable">
+                    <li class="plan__row plan__row--am">
+                      <span class="plan__time" aria-label="10:00 to 13:00"><b>10:00</b><span>13:00</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sun" /></svg></span>
+                      <span class="plan__what"><b>Morning</b> Mock interviews &bull; MtW reflection &bull; review e-learning</span>
+                    </li>
+                    <li class="plan__row plan__row--lunch">
+                      <span class="plan__time" aria-label="12:30 to 13:30"><b>12:30</b><span>13:30</span></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-cup" /></svg></span>
+                      <span class="plan__what"><b>Lunch</b> Break</span>
+                    </li>
+                    <li class="plan__row plan__row--pm">
+                      <span class="plan__time" aria-label="Afternoon"><b>PM</b></span>
+                      <span class="plan__node" aria-hidden="true"><svg focusable="false"><use href="#i-sunset" /></svg></span>
+                      <span class="plan__what"><b>Afternoon</b> Optional: one-to-one time &amp; catch-up</span>
+                    </li>
+                  </ol>
+                  <div class="day__meta">
+                    <p class="day__lead"><span class="day__avatar" aria-hidden="true">M</span><span><small>Led by</small> <b>Your line manager</b> <span>Mock interviews</span></span></p>
+                    <p class="day__take"><span class="day__take-icon" aria-hidden="true"><svg focusable="false"><use href="#i-star" /></svg></span><span><small>You&rsquo;ll take away</small> <b>Reflection log</b></span></p>
+                  </div>
+                </div>
+              </div>
+              <button class="day__toggle" type="button" aria-expanded="false" aria-controls="w2-wed-plan" data-day-toggle>
+                <span class="visually-hidden">Show the timetable for week 2, Wednesday</span>
+              </button>
+            </article>
+            <span class="prog__node" aria-hidden="true"><i></i><b>WED</b></span>
+          </li>
+          <li class="prog__item prog__item--week" id="finish">
+            <span class="prog__wknode" aria-hidden="true"></span>
+            <h3 class="mile mile--finish"><span class="mile__disc"><svg class="mile__icon" aria-hidden="true" focusable="false"><use href="#i-cap" /></svg><span class="mile__word">Finish</span><span class="mile__days">Certificate</span></span></h3>
+          </li>
+          <li class="prog__item prog__item--day prog__item--end prog__item--finish-card">
+            <article class="day day--finish" id="finish-card" data-day>
+              <div class="day__flip">
+                <div class="day__face day__face--front">
+                  <div class="day__band">
+                    <span class="day__week" aria-hidden="true">The finish</span>
+                    <span class="day__shine" aria-hidden="true"></span>
+                  </div>
+                  <img class="day__person" src="../images/programme-finish.webp" srcset="../images/programme-finish-450.webp 450w, ../images/programme-finish.webp 900w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 19vw, (min-width: 48em) 35vw, 51vw" alt="" width="900" height="903" loading="lazy" decoding="async">
+                  <div class="day__body">
+                    <h3 class="day__title" id="finish-title">Your certificate</h3>
+                    <p class="day__text">Finish the fortnight and collect your Movement to Work certificate.</p>
+                    <p class="day__foot" aria-hidden="true"><span class="day__count">You did it</span><span class="day__chip day__chip--done"><svg focusable="false"><use href="#i-check" /></svg>Complete</span></p>
+                  </div>
+                </div>
+              </div>
+              <span class="day__confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            </article>
+            <span class="prog__node prog__node--end" aria-hidden="true"><i><svg focusable="false"><use href="#i-cap" /></svg></i><b>Done</b></span>
+          </li>
+            </ol>
+          </div>
+
+          <div class="prog__controls" aria-hidden="true" data-prog-controls>
+            <button class="prog__step" type="button" tabindex="-1" data-step="-1"><svg focusable="false"><use href="#i-arrow" /></svg></button>
+            <div class="prog__now">
+              <p class="prog__label"><span class="prog__label-week" data-prog-week>Week 1</span><span class="prog__label-day" data-prog-day>Monday</span></p>
+              <div class="prog__bar"><button type="button" tabindex="-1" data-go="w1-mon" aria-label="Week 1, Monday"><i></i></button><button type="button" tabindex="-1" data-go="w1-tue" aria-label="Week 1, Tuesday"><i></i></button><button type="button" tabindex="-1" data-go="w1-wed" aria-label="Week 1, Wednesday"><i></i></button><span class="prog__bar-gap"></span><button type="button" tabindex="-1" data-go="w2-mon" aria-label="Week 2, Monday"><i></i></button><button type="button" tabindex="-1" data-go="w2-tue" aria-label="Week 2, Tuesday"><i></i></button><button type="button" tabindex="-1" data-go="w2-wed" aria-label="Week 2, Wednesday"><i></i></button><button type="button" tabindex="-1" data-go="finish-card" aria-label="Certificate"><i></i></button></div>
+            </div>
+            <button class="prog__step" type="button" tabindex="-1" data-step="1"><svg focusable="false"><use href="#i-arrow" /></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll room for the GET JOB READY hand-over (main.js glides
+           through it and then folds it away). -->
+      <div class="prog__outro" aria-hidden="true" data-prog-outro></div>
+    </section>
+
+    <!-- =================================================================
+         GET JOB READY
+         Three short tools, each with its own colour: practise interviews,
+         build your CV (the centre piece, with a sample CV and feedback),
+         and discover your strengths. Slides up over the GET JOB READY
+         mask at the end of the programme.
+         ================================================================= -->
+    <section class="ready" id="job-ready" aria-labelledby="ready-title">
+
+      <svg class="ready__edge" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M0 60V30C50 30 80 22 140 22S230 34 300 34 390 25 450 25 560 36 640 36 730 24 800 24 900 33 980 33 1060 23 1130 23 1230 35 1300 35 1390 27 1440 27V60Z" />
+      </svg>
+
+      <div class="ready__paint" aria-hidden="true">
+        <span class="ready__dab ready__dab--mint"></span>
+        <span class="ready__dab ready__dab--mint-side"></span>
+        <span class="ready__dab ready__dab--yellow"></span>
+        <span class="ready__dab ready__dab--green"></span>
+      </div>
+
+      <div class="ready__frame">
+
+        <h2 class="ready__title" id="ready-title" data-rise>
+          <span class="ready__script">Build the skills.</span>
+          <span class="ready__main">Boost your <span class="ready__hl">confidence.</span></span>
+        </h2>
+
+        <div class="ready__student v-d1" aria-hidden="true" data-rise>
+          <span class="ready__student-blob"></span>
+          <img src="../images/ready-student.webp" srcset="../images/ready-student-450.webp 450w, ../images/ready-student.webp 900w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 28vw, (min-width: 48em) 33vw, 48vw" alt="" width="900" height="741" loading="lazy" decoding="async">
+          <span class="ready__star"></span>
+        </div>
+
+        <p class="ready__lead">
+          <span class="ready__lead-wide">Everything you need to stand out from the crowd. Import your CV, practise real interview questions and discover what kind of opportunities could be right for you.</span>
+          <span class="ready__lead-narrow">Everything you need to stand out. Improve your CV, practise interviews and discover the opportunities that suit you.</span>
+        </p>
+
+        <div class="ready__board" aria-hidden="true"></div>
+
+        <!-- Phones: one tool at a time. Tap a tab (or swipe the card) to
+             switch. Hidden on wide screens, where all three sit side by side. -->
+        <div class="ready__tabs" role="tablist" aria-label="Get job ready tools" data-tool-tabs>
+          <button type="button" role="tab" id="tab-interview" aria-controls="tool-card-interview" aria-selected="true" data-tool-tab="interview"><span class="ready__tab-time">10 min</span><span class="ready__tab-name">Interviews</span></button>
+          <button type="button" role="tab" id="tab-cv" aria-controls="tool-card-cv" aria-selected="false" tabindex="-1" data-tool-tab="cv"><span class="ready__tab-time">5 min</span><span class="ready__tab-name">Your CV</span></button>
+          <button type="button" role="tab" id="tab-strengths" aria-controls="tool-card-strengths" aria-selected="false" tabindex="-1" data-tool-tab="strengths"><span class="ready__tab-time">15 min</span><span class="ready__tab-name">Strengths</span></button>
+        </div>
+
+        <ul class="ready__tools" data-tools>
+
+          <li class="tool tool--interview v-i0" data-tool="interview">
+            <section class="tool__card" id="tool-card-interview">
+              <p class="tool__time"><span>10 Min</span></p>
+              <h3 class="tool__title" id="tool-interview">Practise Interviews</h3>
+              <p class="tool__text">Explore common interview questions, practise your answers and get helpful feedback.</p>
+              <button class="tool__btn" type="button" data-ivw-open aria-haspopup="dialog">Start Practising <svg aria-hidden="true" focusable="false"><use href="#i-arrow" /></svg></button>
+              <div class="tool__art" aria-hidden="true">
+                <span class="tool__halo"></span>
+                <img src="../images/ready-interview.webp" srcset="../images/ready-interview-450.webp 450w, ../images/ready-interview.webp 875w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 16vw, (min-width: 48em) 30vw, 43vw" alt="" width="875" height="717" loading="lazy" decoding="async">
+                <svg class="tool__doodle tool__doodle--ticks" viewBox="0 0 40 40" focusable="false"><path d="M8 30 22 8M20 34 34 14" /></svg>
+                <svg class="tool__doodle tool__doodle--chat" viewBox="0 0 24 24" focusable="false"><path d="M12 4c4.7 0 8.5 3 8.5 6.8s-3.8 6.8-8.5 6.8c-.9 0-1.8-.1-2.6-.3L5 19.5l1.2-3.6C4.5 14.6 3.5 12.8 3.5 10.8 3.5 7 7.3 4 12 4z" /><path d="M8.5 11h.01M12 11h.01M15.5 11h.01" /></svg>
+                <svg class="tool__doodle tool__doodle--dash" viewBox="0 0 40 40" focusable="false"><path d="M6 14l14 6M10 26l12 4" /></svg>
+              </div>
+              <p class="tool__note tool__note--interview" aria-hidden="true">Build<br>new confidence<svg class="note__arrow" viewBox="0 0 80 60" aria-hidden="true" focusable="false"><path d="M60 4C70 22 60 44 24 50m0 0 9-11m-9 11 12 6" /></svg></p>
+            </section>
+          </li>
+
+          <li class="tool tool--cv v-i1" data-tool="cv">
+            <section class="tool__card" id="tool-card-cv">
+              <svg class="tool__doodle tool__doodle--marks-a" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M8 8l12 16M18 4l12 16" /></svg>
+              <svg class="tool__doodle tool__doodle--marks-b" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M10 28 22 10M20 32 34 14" /></svg>
+              <p class="tool__time"><span>5 Min</span></p>
+              <h3 class="tool__title" id="tool-cv">Build your CV</h3>
+              <p class="tool__text">Import your existing CV and get personalised feedback with practical suggestions to make it stronger.</p>
+              <button class="tool__btn tool__btn--file" type="button" data-cv-open aria-haspopup="dialog">
+                <svg class="tool__upload" aria-hidden="true" focusable="false"><use href="#i-upload" /></svg>
+                Import your CV <svg aria-hidden="true" focusable="false"><use href="#i-arrow" /></svg>
+              </button>
+              <p class="tool__file">PDF or DOCX (Max 5MB)</p>
+              <p class="tool__note tool__note--cv" aria-hidden="true">A stronger CV<br>opens more doors.<svg class="note__arrow" viewBox="0 0 80 60" aria-hidden="true" focusable="false"><path d="M4 40C24 34 44 26 66 12m0 0-13 1m13-1-4 12" /></svg></p>
+
+              <div class="cvx" aria-label="Example CV with feedback" role="group">
+                <img class="cvx__paper" src="../images/ready-cv.webp" srcset="../images/ready-cv-400.webp 400w, ../images/ready-cv.webp 723w" sizes="20vw" alt="Example CV for Jamie Taylor, Marketing Graduate" width="723" height="1064" loading="lazy" decoding="async">
+                <ul class="cvx__tips">
+                  <li class="tip tip--good">
+                    <span class="tip__icon" aria-hidden="true"><svg focusable="false"><use href="#i-check" /></svg></span>
+                    <span class="tip__copy"><b>Strong work experience</b> Your experience shows relevant skills and good progression.</span>
+                  </li>
+                  <li class="tip tip--add">
+                    <span class="tip__icon" aria-hidden="true"><svg focusable="false"><use href="#i-alert" /></svg></span>
+                    <span class="tip__copy"><b>Add measurable results</b> Try including numbers or impact (e.g. &lsquo;increased engagement by 10%&rsquo;)</span>
+                  </li>
+                  <li class="tip tip--skills">
+                    <span class="tip__icon" aria-hidden="true"><svg focusable="false"><use href="#i-bulb" /></svg></span>
+                    <span class="tip__copy"><b>Consider relevant skills</b> Add skills that match the role and show what you bring to the table.</span>
+                  </li>
+                </ul>
+              </div>
+              <p class="tool__note tool__note--impact" aria-hidden="true">Simple changes.<br>Big Impact.<svg class="note__arrow" viewBox="0 0 80 60" aria-hidden="true" focusable="false"><path d="M70 34C58 52 32 54 14 40m0 0 13 1M14 40l4 12" /></svg></p>
+            </section>
+          </li>
+
+          <li class="tool tool--strengths v-i2" data-tool="strengths">
+            <section class="tool__card" id="tool-card-strengths">
+              <p class="tool__time"><span>15 Min</span></p>
+              <h3 class="tool__title" id="tool-strengths">Discover your Strengths</h3>
+              <p class="tool__text">Explore your interests, skills and working preferences to find opportunities that suit you.</p>
+              <button class="tool__btn" type="button" data-qnw-open aria-haspopup="dialog">Take the questionnaire <svg aria-hidden="true" focusable="false"><use href="#i-arrow" /></svg></button>
+              <div class="tool__art" aria-hidden="true">
+                <img src="../images/ready-strengths.webp" srcset="../images/ready-strengths-450.webp 450w, ../images/ready-strengths.webp 900w" sizes="13vw" alt="" width="900" height="660" loading="lazy" decoding="async">
+              </div>
+              <p class="tool__note tool__note--strengths" aria-hidden="true">Find what feels<br>right for you.<svg class="note__arrow" viewBox="0 0 80 60" aria-hidden="true" focusable="false"><path d="M4 44C18 56 46 54 62 30m0 0-12 4m12-4 1 13" /></svg></p>
+            </section>
+          </li>
+        </ul>
+
+        <p class="ready__tagline" aria-hidden="true"><span>Learn more. Feel ready.</span> <span>Go further.</span></p>
+
+      </div>
+    </section>
+
+    <!-- =================================================================
+         NEXT STEP  (the hand-over into Join now)
+         A pinned stage: the title paints in, an arrow draws itself down,
+         then the pale green patch floods the screen and becomes the
+         background of Join now (main.js sets --draw and --grow).
+         ================================================================= -->
+    <div class="next" data-next>
+      <div class="next__stage">
+        <div class="next__set">
+          <div class="next__box" aria-hidden="true">
+            <span class="next__paint" data-next-paint></span>
+            <p class="next__title"><span class="next__small">Ready to take your</span><span class="next__big">Next step</span></p>
+            <span class="next__under"></span>
+          </div>
+          <span class="next__dash next__dash--a" aria-hidden="true"></span>
+          <span class="next__dash next__dash--b" aria-hidden="true"></span>
+          <span class="next__dash next__dash--c" aria-hidden="true"></span>
+          <span class="next__dash next__dash--d" aria-hidden="true"></span>
+          <p class="next__lead">Here&rsquo;s how to get started with Movement to Work and sign up through your Work Coach.</p>
+          <svg class="next__arrow" viewBox="0 0 120 240" aria-hidden="true" focusable="false">
+            <path class="next__glow" pathLength="1" d="M60 6c-16 50 20 92 2 140-6 18-4 44-2 78" />
+            <path class="next__line" pathLength="1" d="M60 6c-16 50 20 92 2 140-6 18-4 44-2 78" />
+            <path class="next__head" d="M32 196l28 30 28-32" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================================
+         JOIN NOW
+         Two ways to sign up, each shown working: a journal message that
+         types itself, and a short conversation with a Work Coach.
+         ================================================================= -->
+    <section class="join" id="join" aria-labelledby="join-title">
+      <div class="join__frame">
+
+        <header class="join__head">
+          <p class="join__kicker" data-rise>Join now</p>
+          <h2 class="join__title v-d1" id="join-title" data-rise><span>Be part of the</span> <span class="join__script">Journey</span></h2>
+          <p class="join__lead v-d2" data-rise>Ready to build your skills, gain experience and move closer to your goals? Movement to Work could be the next step for you.</p>
+        </header>
+
+        <div class="join__person v-d2" data-rise>
+          <img src="../images/join-student.webp" srcset="../images/join-student-500.webp 500w, ../images/join-student-750.webp 750w, ../images/join-student.webp 1000w" sizes="(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) 28vw, (min-width: 48em) 71vw, 56vw" alt="" width="1000" height="929" loading="lazy" decoding="async">
+          <p class="join__note"><span class="join__tape" aria-hidden="true"></span>There&rsquo;s no online sign up. Just speak to your Work Coach and let them know you&rsquo;re interested.</p>
+          <p class="join__tag" aria-hidden="true"><span>Real support.</span> <span>Real opportunities.</span></p>
+        </div>
+
+        <div class="join__ways-wrap">
+          <h3 class="join__how" data-rise>How to sign up <span>Choose whichever suits you</span></h3>
+
+          <ol class="join__ways" data-join-steps>
+            <li class="way way--journal v-i0">
+              <span class="way__num" aria-hidden="true">1</span>
+              <div class="way__head">
+                <span class="way__icon" aria-hidden="true"><svg focusable="false"><use href="#i-journal" /></svg></span>
+                <h4 class="way__title"><span class="visually-hidden">Option 1: </span>Through your journal</h4>
+              </div>
+              <p class="way__text">Send a message to your Work Coach via your journal to express your interest in Movement to Work.</p>
+              <div class="way__demo dj" aria-hidden="true">
+                <span class="dj__to">To: Your Work Coach</span>
+                <p class="dj__msg"><span data-type="Hi, I&rsquo;d like to join Movement to Work. Could you tell me more?"></span><i class="dj__caret"></i></p>
+                <span class="dj__stamp"><svg focusable="false"><use href="#i-check" /></svg>Sent</span>
+              </div>
+            </li>
+            <li class="way way--person v-i1">
+              <span class="way__or" aria-hidden="true">or</span>
+              <span class="way__num" aria-hidden="true">2</span>
+              <div class="way__head">
+                <span class="way__icon" aria-hidden="true"><svg focusable="false"><use href="#i-people" /></svg></span>
+                <h4 class="way__title"><span class="visually-hidden">Option 2: </span>In person</h4>
+              </div>
+              <p class="way__text">Talk to your Work Coach face to face and let them know you&rsquo;d like to join.</p>
+              <div class="way__demo dc" aria-hidden="true">
+                <p class="dc__row dc__row--you"><span class="dc__bubble">I&rsquo;d like to join Movement to Work!</span></p>
+                <p class="dc__row dc__row--coach"><span class="dc__bubble">Great, let me explain the next steps.</span></p>
+                <span class="dc__pin"><svg focusable="false"><use href="#i-pin" /></svg>At your local Jobcentre</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <p class="join__coach v-d2" data-rise>
+          <span class="join__star" aria-hidden="true"><svg focusable="false"><use href="#i-star" /></svg></span>
+          <span>Your Work Coach will then explain the next steps and help you get started.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         FAQ
+         An accordion: one answer open at a time, opening and closing
+         smoothly (main.js).
+         ================================================================= -->
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <svg class="faq__edge" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M0 60V28C60 28 100 20 170 20S280 32 350 32 460 22 540 22 640 34 730 34 830 23 910 23 1010 33 1090 33 1190 22 1270 22 1380 30 1440 30V60Z" />
+      </svg>
+      <div class="faq__frame">
+        <header class="faq__head">
+          <p class="faq__kicker" data-rise>Common questions</p>
+          <h2 class="faq__title v-d1" id="faq-title" data-rise>Got questions?</h2>
+          <p class="faq__sub v-d2" data-rise>Got a question? Find out more about the programme, how it works and how to get started.</p>
+          <div class="faq__help v-d3" data-rise>
+            <p class="faq__help-title">Still got a question?</p>
+            <p class="faq__help-text">Your Jobcentre Work Coach can tell you everything about the programme.</p>
+            <a class="faq__help-link" href="#join">How to sign up <svg aria-hidden="true" focusable="false"><use href="#i-arrow" /></svg></a>
+          </div>
+        </header>
+        <ul class="faq__list" data-faq>
+          <li class="qa v-i1">
+            <h3 class="qa__q">
+              <button class="qa__btn" type="button" id="qa-1-q" aria-expanded="false" aria-controls="qa-1-a" data-qa>
+                <span class="qa__num" aria-hidden="true">01</span>
+                <span class="qa__text">How many people are in each group?</span>
+                <span class="qa__icon" aria-hidden="true"><i></i></span>
+              </button>
+            </h3>
+            <div class="qa__a" id="qa-1-a" role="region" aria-labelledby="qa-1-q">
+              <div class="qa__inner"><p>Each group has a maximum of 5 participants, keeping sessions small and supportive. This means you&rsquo;ll have more opportunities to ask questions, get involved and receive personalised guidance.</p></div>
+            </div>
+          </li>
+          <li class="qa v-i2">
+            <h3 class="qa__q">
+              <button class="qa__btn" type="button" id="qa-2-q" aria-expanded="false" aria-controls="qa-2-a" data-qa>
+                <span class="qa__num" aria-hidden="true">02</span>
+                <span class="qa__text">Who can take part in Movement to Work?</span>
+                <span class="qa__icon" aria-hidden="true"><i></i></span>
+              </button>
+            </h3>
+            <div class="qa__a" id="qa-2-a" role="region" aria-labelledby="qa-2-q">
+              <div class="qa__inner"><p>Movement to Work is designed for young people aged 18&ndash;30 who want to build their confidence, develop practical skills and prepare for employment. Speak to your Jobcentre Work Coach to find out whether the programme is suitable for you.</p></div>
+            </div>
+          </li>
+          <li class="qa v-i3">
+            <h3 class="qa__q">
+              <button class="qa__btn" type="button" id="qa-3-q" aria-expanded="false" aria-controls="qa-3-a" data-qa>
+                <span class="qa__num" aria-hidden="true">03</span>
+                <span class="qa__text">How do I join Movement to Work?</span>
+                <span class="qa__icon" aria-hidden="true"><i></i></span>
+              </button>
+            </h3>
+            <div class="qa__a" id="qa-3-a" role="region" aria-labelledby="qa-3-q">
+              <div class="qa__inner"><p>Joining is simple! Just speak to your Jobcentre Work Coach, either in person or by sending a message through your Universal Credit journal. Let them know you&rsquo;re interested in Movement to Work, and they&rsquo;ll explain the next steps.</p></div>
+            </div>
+          </li>
+          <li class="qa v-i4">
+            <h3 class="qa__q">
+              <button class="qa__btn" type="button" id="qa-4-q" aria-expanded="false" aria-controls="qa-4-a" data-qa>
+                <span class="qa__num" aria-hidden="true">04</span>
+                <span class="qa__text">How long does the programme last?</span>
+                <span class="qa__icon" aria-hidden="true"><i></i></span>
+              </button>
+            </h3>
+            <div class="qa__a" id="qa-4-a" role="region" aria-labelledby="qa-4-q">
+              <div class="qa__inner"><p>The programme runs over 2 weeks, with sessions taking place Monday to Wednesday each week. During this time, you&rsquo;ll take part in activities designed to develop your skills, build confidence and help you prepare for employment.</p></div>
+            </div>
+          </li>
+          <li class="qa v-i5">
+            <h3 class="qa__q">
+              <button class="qa__btn" type="button" id="qa-5-q" aria-expanded="false" aria-controls="qa-5-a" data-qa>
+                <span class="qa__num" aria-hidden="true">05</span>
+                <span class="qa__text">Do I need previous work experience?</span>
+                <span class="qa__icon" aria-hidden="true"><i></i></span>
+              </button>
+            </h3>
+            <div class="qa__a" id="qa-5-a" role="region" aria-labelledby="qa-5-q">
+              <div class="qa__inner"><p>Not at all! You don&rsquo;t need any previous work experience to take part. Movement to Work is designed to help you develop new skills, discover your strengths and build the confidence to take your next step towards employment.</p></div>
+            </div>
+          </li>
+          <li class="qa v-i6">
+            <h3 class="qa__q">
+              <button class="qa__btn" type="button" id="qa-6-q" aria-expanded="false" aria-controls="qa-6-a" data-qa>
+                <span class="qa__num" aria-hidden="true">06</span>
+                <span class="qa__text">What will I do during the programme?</span>
+                <span class="qa__icon" aria-hidden="true"><i></i></span>
+              </button>
+            </h3>
+            <div class="qa__a" id="qa-6-a" role="region" aria-labelledby="qa-6-q">
+              <div class="qa__inner"><p>You&rsquo;ll take part in practical activities, group discussions and exercises designed to develop your communication, teamwork and problem-solving skills. You&rsquo;ll also receive guidance to help you understand your strengths, explore opportunities and prepare for the workplace.</p></div>
+            </div>
+          </li>
+          <li class="qa v-i7">
+            <h3 class="qa__q">
+              <button class="qa__btn" type="button" id="qa-7-q" aria-expanded="false" aria-controls="qa-7-a" data-qa>
+                <span class="qa__num" aria-hidden="true">07</span>
+                <span class="qa__text">Will I get help with my CV and interviews?</span>
+                <span class="qa__icon" aria-hidden="true"><i></i></span>
+              </button>
+            </h3>
+            <div class="qa__a" id="qa-7-a" role="region" aria-labelledby="qa-7-q">
+              <div class="qa__inner"><p>Yes! You&rsquo;ll receive support with improving your CV, preparing for interviews and understanding what employers look for. You&rsquo;ll also have opportunities to practise answering common interview questions and build your confidence when applying for jobs.</p></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
 
   </main>
+
+  <!-- ===================================================================
+       FOOTER
+       =================================================================== -->
+  <footer class="foot" aria-labelledby="foot-title">
+    <svg class="foot__edge" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path d="M0 0V40C160 62 330 78 520 70S860 40 1040 46 1320 90 1440 98V0Z" />
+    </svg>
+    <span class="foot__glow" aria-hidden="true"></span>
+
+    <div class="foot__frame">
+      <div class="foot__brand">
+        <p class="foot__eyebrow">Your next step, our mission</p>
+        <h2 class="foot__title" id="foot-title">Movement to Work</h2>
+        <p class="foot__text">Connecting ambitious people with real opportunities. Helping the next generation get into, and go further into work.</p>
+        <ul class="foot__for">
+          <li><span class="foot__badge" aria-hidden="true"><svg focusable="false"><use href="#i-cap" /></svg></span>For School Leavers</li>
+          <li><span class="foot__badge" aria-hidden="true"><svg focusable="false"><use href="#i-briefcase" /></svg></span>For Job Seekers</li>
+        </ul>
+      </div>
+
+      <nav class="foot__nav" aria-label="Footer">
+          <div class="foot__col v-i0">
+            <svg class="foot__icon" aria-hidden="true" focusable="false"><use href="#i-f-gear" /></svg>
+            <h3 class="foot__head">Explore</h3>
+            <ul><li><a href="#home">Home</a></li><li><a href="#about">About Us</a></li><li><a href="#skills">Skills</a></li><li><a href="#programme">The Programme</a></li></ul>
+          </div>
+          <div class="foot__col v-i1">
+            <svg class="foot__icon" aria-hidden="true" focusable="false"><use href="#i-f-support" /></svg>
+            <h3 class="foot__head">Support</h3>
+            <ul><li><a href="#faq">FAQ</a></li><li><a href="#join">How to Join</a></li></ul>
+          </div>
+          <div class="foot__col v-i2">
+            <svg class="foot__icon" aria-hidden="true" focusable="false"><use href="#i-f-bag" /></svg>
+            <h3 class="foot__head">Get Job Ready</h3>
+            <ul><li><a href="#tool-cv">CV Review</a></li><li><a href="#tool-interview">Practise Interviews</a></li><li><a href="#tool-strengths">Questionnaires</a></li></ul>
+          </div>
+          <div class="foot__col v-i3">
+            <svg class="foot__icon" aria-hidden="true" focusable="false"><use href="#i-f-link" /></svg>
+            <h3 class="foot__head">Quick Links</h3>
+            <ul><li><a href="#join">Join the Programme</a></li><li><a href="#home">Back to Top <span aria-hidden="true">&uarr;</span></a></li></ul>
+          </div>
+      </nav>
+
+      <svg class="foot__arrows" viewBox="0 0 220 120" aria-hidden="true" focusable="false">
+        <path d="M14 108 74 30m0 0-30 6m30-6 2 30M110 98l74-78m0 0-32 4m32-4 0 32" />
+      </svg>
+    </div>
+
+    <svg class="foot__word" viewBox="0 0 1292 158" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+      <text x="646" y="168" text-anchor="middle" textLength="1260" lengthAdjust="spacingAndGlyphs">MOVEMENT TO WORK</text>
+    </svg>
+
+    <div class="foot__bar">
+      <p>Movement to Work <span class="foot__dot" aria-hidden="true"></span> Helping you move forward</p>
+      <ul>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="disclaimer.html">Disclaimer</a></li>
+      </ul>
+    </div>
+  </footer>
+
 
 
   <!-- ===================================================================
@@ -1243,7 +2164,188 @@
     </div>
   </dialog>
 
-  <script src="../js/main.js" defer></script>
+
+  <!-- ===================================================================
+       CV UPLOAD  (modal)
+       Drag and drop or browse. The file is read on this device by
+       cv-review.js; nothing is sent anywhere.
+       =================================================================== -->
+  <dialog class="cvu" data-cvu aria-labelledby="cvu-title">
+    <div class="cvu__card">
+      <header class="cvu__head">
+        <h2 class="cvu__title" id="cvu-title">Upload your CV</h2>
+        <button class="cvu__x" type="button" data-cvu-close><svg aria-hidden="true" focusable="false"><use href="#i-close" /></svg><span class="visually-hidden">Close</span></button>
+      </header>
+
+      <div class="cvu__body">
+        <div class="cvu__drop" data-cvu-drop>
+          <span class="cvu__drop-icon" aria-hidden="true"><svg focusable="false"><use href="#i-upload" /></svg></span>
+          <p class="cvu__drop-title">Drag and drop your file here</p>
+          <p class="cvu__or" aria-hidden="true">or</p>
+          <label class="cvu__browse">
+            <input class="visually-hidden" type="file" data-cvu-input
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            Browse files
+          </label>
+          <p class="cvu__hint">PDF or DOCX, up to 5MB</p>
+        </div>
+
+        <div class="cvu__work" data-cvu-work hidden>
+          <p class="cvu__file"><svg aria-hidden="true" focusable="false"><use href="#i-file" /></svg><span data-cvu-name></span></p>
+          <div class="cvu__bar" aria-hidden="true"><span data-cvu-bar></span></div>
+          <ol class="cvu__steps" data-cvu-steps>
+            <li>Reading your file</li>
+            <li>Finding your sections</li>
+            <li>Checking the content</li>
+            <li>Working out your score</li>
+          </ol>
+        </div>
+
+        <div class="cvu__done" data-cvu-done hidden>
+          <span class="cvu__tick" aria-hidden="true"><svg focusable="false"><use href="#i-check" /></svg></span>
+          <p class="cvu__done-title">Your CV is ready to review</p>
+          <p class="cvu__done-text" data-cvu-summary></p>
+        </div>
+
+        <p class="cvu__error" data-cvu-error role="alert" hidden></p>
+        <p class="visually-hidden" data-cvu-live role="status" aria-live="polite"></p>
+
+        <p class="cvu__private"><svg aria-hidden="true" focusable="false"><use href="#i-lock" /></svg>Your CV is read on this device and never uploaded. It is cleared when you close the review.</p>
+      </div>
+
+      <footer class="cvu__foot">
+        <button class="cvu__ghost" type="button" data-cvu-close>Cancel</button>
+        <button class="cvu__go" type="button" data-cvu-go hidden>See your review <svg aria-hidden="true" focusable="false"><use href="#i-arrow" /></svg></button>
+      </footer>
+    </div>
+  </dialog>
+
+
+  <!-- ===================================================================
+       CV REVIEW  (full-screen dialog)
+       Built by cv-review.js from the reader's own CV: an overview with the
+       score, then a page for each section with feedback and an editor.
+       =================================================================== -->
+  <dialog class="cvr" data-cvr aria-labelledby="cvr-heading">
+    <div class="cvr__app">
+      <aside class="cvr__side" data-cvr-side id="cvr-side">
+        <p class="cvr__logo">jobcentre<span>plus</span></p>
+        <p class="cvr__name" id="cvr-heading">CV review</p>
+        <p class="cvr__progress-text"><span data-cvr-seen>0</span> / 6 sections reviewed</p>
+        <div class="cvr__progress" aria-hidden="true"><span data-cvr-seenbar></span></div>
+        <nav class="cvr__nav" aria-label="CV review sections">
+          <ul data-cvr-nav></ul>
+        </nav>
+        <button class="cvr__rescore" type="button" data-cvr-rescore><svg aria-hidden="true" focusable="false"><use href="#i-refresh" /></svg>Re-score CV<svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button>
+        <button class="cvr__again" type="button" data-cvr-upload>Upload a different CV</button>
+        <input class="visually-hidden" type="file" tabindex="-1" aria-hidden="true" data-cvr-file
+          accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+      </aside>
+
+      <button class="cvr__tab" type="button" data-cvr-tab aria-controls="cvr-side" aria-expanded="false">
+        <svg aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg><span class="visually-hidden">Open the sections menu</span>
+      </button>
+      <div class="cvr__scrim" data-cvr-scrim hidden></div>
+
+      <div class="cvr__main" data-cvr-main tabindex="-1">
+        <header class="cvr__bar">
+          <p class="cvr__bar-logo">jobcentre<span>plus</span></p>
+          <button class="cvr__close" type="button" data-cvr-close><svg aria-hidden="true" focusable="false"><use href="#i-close" /></svg><span>Close review</span></button>
+        </header>
+        <div class="cvr__page" data-cvr-page></div>
+      </div>
+
+      <div class="cvr__toast" data-cvr-toast role="status" aria-live="polite" hidden></div>
+
+      <div class="cvr__busy" data-cvr-busy role="status" hidden>
+        <div class="cvr__busy-card">
+          <span class="cvr__spinner" aria-hidden="true"></span>
+          <p class="cvr__busy-title">Reading your new CV</p>
+          <p class="cvr__busy-name" data-cvr-busy-name></p>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Interview practice: a full-screen tool like the CV review (interview.js). -->
+  <dialog class="cvr ivw ivw--purple" data-ivw aria-labelledby="ivw-heading">
+    <div class="cvr__app">
+      <aside class="cvr__side ivw__side" id="ivw-side">
+        <p class="cvr__logo">jobcentre<span>plus</span></p>
+        <p class="cvr__name" id="ivw-heading">Interview practice</p>
+        <p class="cvr__progress-text" data-ivw-stat>No practice yet</p>
+        <nav class="cvr__nav ivw__nav" aria-label="Interview practice">
+          <ul>
+            <li><button type="button" data-ivw-go="dashboard"><svg class="ivw__nav-ico" aria-hidden="true" focusable="false"><use href="#i-home" /></svg><span class="cvr__nav-name">Dashboard</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button></li>
+            <li><button type="button" data-ivw-go="questions"><svg class="ivw__nav-ico" aria-hidden="true" focusable="false"><use href="#i-list" /></svg><span class="cvr__nav-name">Mock Questions</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button></li>
+            <li><button type="button" data-ivw-go="practice"><svg class="ivw__nav-ico" aria-hidden="true" focusable="false"><use href="#i-chat" /></svg><span class="cvr__nav-name">Assessment</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button></li>
+            <li><button type="button" data-ivw-go="results"><svg class="ivw__nav-ico" aria-hidden="true" focusable="false"><use href="#i-bars" /></svg><span class="cvr__nav-name">Results</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button></li>
+          </ul>
+        </nav>
+        <button class="cvr__rescore ivw__start" type="button" data-ivw-start><svg aria-hidden="true" focusable="false"><use href="#i-mic" /></svg><span>Start a 5-question interview</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button>
+        <p class="ivw__side-note"><svg aria-hidden="true" focusable="false"><use href="#i-lock" /></svg>Practice feedback only. Your answers stay on this device.</p>
+      </aside>
+
+      <button class="cvr__tab" type="button" data-ivw-tab aria-controls="ivw-side" aria-expanded="false">
+        <svg aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg><span class="visually-hidden">Open the interview practice menu</span>
+      </button>
+      <div class="cvr__scrim" data-ivw-scrim hidden></div>
+
+      <div class="cvr__main ivw__main" data-ivw-main tabindex="-1">
+        <header class="cvr__bar">
+          <p class="cvr__bar-logo">jobcentre<span>plus</span></p>
+          <button class="cvr__close" type="button" data-ivw-close><svg aria-hidden="true" focusable="false"><use href="#i-close" /></svg><span>Close practice</span></button>
+        </header>
+        <div class="cvr__page ivw__page" data-ivw-page></div>
+        <span class="ivw__wash" aria-hidden="true"></span>
+      </div>
+
+      <div class="cvr__toast" data-ivw-toast role="status" aria-live="polite" hidden></div>
+      <p class="visually-hidden" data-ivw-live aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <!-- Discover your strengths: questionnaires and a personal profile (questionnaire.js). -->
+  <dialog class="cvr ivw ivw--orange qnw" data-qnw aria-labelledby="qnw-heading">
+    <div class="cvr__app">
+      <aside class="cvr__side ivw__side" id="qnw-side">
+        <p class="cvr__logo">jobcentre<span>plus</span></p>
+        <p class="cvr__name" id="qnw-heading">Your profile</p>
+        <p class="cvr__progress-text" data-qnw-stat>0 of 7 questionnaires done</p>
+        <div class="cvr__progress" aria-hidden="true"><span data-qnw-bar></span></div>
+        <nav class="cvr__nav ivw__nav" aria-label="Your profile">
+          <ul>
+            <li><button type="button" data-qnw-go="dashboard"><svg class="ivw__nav-ico" aria-hidden="true" focusable="false"><use href="#i-home" /></svg><span class="cvr__nav-name">Dashboard</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button></li>
+            <li><button type="button" data-qnw-go="questions"><svg class="ivw__nav-ico" aria-hidden="true" focusable="false"><use href="#i-list" /></svg><span class="cvr__nav-name">Questionnaires</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button></li>
+            <li><button type="button" data-qnw-go="summary"><svg class="ivw__nav-ico" aria-hidden="true" focusable="false"><use href="#i-user" /></svg><span class="cvr__nav-name">Summary</span><svg class="cvr__chev" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></button></li>
+          </ul>
+        </nav>
+        <p class="ivw__side-note"><svg aria-hidden="true" focusable="false"><use href="#i-lock" /></svg>Your answers are saved in this browser only. Nothing is sent to us.</p>
+      </aside>
+
+      <button class="cvr__tab" type="button" data-qnw-tab aria-controls="qnw-side" aria-expanded="false">
+        <svg aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg><span class="visually-hidden">Open the profile menu</span>
+      </button>
+      <div class="cvr__scrim" data-qnw-scrim hidden></div>
+
+      <div class="cvr__main ivw__main" data-qnw-main tabindex="-1">
+        <header class="cvr__bar">
+          <p class="cvr__bar-logo">jobcentre<span>plus</span></p>
+          <button class="cvr__close" type="button" data-qnw-close><svg aria-hidden="true" focusable="false"><use href="#i-close" /></svg><span>Close</span></button>
+        </header>
+        <div class="cvr__page ivw__page" data-qnw-page></div>
+        <span class="ivw__wash" aria-hidden="true"></span>
+      </div>
+
+      <div class="cvr__toast" data-qnw-toast role="status" aria-live="polite" hidden></div>
+      <p class="visually-hidden" data-qnw-live aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <!-- Page behaviour. The three tools (CV review, interview practice and
+       the strengths profile) are fetched by this script when first wanted:
+       js/cv.min.js, js/interview.min.js, js/profile.min.js, css/tools.min.css -->
+  <script src="../js/main.min.js" defer></script>
 
 </body>
 
