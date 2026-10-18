@@ -1,0 +1,92 @@
+**Microsoft Clarity — Usability Testing & Behaviour Analysis**
+
+**Movement to Work — Testing During Implementation**
+
+**Testing Approach**
+
+* Microsoft Clarity was integrated into the working Movement to Work website to observe how participants navigated and interacted with its features.
+* Five participants were involved in informal usability testing, with feedback gathered throughout prototyping and implementation.
+* Testing focused on navigation, clarity of information, responsiveness and the usability of interactive elements.
+* Session recordings, scroll-depth data and click data were reviewed to support observations from testing.
+* The scroll-depth findings relate to one desktop session, while the click data represents the available Clarity interaction report.
+
+**Scroll Behaviour**
+
+* The desktop session reached 100% scroll depth, showing that the participant reached the bottom of the homepage.
+* Approximately 19 seconds (16.28%) were spent near the hero section at 0–5% scroll depth.
+* The longest recorded period was 49 seconds (41.81%) at 40–45% scroll depth, corresponding to the interactive skills puzzle.
+* At 55–60% scroll depth, corresponding to Get Job Ready, the participant spent less than one second.
+* Approximately 18 seconds (15.45%) were spent at 75–80% scroll depth, corresponding to the FAQ section.
+* These results highlight where the participant paused, although time spent at a scroll position does not necessarily indicate engagement or difficulty.
+
+**Programme Journey — Most Clicked Section**
+
+* The interactive two-week programme section received 19 clicks, representing 22.35% of clicks in the supplied Clarity report.
+* This was the highest click count recorded for an individual grouped element.
+* The timetable interactions suggest visitors were exploring the programme's structure and daily activities.
+* Further review can help establish whether participants found it straightforward to switch between programme days.
+
+**Skills Puzzle — Longest Time Spent**
+
+* The participant spent approximately 49 seconds at the scroll position containing the skills puzzle.
+* This accounted for 41.81% of the recorded time.
+* Clarity also recorded clicks on individual skills, including Problem-Solving and Teamwork.
+* The longer pause may reflect interest in the activity, time spent reading instructions or difficulty understanding the interaction.
+* Further checks should focus on whether puzzle-piece selection, instructions and visual feedback are clear.
+
+**Get Job Ready — Quick Scroll**
+
+* The participant spent less than one second at 55–60% scroll depth, where the Get Job Ready section appears.
+* This indicates that the participant moved through this part of the homepage quickly during the recorded session.
+* Clarity also recorded interactions with features such as Strengths, Mock Questions, Assessment and CV Upload.
+* A quick scroll through the homepage section does not necessarily mean the tools were overlooked, especially if they were accessed through other navigation routes.
+* Further recordings can help determine whether the section communicates its purpose clearly.
+
+**FAQ — Time Spent Reading**
+
+* Approximately 18 seconds were recorded at 75–80% scroll depth, corresponding to the FAQ section.
+* This was one of the longer pauses recorded during the session.
+* The participant may have been reading programme information or exploring frequently asked questions.
+* Reviewing the recording can help establish whether the information was easy to locate and understand.
+
+**About Us Crossword**
+
+* Clarity recorded clicks within the interactive crossword section.
+* Purpose, Movement to Work and Eligibility were among the selected options.
+* These interactions show that the crossword was used during testing.
+* The selected-word states and information panels should remain clear and easy to navigate.
+
+**Potential Usability Issues**
+
+* Clarity identified possible dead clicks on the hero section and Browse Files button.
+* These warnings need to be checked against the recordings before treating them as confirmed usability problems.
+* The CV upload control should be tested to ensure the file picker opens correctly and provides clear feedback.
+* Elements that appear interactive should respond consistently or make their purpose clearer.
+* Any repeated hesitation, unexpected clicks or unsuccessful interactions should be documented.
+
+**Improvements and Next Steps**
+
+* Review the programme timetable to confirm that switching between days is straightforward.
+* Check that the skills puzzle instructions, selection behaviour and progress feedback are clear.
+* Investigate potential dead clicks in the hero and CV upload areas.
+* Review whether the Get Job Ready homepage section provides clear navigation to its tools.
+* Check FAQ readability and whether answers are easy to expand and close.
+* Compare further desktop and mobile recordings to identify repeated issues.
+* Document any changes made following testing, including before-and-after evidence where available.
+
+**Testing Limitations**
+
+* The sample was small, so findings should be treated as exploratory rather than representative of all potential users.
+* Scroll duration alone cannot confirm interest, comprehension or satisfaction.
+* Click counts do not necessarily represent unique users or successful task completions.
+* The programme's 19 clicks relate to a grouped element in Clarity's click report, rather than necessarily every click across the entire programme section.
+* Further observation is needed before drawing conclusions about why participants behaved in particular ways.
+
+**Overall Findings**
+
+* The programme timetable was the most frequently clicked grouped element in the supplied report, receiving 19 clicks (22.35%).
+* The skills puzzle had the longest recorded pause, with 49 seconds spent at its scroll position.
+* The FAQ section also received notable viewing time, with approximately 18 seconds recorded.
+* Get Job Ready was passed through quickly at its homepage scroll position, although its tools received clicks elsewhere in the interaction data.
+* The results provide evidence of how the website was explored and identify areas for further usability review.
+* These findings will be considered alongside participant feedback when refining the website.

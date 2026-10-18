@@ -1,1 +1,257 @@
+**Movement to Work — Complete Project Summary**
 
+**Project Overview**
+
+Movement to Work is a responsive employability platform designed to help young people build confidence, develop workplace skills and prepare for employment. The project was developed around the Movement to Work programme at Skelmersdale Jobcentre, with a focus on making information and practical career support easier to access.
+
+The aim was to create more than a traditional informational website. Alongside explaining the programme and how to join, the platform introduces interactive activities and job-readiness tools that encourage users to explore their strengths, improve their CVs and practise for interviews.
+
+I worked across the UX/UI design and front-end development process, from researching the user journey and creating Figma prototypes through to implementing, testing and refining the working website.
+
+**Project Objectives**
+
+* Make the Movement to Work programme easier to understand for young people aged approximately 18–30.
+* Clearly explain eligibility, programme activities, benefits and how to get involved.
+* Design an approachable experience that feels engaging rather than formal or overwhelming.
+* Give users practical tools to help them prepare for employment.
+* Create accessible and responsive layouts for desktop and mobile devices.
+* Use research, feedback and behavioural observations to guide design decisions.
+* Develop a functioning website rather than stopping at the prototype stage.
+
+**Research and Planning**
+
+The project began by understanding the purpose of Movement to Work, the intended audience and the information users would need before deciding whether to participate.
+
+I considered potential barriers such as limited work experience, low confidence, uncertainty about career direction and difficulties understanding employment-related information.
+
+Research and planning activities included:
+
+* Reviewing the programme's aims, audience and available support.
+* Identifying the key questions young people may have before joining.
+* Planning the main user journeys, from discovering the programme to exploring practical employment tools.
+* Organising content into clearer sections and navigation routes.
+* Exploring different layouts and interactions before creating detailed designs.
+* Considering accessibility, mobile usability and the level of guidance needed for first-time visitors.
+
+The research helped shape a platform that combines clear information with practical activities rather than presenting everything as long blocks of text.
+
+**UX/UI Design Process**
+
+The website was designed in Figma, progressing from early layouts and wireframes to high-fidelity desktop and mobile prototypes.
+
+Throughout the design process, I focused on visual consistency, readable content, straightforward navigation and interactions that encourage users to explore without making the website difficult to use.
+
+Key design work included:
+
+* Creating wireframes to establish layouts, content hierarchy and navigation.
+* Developing high-fidelity prototypes with consistent colours, typography, illustrations and interactive components.
+* Designing custom sections for the homepage, programme information and employability tools.
+* Building reusable visual patterns for cards, buttons, forms and feedback messages.
+* Creating dedicated mobile layouts rather than simply shrinking desktop content.
+* Refining spacing, typography and navigation based on usability feedback.
+
+The visual direction uses Movement to Work-inspired greens and yellow, approachable imagery, handwritten details and interactive elements to make the experience feel welcoming.
+
+**Website Features and Functionality**
+
+**Homepage and Programme Introduction**
+
+* Introduces Movement to Work and explains its benefits.
+* Uses visual storytelling and interactive sections to guide visitors through the programme.
+* Provides clear navigation towards programme information, employment tools and joining instructions.
+* Includes responsive layouts and mobile-friendly navigation.
+
+**About Us — Interactive Crossword**
+
+* Designed an interactive crossword-inspired section covering Purpose, Movement to Work and Eligibility.
+* Selecting a word reveals additional information about the programme.
+* Encourages visitors to explore information at their own pace rather than reading long paragraphs.
+* Uses visual feedback to show which topic is selected.
+
+**Skills Development Puzzle**
+
+* Created an interactive puzzle featuring 12 employability skills, including communication, teamwork, adaptability, problem-solving and time management.
+* Users can select or add puzzle pieces to explore individual skills.
+* Included a progress indicator to show how many skills have been added.
+* Adapted the interaction for mobile devices using touch-friendly selection rather than relying entirely on dragging.
+* Designed the activity to make transferable skills more approachable and understandable.
+
+**Two-Week Programme Journey**
+
+* Designed an interactive timeline covering the two-week Movement to Work programme.
+* Organised the programme into Monday, Tuesday and Wednesday activities for each week.
+* Created expandable daily timetables explaining planned activities, support and learning opportunities.
+* Included a final completion stage and certificate information.
+* Developed a clearer mobile layout to avoid relying on a wide desktop timeline.
+
+**Get Job Ready — CV Support**
+
+* Developed a CV import and review feature to help users assess their existing CVs.
+* Implemented programmed checks and rules rather than relying on paid external AI services.
+* Provided structured feedback on areas such as CV content, organisation and potential improvements.
+* Designed a CV review interface with feedback categories and document navigation.
+* Adapted the interface for mobile using collapsible navigation and responsive panels.
+
+**Get Job Ready — Interview Practice**
+
+* Created interview practice tools with mock questions and guided responses.
+* Included question navigation, practice controls and feedback.
+* Incorporated guidance around the STAR interview technique.
+* Designed the experience to help users become more familiar with interview situations.
+* Provided opportunities to review responses and identify areas for improvement.
+
+**Questionnaires and Personal Profile**
+
+* Designed questionnaires covering strengths, confidence, work preferences and areas for development.
+* Created a personal summary that brings together questionnaire responses.
+* Added visual progress indicators and structured results.
+* Designed the profile information to remain on the user's device rather than requiring an online account.
+* Used the results to help users reflect on their abilities and potential next steps.
+
+**Joining the Programme**
+
+* Created a Join Now section explaining how interested users can contact their Jobcentre Work Coach.
+* Included guidance on contacting a Work Coach through the Universal Credit journal or in person.
+* Avoided introducing an unofficial online application process.
+* Used clear instructions to help visitors understand their next step.
+
+**Front-End Development**
+
+Following the Figma design stage, I implemented the website using HTML, CSS and JavaScript, translating the prototypes into functioning responsive pages and interactive components.
+
+Development involved:
+
+* Building responsive layouts for desktop and mobile.
+* Implementing navigation, cards, puzzles, questionnaires and programme timelines.
+* Developing the logic behind CV feedback and interview practice tools.
+* Creating interactive states, progress indicators and feedback messages.
+* Organising the project files and maintaining the code through Git and GitHub.
+* Deploying the working website using Cloudflare Workers.
+* Testing functionality and adjusting layouts during implementation.
+* Resolving issues involving smaller screen sizes, touch interactions, file uploads and content overflow.
+
+The development process helped bridge the gap between static Figma prototypes and real browser interactions.
+
+**Responsive Design and Accessibility**
+
+Accessibility and responsiveness were considered throughout the design and development process.
+
+Areas of focus included:
+
+* Clear typography, spacing and visual hierarchy.
+* Readable text and appropriate colour contrast.
+* Dedicated desktop and mobile layouts.
+* Touch-friendly controls and navigation.
+* Collapsible navigation menus and panels where screen space is limited.
+* Clear instructions and feedback for interactive features.
+* Consistent design patterns across different sections and tools.
+* Reducing unnecessary complexity in forms and user journeys.
+
+The mobile experience required particular attention because interactions such as dragging puzzle pieces or exploring wide programme timelines do not always translate effectively to smaller screens.
+
+Where appropriate, I adapted these interactions to provide more suitable mobile alternatives while maintaining the same core functionality.
+
+**Usability Testing and Iteration**
+
+Informal usability testing was carried out with approximately five participants during prototyping and implementation.
+
+Participants explored different sections, tried interactive features and provided feedback on navigation, clarity and functionality.
+
+Testing helped identify opportunities to improve:
+
+* Mobile navigation and layout consistency.
+* The presentation of programme information.
+* Puzzle-piece selection and interaction feedback.
+* Readability and spacing on smaller screens.
+* The organisation of CV and interview tools.
+* Clarity of instructions and interactive controls.
+
+Changes were made throughout development rather than waiting until the website was fully completed.
+
+This iterative approach helped identify practical usability issues that were not always obvious from the original designs.
+
+**Microsoft Clarity — Behavioural Analysis**
+
+Microsoft Clarity was integrated into the working website to collect session recordings, click data and scroll-depth information.
+
+The available findings included:
+
+* One desktop session reached 100% scroll depth.
+* The skills puzzle had the longest recorded pause, with approximately 49 seconds (41.81%) spent at its scroll position.
+* The programme timetable was the most frequently clicked grouped element, receiving 19 clicks (22.35%) in the supplied click report.
+* Approximately 18 seconds (15.45%) were spent around the FAQ section.
+* Get Job Ready was passed through quickly at its homepage scroll position, although interactions with its tools were also recorded.
+* Clicks were recorded across the crossword, skills puzzle, questionnaires, CV tools and interview features.
+* Possible dead clicks were flagged around the hero section and Browse Files button for further investigation.
+
+These observations provided additional insight into how the website was explored during testing.
+
+The results were treated as exploratory findings rather than proof of successful task completion or user satisfaction, as scroll duration and click counts alone cannot establish why somebody interacted with a particular section.
+
+**Challenges and Design Decisions**
+
+One of the main challenges was balancing useful employment information with interactive activities without making the website unnecessarily complicated.
+
+I addressed this by breaking content into manageable sections, using interactive elements where they added value and keeping navigation consistent.
+
+Other challenges included:
+
+* Translating complex desktop interactions into usable mobile alternatives.
+* Maintaining consistency across several different tools and layouts.
+* Developing useful CV feedback without relying on paid AI services.
+* Making interactive features understandable without requiring additional instructions.
+* Clearly communicating the programme's joining process.
+* Maintaining functionality while continuously refining the design.
+* Ensuring the implemented website remained visually consistent with the original Figma prototypes.
+
+These challenges encouraged me to consider both the visual design and the practical experience of using the platform.
+
+**Project Outcome**
+
+The outcome is a working, responsive employability platform bringing together programme information, interactive activities and practical employment-preparation tools.
+
+The project demonstrates my experience in:
+
+* Researching user needs and identifying project objectives.
+* Planning user journeys and organising information.
+* Creating wireframes and high-fidelity Figma prototypes.
+* Designing responsive interfaces and considering accessibility.
+* Developing interactive features with front-end technologies.
+* Collecting and interpreting usability feedback.
+* Using Microsoft Clarity to examine real user interactions.
+* Iterating on designs and functionality during implementation.
+* Managing and documenting a project through GitHub.
+
+It also provided experience of working across the complete design-to-development workflow rather than focusing on one stage in isolation.
+
+**Reflection and Future Improvements**
+
+The project reinforced the importance of testing throughout the design process, particularly when working with interactive features.
+
+It also demonstrated how behavioural analytics can complement direct participant feedback by highlighting where users pause, click or encounter unexpected behaviour.
+
+Areas for continued improvement include:
+
+* Reviewing additional Microsoft Clarity recordings for repeated usability issues.
+* Investigating potential dead clicks and unclear interactions.
+* Continuing responsive and accessibility checks.
+* Refining CV analysis and interview feedback where appropriate.
+* Carrying out more structured task-based testing with a wider range of participants.
+* Measuring whether future changes improve task completion and understanding.
+* Database to store sessions across devices.
+* User profiles with custokm personalization options.
+* Online sign-up method.
+
+**Final Summary**
+
+Movement to Work brought together my interests in UX/UI design, front-end development, accessibility and user-centred problem-solving.
+Starting with research and early concepts, I designed and developed a functional platform intended to make employment support easier to understand and more engaging for young people.
+Working across Figma, development, usability testing and behavioural analysis gave me experience of the complete product workflow, from identifying user needs to delivering and refining a working digital experience.
+The biggest lesson was understanding that good design is not just about creating polished interfaces. It is about making sure people can understand, navigate and use what has been built, then using feedback and evidence to improve the experience.
+
+**Project Links**
+
+* **GitHub Repository:** https://github.com/BenjaminDThomas/movement-to-work-jobcentre-platform
+* **Live Website:** https://movement-to-work.movement-to-work.workers.dev/
+* **Figma Wireframes & Prototypes:** https://www.figma.com/design/A5by1471o8vS8N9O4QIIg9/Movement-To-Work-Case-Study?node-id=1-11
+* **Figma Research:** https://www.figma.com/design/A5by1471o8vS8N9O4QIIg9/Movement-To-Work-Case-Study?node-id=2018-2

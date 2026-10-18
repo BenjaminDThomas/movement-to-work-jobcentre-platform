@@ -1,1 +1,25 @@
+**Movement to Work — Future Development Ideas
 
+**Testing and Improvements
+- Review additional Microsoft Clarity recordings to identify repeated usability issues.
+- Investigate potential dead clicks and unclear interactions.
+- Continue accessibility, keyboard navigation and mobile responsiveness checks.
+- Refine CV analysis and interview feedback using findings from testing.
+- Carry out structured task-based tests with more participants.
+- Track whether future changes improve task completion and understanding.
+
+**Features and Personalisation
+- Introduce secure accounts or optional user profiles with personalised goals, saved progress and preferences.
+- Explore a secure database to sync questionnaire results and practice sessions across devices, with clear consent, retention and deletion controls.
+- Add a progress dashboard showing completed activities and suggested next steps.
+- Consider downloadable CV feedback and interview practice summaries.
+- Explore online programme registration only if approved by the Jobcentre/Movement to Work team; until then, keep the existing Work Coach contact guidance.
+
+**Website and Hosting
+- Keep Cloudflare Workers if performance and deployment remain reliable; moving hosts is not necessary just to improve the URL.
+- Consider a short custom domain for easier sharing and a more professional presentation. This is optional and would involve domain registration.
+- Review privacy information and data protection before adding accounts, CV storage or cross-device syncing.
+
+**Priority
+- Short term: Fix or verify deployment paths, investigate dead clicks, complete accessibility checks and review recordings.
+- Longer term: Personalised profiles, cross-device syncing and any officially approved online registration process.
