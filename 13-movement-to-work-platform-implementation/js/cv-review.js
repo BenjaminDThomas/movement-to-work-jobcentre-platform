@@ -811,8 +811,7 @@
     var notes = NOTE_KEYS.map(function (k) { return noteHtml(k); }).join('');
     return '<section class="cvd" aria-label="Your CV">' +
       '<div class="cvd__bar"><p class="cvd__file">' + icon('i-file') + '<span>' + esc(d && d.name ? d.name : 'Your CV') + '</span></p>' +
-        '<button type="button" class="cvd__zoom" data-cvd-zoom aria-pressed="' + state.wide + '">' +
-          icon(state.wide ? 'i-shrink' : 'i-expand') + '<span>' + (state.wide ? 'Show score panel' : 'Enlarge CV') + '</span></button></div>' +
+        '<button type="button" class="cvd__zoom" data-cvd-zoom aria-pressed="' + state.wide + '">' + zoomLabel(state.wide) + '</button></div>' +
       '<p class="cvd__note">This is the CV you uploaded. Changes you make in each section are scored, but not drawn here.</p>' +
       '<div class="cvd__stage" data-cvd-stage><div class="cvd__doc" data-cvd-doc>' + body + '</div>' +
       '<div class="cvd__notes" data-cvd-notes>' + notes + '</div></div></section>';
@@ -926,9 +925,27 @@
     var z = o.querySelector('[data-cvd-zoom]');
     if (z) {
       z.setAttribute('aria-pressed', on ? 'true' : 'false');
-      z.innerHTML = icon(on ? 'i-shrink' : 'i-expand') + '<span>' + (on ? 'Show score panel' : 'Enlarge CV') + '</span>';
+      z.innerHTML = zoomLabel(on);
     }
-    window.requestAnimationFrame(layoutNotes);
+    window.requestAnimationFrame(function () {
+      layoutNotes();
+      // Brought back: make sure the panel is on screen, not above it.
+      var card = o.querySelector('.cvo__card');
+      if (!on && card) {
+        var r = card.getBoundingClientRect();
+        if (r.bottom < 80 || r.top > window.innerHeight - 80) {
+          card.scrollIntoView({ block: 'start', behavior: reduce.matches ? 'auto' : 'smooth' });
+        }
+      }
+    });
+  }
+
+  /** The Enlarge / Show score panel button: with the panel tucked away it
+   *  carries the score, so it is clear what it brings back. */
+  function zoomLabel(on) {
+    return on && state.result ?
+      '<b class="cvd__zoom-score">' + state.result.score + '</b><span>Show score panel</span>' + icon('i-shrink') :
+      icon('i-expand') + '<span>Enlarge CV</span>';
   }
 
   function overviewHtml() {
@@ -959,7 +976,7 @@
             docHtml() +
           '</div>' +
           '<button type="button" class="cvo__pill" data-cvo-show aria-label="Show the score panel. Score ' + r.score + ' out of 100">' +
-            '<b>' + r.score + '</b><span>CV ready</span>' + icon('i-chevron') + '</button>' +
+            '<b>' + r.score + '</b><span>Show score panel</span>' + icon('i-chevron') + '</button>' +
           '<aside class="cvo__card" aria-labelledby="cvo-overall">' +
             '<div class="cvo__card-head">' + icon('i-star', 'cvo__star') + '<div><h3 id="cvo-overall">Overall</h3><p>A quick look at your CV and the key areas to improve.</p></div>' +
               '<button type="button" class="cvo__min" data-cvo-min>' + icon('i-shrink') + '<span class="visually-hidden">Minimise the score panel</span></button></div>' +
@@ -1091,6 +1108,7 @@
     var next = SECTIONS[idx + 1];
     return '' +
       '<div class="cvs">' +
+        '<button class="toolback" type="button" data-go="overview">' + icon('i-arrow') + '<span>Back to overview</span></button>' +
         '<header class="cvs__head">' +
           '<div class="cvs__ring cvs__ring--' + lvl + '" data-css="--p: ' + score * 10 + '" role="img" aria-label="' + s.name + ' score ' + score + ' out of 10">' +
             '<svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="25" class="cvs__ring-bg" /><circle cx="30" cy="30" r="25" pathLength="100" class="cvs__ring-fg" /></svg><b>' + score + '</b></div>' +

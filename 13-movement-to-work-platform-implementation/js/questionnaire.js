@@ -362,6 +362,7 @@
     var n = st.questions.length;
     var body = state.index >= n ? stageDoneHtml(st, pr) : questionHtml(st, st.questions[state.index], state.index, n);
     return '<div class="qnq">' +
+      '<button class="toolback" type="button" data-qnw-go="dashboard">' + icon('i-arrow') + '<span>Back to dashboard</span></button>' +
       head('Small steps, big opportunities', 'Complete the questionnaires below to build your profile, understand your strengths and spot areas for improvement.') +
       journeyHtml(pr, state.stage) +
       body +
@@ -644,6 +645,17 @@
     '</div>';
   }
 
+  /** Strengths with no confidence rating yet: a way straight to the
+   *  questions that give them one. */
+  function rateHtml(unrated) {
+    var at = D.STAGES.map(function (st) { return st.key; }).indexOf('confidence');
+    if (!unrated.length || at === -1) {
+      return '';
+    }
+    return '<p class="qnpanel__note qnpanel__rate">No confidence rating yet for ' + esc(unrated.map(function (s) { return s.name; }).join(', ')) + '. ' +
+      '<button class="ivlink" type="button" data-qnw-stage="' + at + '">Rate yourself in ' + esc(D.STAGES[at].name) + '</button></p>';
+  }
+
   function panelHtml(key, p) {
     if (key === 'strengths') {
       var known = p.strengths.filter(function (s) { return s.tone !== 'none'; });
@@ -660,7 +672,8 @@
           '</li>';
         }).join('') + '</ul>' : '<p>Answer the Strengths and Confidence questionnaires to see this.</p>') +
         '<p class="qnpanel__note">Bars show your own confidence ratings (the average of your 1 to 5 answers, as a share of 5). They are not a measured skill score.</p>' +
-        (unknown.length ? '<p class="qnpanel__note"><b>Not enough information yet:</b> ' + esc(unknown.map(function (s) { return s.name; }).join(', ')) + '.</p>' : '');
+        (unknown.length ? '<p class="qnpanel__note"><b>Not enough information yet:</b> ' + esc(unknown.map(function (s) { return s.name; }).join(', ')) + '.</p>' : '') +
+        rateHtml(p.strengths.filter(function (s) { return s.percent == null; }));
     }
     if (key === 'develop') {
       if (!p.develop.length) {

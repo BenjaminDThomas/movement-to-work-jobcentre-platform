@@ -144,6 +144,36 @@ body {
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Room for the scrollbar is always kept, so the page never shifts
+     sideways when something holds the scrolling for a moment. */
+  scrollbar-gutter: stable;
+}
+
+/* While a hand-over glides the page, a touch screen's own scrolling is
+   held here as well as in main.js: a swipe that has already begun cannot
+   be cancelled from script, and it fought the glide. (Mouse and trackpad
+   input is held by main.js alone.) */
+@media (pointer: coarse) {
+  html.is-autoplaying {
+    overflow: hidden;
+    touch-action: none;
+  }
+}
+
+.journey__bar {
+  display: none;
+}
+
+/* One screen tall, measured once by main.js (screenH): the steady height
+   every pinned section is built from. */
+.screen-probe {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: var(--screen);
+  visibility: hidden;
+  pointer-events: none;
 }
 
 body {
@@ -283,7 +313,7 @@ html:not(.js) .menu-toggle {
 
 /* The cap's base rests on the box's yellow rim, not inside the box. */
 .menu-toggle__cap {
-  width: calc(36 * var(--u));
+  width: calc(40 * var(--u));
   height: auto;
   margin-bottom: calc(-2 * var(--u));
   position: relative;
@@ -292,20 +322,20 @@ html:not(.js) .menu-toggle {
 
 .menu-toggle__box {
   position: relative;
-  width: calc(44 * var(--u));
-  height: calc(44 * var(--u));
+  width: calc(50 * var(--u));
+  height: calc(50 * var(--u));
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(5 * var(--u));
+  gap: calc(5.5 * var(--u));
 }
 
 .menu-toggle__bar {
   display: block;
-  width: calc(22 * var(--u));
-  height: calc(3.5 * var(--u));
+  width: calc(25 * var(--u));
+  height: calc(4 * var(--u));
 }
 
 
@@ -617,6 +647,18 @@ html:not(.js) .menu-toggle {
 .site-header > a,
 .about__bar > a {
   pointer-events: auto;
+}
+
+/* Only the painted Join corner takes clicks and taps. Its box reaches
+   down into the page under the curve, where taps meant for the page
+   used to open Join. */
+.site-header > .corner-cta {
+  pointer-events: none;
+}
+
+.corner-cta__plate,
+.corner-cta__under {
+  pointer-events: visiblePainted;
 }
 
 .brand,
@@ -1803,8 +1845,25 @@ html:not(.js) .menu-toggle {
      main.js slides each new scene up over the one before (--enter runs
      from 1, below the screen, to 0, in place), so the reader stays still
      while the photographs move. */
+  /* 3 x (hold + move) + hold screens of pin (main.js), plus one. */
   .js .journey {
-    height: calc(var(--screen) * 4.9);
+    height: calc(var(--screen) * 4);
+  }
+
+  /* Along the top while the stages play: how far through them you are. */
+  .js .journey__bar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    display: block;
+    height: 5px;
+    margin-bottom: -5px;
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .js .journey.is-pinned .journey__bar {
+    opacity: 1;
   }
 
   .js .journey__list {
@@ -2276,8 +2335,10 @@ html:not(.js) .menu-toggle {
   place-items: center;
 }
 
-.board__slot:nth-child(1) { grid-area: 1 / 2; }
-.board__slot:nth-child(2) { grid-area: 1 / 3; }
+/* The top and bottom rows reach into the corners, so no part of the
+   circle is left empty. Their plus sits in the part that shows. */
+.board__slot:nth-child(1) { grid-area: 1 / 1 / 2 / 3; padding-left: 24%; }
+.board__slot:nth-child(2) { grid-area: 1 / 3 / 2 / 5; padding-right: 24%; }
 .board__slot:nth-child(3) { grid-area: 2 / 1; }
 .board__slot:nth-child(4) { grid-area: 2 / 2; }
 .board__slot:nth-child(5) { grid-area: 2 / 3; }
@@ -2286,12 +2347,11 @@ html:not(.js) .menu-toggle {
 .board__slot:nth-child(8) { grid-area: 3 / 2; }
 .board__slot:nth-child(9) { grid-area: 3 / 3; }
 .board__slot:nth-child(10) { grid-area: 3 / 4; }
-.board__slot:nth-child(11) { grid-area: 4 / 2; }
-.board__slot:nth-child(12) { grid-area: 4 / 3; }
+.board__slot:nth-child(11) { grid-area: 4 / 1 / 5 / 3; padding-left: 24%; }
+.board__slot:nth-child(12) { grid-area: 4 / 3 / 5 / 5; padding-right: 24%; }
 
-/* A strict 4 x 4 grid: every slot is exactly one cell, so tiles line up
-   with each other and with the guide lines drawn on the disc. The four
-   corner cells fall outside the circle and are simply left empty. */
+/* A 4 x 4 grid: the middle rows are one cell per slot, and the top and
+   bottom rows two cells per slot, so the corners are filled. */
 .board__tile {
   position: absolute;
   inset: 0;
@@ -2305,11 +2365,13 @@ html:not(.js) .menu-toggle {
 
 /* Edge tiles keep their content inside the visible part of the circle. */
 .board__slot:nth-child(-n+2) .board__tile { justify-content: flex-end; padding-bottom: 12%; }
-.board__slot:nth-child(n+11) .board__tile { justify-content: flex-start; padding-top: 12%; }
+/* Bottom row: the name above the icon, where the circle is still wide
+   enough for it. */
+.board__slot:nth-child(n+11) .board__tile { flex-direction: column-reverse; justify-content: flex-end; padding-top: 8%; }
 .board__slot:nth-child(1) .board__tile,
-.board__slot:nth-child(11) .board__tile { padding-left: 14%; }
+.board__slot:nth-child(11) .board__tile { padding-left: 24%; }
 .board__slot:nth-child(2) .board__tile,
-.board__slot:nth-child(12) .board__tile { padding-right: 14%; }
+.board__slot:nth-child(12) .board__tile { padding-right: 24%; }
 .board__slot:nth-child(3) .board__tile,
 .board__slot:nth-child(7) .board__tile { padding-left: 24%; }
 .board__slot:nth-child(6) .board__tile,
@@ -3451,7 +3513,9 @@ html:not(.js) .menu-toggle {
   position: absolute;
   bottom: calc(100% - var(--band));
   right: var(--pr, calc(12 * var(--u)));
-  z-index: 2;
+  /* In front of the fine inner line (the face's ::after), so it never
+     runs across a face. */
+  z-index: 4;
   width: calc(var(--pw, calc(150 * var(--u))) * var(--pk));
   max-width: none;
   transform-origin: 50% 100%;
@@ -3672,8 +3736,13 @@ html:not(.js) .menu-toggle {
 /* The certificate: a taller band with the graduate, no timetable. */
 .day--finish {
   --band: calc(var(--card-h) * 0.52);
-  --pw: calc(212 * var(--u));
-  --pr: calc(30 * var(--u));
+  --pw: calc(200 * var(--u));
+  --pr: calc(4 * var(--u));
+}
+
+/* "The finish" stays readable beside the graduate. */
+.day--finish .day__week {
+  z-index: 5;
 }
 
 .day__shine {
@@ -4257,7 +4326,7 @@ html:not(.js) .menu-toggle {
   .ready__student { left: calc(846 * var(--u)); right: auto; top: calc(var(--top) + calc(14 * var(--u))); width: calc(380 * var(--u)); height: calc(290 * var(--u)); }
   .ready__student img { left: calc(18 * var(--u)); width: calc(338 * var(--u)); border-radius: 0; }
   .ready__student-blob { left: calc(-30 * var(--u)); right: 0; top: calc(92 * var(--u)); bottom: calc(-10 * var(--u)); }
-  .ready__star { left: calc(390 * var(--u)); right: auto; top: calc(104 * var(--u)); width: calc(80 * var(--u)); height: calc(80 * var(--u)); }
+  .ready__star { left: calc(344 * var(--u)); right: auto; top: calc(70 * var(--u)); width: calc(70 * var(--u)); height: calc(70 * var(--u)); }
 
   .ready__lead { left: calc(64 * var(--u)); top: calc(var(--top) + calc(238 * var(--u))); width: calc(560 * var(--u)); margin: 0; padding-left: calc(20 * var(--u)); min-height: 0; }
   .ready__lead-wide { display: inline; }
@@ -4281,13 +4350,14 @@ html:not(.js) .menu-toggle {
     border-radius: calc(30 * var(--u));
     pointer-events: none;
   }
-  .tool { position: absolute; top: calc(var(--top) + calc(326 * var(--u))); height: calc(344 * var(--u)); z-index: 1; }
+  .tool { position: absolute; top: calc(var(--top) + calc(318 * var(--u))); height: calc(364 * var(--u)); z-index: 1; }
   .tool__card { min-height: 0; height: 100%; padding: 0; }
   .tool__card > * { position: absolute; margin: 0; }
 
-  .tool--interview { left: calc(38 * var(--u)); width: calc(380 * var(--u)); }
-  .tool--cv { left: calc(434 * var(--u)); width: calc(424 * var(--u)); }
-  .tool--strengths { left: calc(874 * var(--u)); width: calc(380 * var(--u)); }
+  /* calc(28 * var(--u)) between the cards, so each one reads on its own. */
+  .tool--interview { left: calc(42 * var(--u)); width: calc(372 * var(--u)); }
+  .tool--cv { left: calc(442 * var(--u)); width: calc(408 * var(--u)); }
+  .tool--strengths { left: calc(878 * var(--u)); width: calc(372 * var(--u)); }
 
   /* The same bones in every card */
   .tool__time { left: calc(20 * var(--u)); top: calc(18 * var(--u)); width: calc(124 * var(--u)); height: calc(58 * var(--u)); }
@@ -4303,13 +4373,13 @@ html:not(.js) .menu-toggle {
   /* Build your CV: the example CV with one piece of feedback on it */
   .tool--cv .tool__time { width: calc(128 * var(--u)); height: calc(62 * var(--u)); }
   .tool--cv .tool__title { left: calc(32 * var(--u)); top: calc(86 * var(--u)); }
-  .tool--cv .tool__text { width: calc(196 * var(--u)); }
+  .tool--cv .tool__text { width: calc(186 * var(--u)); }
   .tool--cv .tool__file { left: calc(36 * var(--u)); top: calc(270 * var(--u)); }
   .tool__note--cv { left: calc(36 * var(--u)); top: calc(296 * var(--u)); }
   .tool__note--cv .note__arrow { display: none; }
   .cvx { left: auto; right: calc(26 * var(--u)); top: calc(30 * var(--u)); width: calc(150 * var(--u)); padding: 0; }
   .cvx__paper { width: calc(150 * var(--u)); }
-  .cvx__tips { left: auto; right: calc(-14 * var(--u)); top: calc(150 * var(--u)); bottom: auto; width: calc(172 * var(--u)); gap: 0; }
+  .cvx__tips { left: auto; right: calc(12 * var(--u)); top: calc(122 * var(--u)); bottom: auto; width: calc(148 * var(--u)); gap: 0; }
   .cvx__tips .tip--good,
   .cvx__tips .tip--skills { display: none; }
   .tool__note--impact { display: none; }
@@ -5048,7 +5118,9 @@ html:not(.js) .menu-toggle {
   align-items: center;
   justify-content: space-between;
   gap: calc(6 * var(--u)) calc(18 * var(--u));
-  padding: calc(12 * var(--u)) calc(20 * var(--u)) calc(16 * var(--u));
+  /* Clear of the menu button in the bottom-right corner, so Privacy
+     Policy and Disclaimer can always be reached. */
+  padding: calc(12 * var(--u)) calc(82 * var(--u)) calc(16 * var(--u)) calc(20 * var(--u));
 }
 
 .foot__bar ul {
@@ -5194,7 +5266,7 @@ html:not(.js) .menu-toggle {
   }
 
   .join__tag {
-    margin: calc(-14 * var(--u)) 0 0;
+    margin: calc(18 * var(--u)) 0 0;
     align-items: center;
   }
 
@@ -5255,7 +5327,7 @@ html:not(.js) .menu-toggle {
   }
 
   .foot__bar {
-    padding: calc(14 * var(--u)) calc(40 * var(--u)) calc(18 * var(--u));
+    padding: calc(14 * var(--u)) calc(112 * var(--u)) calc(18 * var(--u)) calc(40 * var(--u));
   }
 }
 
@@ -5731,6 +5803,168 @@ html:not(.js) .menu-toggle {
     justify-self: end;
     margin-top: calc(26 * var(--u));
   }
+}
+
+/* Tablets held upright, and any screen between a phone and the wide
+   layout: every tool at once (no tabs, see tabletQuery in main.js), each a
+   wide card with its words on the left and its picture on the right, so
+   the card is filled rather than stretched. */
+@media not all and (min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em) {
+  @media (min-width: 40em) and (min-height: 28em) {
+    .js .ready__tabs {
+      display: none;
+    }
+
+    .js .ready__tools {
+      display: grid;
+      gap: calc(16 * var(--u));
+      margin: 0 calc(-6 * var(--u));
+      padding: calc(16 * var(--u));
+      border-radius: calc(26 * var(--u));
+    }
+
+    .js .ready__tools .tool__card {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) minmax(0, min(calc(176 * var(--u)), 36%));
+      align-items: center;
+      column-gap: calc(10 * var(--u));
+      row-gap: 0;
+      min-height: 0;
+      padding: calc(22 * var(--u)) calc(22 * var(--u)) calc(22 * var(--u)) calc(26 * var(--u));
+    }
+
+    .js .ready__tools .tool__card > * {
+      position: relative;
+      left: auto;
+      right: auto;
+      top: auto;
+      bottom: auto;
+      grid-column: 1 / 3;
+      margin: 0;
+    }
+
+    .js .ready__tools .tool__time {
+      grid-column: 1;
+      grid-row: 1;
+      width: calc(96 * var(--u));
+      height: calc(48 * var(--u));
+      margin-left: calc(-4 * var(--u));
+    }
+
+    .js .ready__tools .tool__title {
+      grid-column: 2 / 4;
+      grid-row: 1;
+      justify-self: start;
+    }
+
+    .js .ready__tools .tool__text {
+      grid-row: 2;
+      max-width: 34em;
+      margin-top: calc(14 * var(--u));
+    }
+
+    .js .ready__tools .tool__btn {
+      grid-row: 3;
+      justify-self: start;
+      margin-top: calc(18 * var(--u));
+      white-space: nowrap;
+    }
+
+    .js .ready__tools .tool__btn svg {
+      flex-shrink: 0;
+    }
+
+    .js .ready__tools .tool__file {
+      grid-row: 4;
+      margin-top: calc(10 * var(--u));
+    }
+
+    .js .ready__tools .tool__note {
+      grid-row: 5;
+      justify-self: start;
+      width: max-content;
+      margin: calc(18 * var(--u)) 0 0 calc(6 * var(--u));
+      rotate: -5deg;
+    }
+
+    .js .ready__tools .tool__note .note__arrow,
+    .js .ready__tools .tool__note--impact,
+    .js .ready__tools .tool__doodle {
+      display: none;
+    }
+
+    /* The picture fills the right-hand column, standing on the card's
+       bottom edge. */
+    .js .ready__tools .tool__art {
+      grid-column: 3;
+      grid-row: 2 / span 4;
+      align-self: end;
+      width: auto;
+      max-width: none;
+      margin: 0 calc(-8 * var(--u)) calc(-22 * var(--u)) 0;
+    }
+
+    /* The CV card: the example CV in that column, with one piece of
+       feedback on it. */
+    .js .ready__tools .cvx {
+      grid-column: 3;
+      grid-row: 2 / span 4;
+      align-self: center;
+      width: min(calc(150 * var(--u)), 100%);
+      justify-self: center;
+    }
+
+    .js .ready__tools .cvx__paper {
+      width: 100%;
+    }
+
+    .js .ready__tools .cvx__tips {
+      left: auto;
+      right: calc(-6 * var(--u));
+      top: auto;
+      bottom: calc(-18 * var(--u));
+      width: calc(176 * var(--u));
+      gap: 0;
+    }
+
+    .js .ready__tools .cvx__tips .tip--good,
+    .js .ready__tools .cvx__tips .tip--skills {
+      display: none;
+    }
+
+    .js .ready__tools .tool--cv .tool__time {
+      width: calc(104 * var(--u));
+      height: calc(52 * var(--u));
+    }
+  }
+
+  /* Narrower than a portrait iPad, the feedback note would sit on the
+     button, so the example CV goes without it. */
+  @media (min-width: 40em) and (max-width: 47.99em) and (min-height: 28em) {
+    .js .ready__tools .cvx__tips {
+      display: none;
+    }
+
+    .js .ready__tools .cvx {
+      width: min(calc(150 * var(--u)), 86%);
+    }
+
+    .js .ready__tools .tool--cv .tool__title {
+      font-size: calc(30 * var(--u));
+    }
+  }
+}
+
+/* Coming back: the time patch shows progress ("Scored 42", "In progress"),
+   which is longer than "10 Min", so the patch grows with its label instead
+   of the words running into its torn edge. */
+.tool.has-progress .tool__time,
+.js .ready__tools .tool.has-progress .tool__time {
+  width: auto;
+  min-width: calc(96 * var(--u));
+  padding: 0 calc(18 * var(--u));
+  white-space: nowrap;
 }
 
 /* The growing patch stays behind the lead and the arrow. */

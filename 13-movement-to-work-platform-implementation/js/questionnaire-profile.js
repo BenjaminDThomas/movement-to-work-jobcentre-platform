@@ -151,9 +151,9 @@
       roles: ['support', 'listener', 'organiser'] },
     { key: 'problem', name: 'Problem-solving', skills: ['problem'], improve: ['problem'], goals: ['problem'], ratings: ['c6', 's6'] },
     { key: 'organisation', name: 'Organisation', skills: ['organisation', 'time', 'detail', 'reliability'], improve: ['organisation', 'time', 'detail'],
-      goals: ['organisation'], ratings: [], roles: ['organiser'] },
-    { key: 'adaptability', name: 'Adaptability', skills: ['adaptability', 'initiative'], improve: ['adaptability', 'initiative'], ratings: [] },
-    { key: 'digital', name: 'Digital confidence', skills: ['digital'], improve: ['digital'], goals: ['digital'], ratings: [] },
+      goals: ['organisation'], ratings: ['c9'], roles: ['organiser'] },
+    { key: 'adaptability', name: 'Adaptability', skills: ['adaptability', 'initiative'], improve: ['adaptability', 'initiative'], ratings: ['c10'] },
+    { key: 'digital', name: 'Digital confidence', skills: ['digital'], improve: ['digital'], goals: ['digital'], ratings: ['c11'] },
     { key: 'learning', name: 'Learning confidence', skills: ['learning'], improve: ['learning'], ratings: ['c4'] },
     { key: 'workplace', name: 'Workplace confidence', skills: [], improve: [], ratings: ['c7', 'c8', 'c2'] }
   ];

@@ -69,6 +69,59 @@
   var wideQuery = window.matchMedia(
     '(min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em)'
   );
+  // Tablets held upright (and other screens between a phone and the wide
+  // layout): room to show every Get Job Ready tool at once, so no tabs.
+  // Must match the tablet query in grid.css section 25.
+  var tabletQuery = window.matchMedia('(min-width: 40em) and (min-height: 28em)');
+
+  /* Phones show and hide their address bar as you scroll. That fires
+     'resize' and changes window.innerHeight, though nothing on the page
+     changes size: every pinned section is measured in small-viewport
+     units (--screen, grid.css). So the page works from that steady height,
+     and a resize only counts when the width or that height really changes.
+     Treating the address bar as a resize used to put the page back where
+     it had been a moment before (straight after a hand-over, back to
+     About), and re-measured the programme on every swipe. */
+  var screenProbe = null;
+  var screenCache = 0;
+  var sizeSeen = { w: window.innerWidth, h: -1 };
+  var realResize = true;
+
+  function screenH() {
+    if (!screenCache) {
+      if (!screenProbe) {
+        screenProbe = document.createElement('div');
+        screenProbe.className = 'screen-probe';
+        screenProbe.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(screenProbe);
+      }
+      screenCache = screenProbe.offsetHeight || window.innerHeight;
+    }
+    return screenCache;
+  }
+
+  // Registered before every other resize handler, so each can ask.
+  window.addEventListener('resize', function () {
+    screenCache = 0;
+    var w = window.innerWidth;
+    var h = screenH();
+    realResize = w !== sizeSeen.w || sizeSeen.h < 0 || Math.abs(h - sizeSeen.h) > 1;
+    sizeSeen.w = w;
+    sizeSeen.h = h;
+  });
+
+  /* Focus that follows a tap or click (back onto a card's button when a
+     tool closes, or onto the current link when the menu opens) is not
+     ringed; the ring comes back as soon as a key is pressed (style.css,
+     section 15). */
+  document.addEventListener('pointerdown', function () {
+    doc.classList.add('is-pointing');
+  }, true);
+  document.addEventListener('keydown', function (event) {
+    if (!event.metaKey && !event.ctrlKey && !event.altKey) {
+      doc.classList.remove('is-pointing');
+    }
+  }, true);
 
   function clamp(v, min, max) {
     return v < min ? min : v > max ? max : v;
@@ -227,6 +280,25 @@
     // (It used to fade, then lose the fade class while still on screen,
     // which made the menu reappear and play its close a second time.)
     stopAutoplay();
+    // Measure the destination from the page as it will be once you arrive,
+    // not as it is now. Part-way through the opening, the intro track and
+    // the Get Job Ready hand-over were still open above the destination
+    // and folded away a moment after the jump, and sections not yet drawn
+    // only had estimated heights; both moved the page on, so Get Job Ready
+    // landed on the section after it. So: fold whatever lies above the
+    // destination first, and draw every section for this one measurement.
+    doc.classList.add('is-drawing-all');
+    progNear = true;
+    ensureProg();
+    var after = function (el) {
+      return !!el && (el === target || !!(el.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING));
+    };
+    if (active && id !== 'home' && intro && !intro.contains(target) && after(intro)) {
+      setCollapsed(true);
+    }
+    if (active && readySection && progOutro && after(readySection)) {
+      setOutroDone(true);
+    }
     var y = target.getBoundingClientRect().top + window.scrollY;
     if (id === 'home') {
       y = 0;
@@ -235,6 +307,14 @@
       setCollapsed(false);
     }
     window.scrollTo({ top: y, behavior: 'instant' });
+    lastY = window.scrollY;
+    outroLastY = window.scrollY;
+    requestUpdate();
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () {
+        doc.classList.remove('is-drawing-all');
+      });
+    });
     closeMenu(false);
 
     if (!target.hasAttribute('tabindex')) {
@@ -607,8 +687,22 @@
      hold either side so every scene can be read before the next arrives. */
   var pinFallback = false;
 
-  var HOLD = 0.32;      // screens of stillness before each hand-over
-  var MOVE = 0.88;      // screens the slide-up itself takes
+  var HOLD = 0.14;      // screens of stillness before each hand-over
+  var MOVE = 0.8;       // screens the slide-up itself takes
+  // The track (grid.css) is 3 x (HOLD + MOVE) + HOLD screens of pin, plus
+  // one screen: kept short so the scenes follow the scroll without long
+  // stretches where nothing moves.
+  var journeyBar = document.querySelector('[data-journey-bar]');
+  var journeyPinned = null;
+
+  function setVar(el, name, value) {
+    // Only when it changes: each write restyles the whole scene.
+    var key = '_' + name;
+    if (el[key] !== value) {
+      el[key] = value;
+      el.style.setProperty(name, value);
+    }
+  }
 
   function updateScenes(vh) {
     if (!journey || !scenes.length) {
@@ -640,17 +734,28 @@
     scenes.forEach(function (scene, i) {
       var inn = e[i];
       var out = e[i + 1] || 0;
-      scene.style.setProperty('--enter', (i === 0 ? 0 : 1 - inn).toFixed(4));
-      scene.style.setProperty('--in', inn.toFixed(4));
-      scene.style.setProperty('--out', out.toFixed(4));
+      setVar(scene, '--enter', (i === 0 ? 0 : 1 - inn).toFixed(4));
+      setVar(scene, '--in', inn.toFixed(4));
+      setVar(scene, '--out', out.toFixed(4));
 
       // The photograph keeps drifting upwards for as long as the scene
       // is on screen: from arriving, through its hold, until covered.
       var life = clamp((inn + out) / 2, 0, 1);
-      scene.style.setProperty('--drift', ((0.5 - life) * 14).toFixed(3));
+      setVar(scene, '--drift', ((0.5 - life) * 14).toFixed(3));
 
       scene.classList.toggle('is-active', inn > 0.55 && out < 0.9);
     });
+
+    // The bar along the top: how far through the four stages you are.
+    if (journeyBar) {
+      var pinned = rect.top <= 0.5 && rect.bottom >= vh - 0.5;
+      if (pinned !== journeyPinned) {
+        journeyPinned = pinned;
+        journey.classList.toggle('is-pinned', pinned);
+      }
+      var through = clamp(-rect.top / Math.max(1, rect.height - vh), 0, 1);
+      setVar(journeyBar, '--p', through.toFixed(4));
+    }
 
   }
 
@@ -666,23 +771,48 @@
     }
   }
 
+  var forceUpdate = true;
+  var lastRunY = -1;
+
   function update() {
     ticking = false;
+    var y = window.scrollY;
+    // Already drawn for this position this frame (a hand-over draws in
+    // step with its own scrolling, then the scroll event asks again).
+    if (!forceUpdate && y === lastRunY) {
+      return;
+    }
+    forceUpdate = false;
+    lastRunY = y;
     updateScrolled();
     if (!active) {
       return;
     }
-    var vh = window.innerHeight;
+    var vh = screenH();
     updateIntro(vh);
     updateScenes(vh);
     updateProg(vh);
   }
 
-  function requestUpdate() {
+  function queueUpdate() {
     if (!ticking) {
       ticking = true;
       window.requestAnimationFrame(update);
     }
+  }
+
+  /** Redraw on the next frame, even if the page has not moved. */
+  function requestUpdate() {
+    forceUpdate = true;
+    queueUpdate();
+  }
+
+  /** Scroll, then draw in the same frame. A hand-over moves the page from
+   *  inside an animation frame; waiting for the scroll event drew every
+   *  frame one frame late, which is what made hand-overs judder. */
+  function scrollNow(top) {
+    window.scrollTo({ top: top, behavior: 'instant' });
+    update();
   }
 
   /** Clear every inline style the timeline wrote, for the static layout. */
@@ -703,6 +833,9 @@
       scene.style.removeProperty('--out');
       scene.style.removeProperty('--drift');
       scene.style.removeProperty('--enter');
+      ['--in', '--out', '--drift', '--enter'].forEach(function (name) {
+        scene['_' + name] = undefined;
+      });
       scene.classList.add('is-active');
     });
   }
@@ -850,7 +983,7 @@
   }
 
   function introEnd() {
-    return intro.offsetTop + intro.offsetHeight - window.innerHeight;
+    return intro.offsetTop + intro.offsetHeight - screenH();
   }
 
   function easeAuto(t) {
@@ -890,7 +1023,7 @@
         start = now;
       }
       var t = clamp((now - start) / duration, 0, 1);
-      window.scrollTo({ top: from + (to - from) * easeAuto(t), behavior: 'instant' });
+      scrollNow(from + (to - from) * easeAuto(t));
       if (t < 1) {
         window.requestAnimationFrame(step);
       } else {
@@ -1016,7 +1149,7 @@
     setMotion();
     listen(pinQuery, setMotion);
     listen(wideQuery, requestUpdate);
-    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('scroll', queueUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate);
     // Fonts change the mask's letter shapes; redraw once they arrive.
     if (document.fonts && document.fonts.ready) {
@@ -1489,6 +1622,19 @@
       return -1;
     }
 
+    /** Where a piece lands in a slot: the slot itself, or for the wide
+     *  slots at the top and bottom (which reach into the corners) a square
+     *  over the part of the circle that shows, so the piece never
+     *  stretches on the way in. */
+    function landRect(i) {
+      var r = slots[i].getBoundingClientRect();
+      if (r.width < r.height * 1.3) {
+        return r;
+      }
+      var cx = r.left + r.width / 2 + (i === 0 || i === 10 ? 1 : -1) * r.width * 0.12;
+      return { left: cx - r.height / 2, top: r.top, width: r.height, height: r.height };
+    }
+
     function nearestSlot(x, y) {
       var best = -1;
       var bestD = Infinity;
@@ -1590,7 +1736,7 @@
         place(key, slotIndex);
         return;
       }
-      var to = slots[slotIndex].getBoundingClientRect();
+      var to = landRect(slotIndex);
       var ghost = makeGhost(key, fromRect);
       var sx = to.width / fromRect.width;
       var sy = to.height / fromRect.height;
@@ -1652,6 +1798,10 @@
       if (!sheet.open) {
         sheet.showModal();
       }
+      // Opening moves focus into the card while it is still below the
+      // screen, and the browser scrolls the dialog to show it: the card
+      // then rose past its place and jumped back. Undo that scroll.
+      sheet.scrollTop = 0;
       card.scrollTop = 0;
       // Restart the entrance each time.
       sheet.classList.remove('is-shown');
@@ -1803,6 +1953,7 @@
         target: -1
       };
       piece.parentNode.classList.add('is-dragging');
+      doc.classList.add('is-grabbing');
       moveDrag(x, y);
       return true;
     }
@@ -1834,9 +1985,10 @@
         s.classList.remove('is-target');
       });
       d.piece.parentNode.classList.remove('is-dragging');
+      doc.classList.remove('is-grabbing');
 
       if (d.target >= 0) {
-        var to = slots[d.target].getBoundingClientRect();
+        var to = landRect(d.target);
         var anim = d.ghost.animate([
           { transform: d.ghost.style.transform },
           { transform: 'translate3d(' + to.left + 'px,' + to.top + 'px,0) scale(' + (to.width / d.rect.width) + ',' + (to.height / d.rect.height) + ')' }
@@ -2018,7 +2170,7 @@
   ];
 
   function trackTravel() {
-    return Math.max(1, progTrack.offsetHeight - window.innerHeight);
+    return Math.max(1, progTrack.offsetHeight - screenH());
   }
 
   function trackTop() {
@@ -2100,11 +2252,11 @@
     var to = clamp(top, 0, document.documentElement.scrollHeight - window.innerHeight);
     var dist = to - from;
     if (Math.abs(dist) < 2) {
-      return;
+      return 0;
     }
     if (reduceQuery.matches) {
       window.scrollTo({ top: to, behavior: 'instant' });
-      return;
+      return 0;
     }
     var ms = duration || clamp(450 + Math.abs(dist) * 0.3, 600, 1300);
     var start = null;
@@ -2118,7 +2270,7 @@
         start = now;
       }
       var t = clamp((now - start) / ms, 0, 1);
-      window.scrollTo({ top: from + dist * easeAuto(t), behavior: 'instant' });
+      scrollNow(from + dist * easeAuto(t));
       if (t < 1) {
         window.requestAnimationFrame(step);
       } else {
@@ -2126,20 +2278,21 @@
       }
     }
     window.requestAnimationFrame(step);
+    return ms;
   }
 
-  /** Bring a day card (or any item) to the middle. */
+  /** Bring a day card (or any item) to the middle. Returns how long the
+   *  glide takes (0 when it is already there). */
   function showItem(el) {
     if (!el) {
-      return;
+      return 0;
     }
     if (sideways) {
-      glideTo(sideTarget(el));
-      return;
+      return glideTo(sideTarget(el)) || 0;
     }
     // Phones and tablets: the days run down the page, so scroll to it.
     var r = el.getBoundingClientRect();
-    glideTo(window.scrollY + r.top + r.height / 2 - window.innerHeight / 2);
+    return glideTo(window.scrollY + r.top + r.height / 2 - window.innerHeight / 2) || 0;
   }
 
   function stepDay(dir) {
@@ -2166,6 +2319,11 @@
         index = i;
       }
     });
+    // At the very end of the belt the certificate cannot reach the middle,
+    // so it is the current card once the belt has run out.
+    if (sideways && progDist && progX >= progDist - 2) {
+      index = progDays.length - 1;
+    }
     progCurrent = index;
     progDays.forEach(function (day, i) {
       day.closest('.prog__item').classList.toggle('is-current', i === index);
@@ -2199,7 +2357,7 @@
   var OUTRO_MS = 2900;
 
   function outroStart() {
-    return progOutro.getBoundingClientRect().top + window.scrollY - window.innerHeight;
+    return progOutro.getBoundingClientRect().top + window.scrollY - screenH();
   }
 
   function outroEnd() {
@@ -2232,8 +2390,11 @@
     if (menuOpen || document.querySelector('dialog[open]') || auto) {
       return false;
     }
+    // A little room past the last card first, so the certificate can be
+    // looked at without the next swipe carrying the page away; the hand-
+    // over starts where the green field begins to show.
     var y = window.scrollY;
-    return y >= outroStart() - 4 && y < outroEnd() - 4;
+    return y >= outroStart() + screenH() * 0.3 - 4 && y < outroEnd() - 4;
   }
 
   function playOutro() {
@@ -2261,7 +2422,7 @@
         start = now;
       }
       var t = clamp((now - start) / ms, 0, 1);
-      window.scrollTo({ top: from + (to - from) * easeAuto(t), behavior: 'instant' });
+      scrollNow(from + (to - from) * easeAuto(t));
       if (t < 1) {
         window.requestAnimationFrame(step);
       } else {
@@ -2314,14 +2475,22 @@
     } else {
       // Phones: the coloured line fills down the track to the middle of
       // the screen, and each day's node fills in as the line reaches it.
+      // Every position is read first, then everything is written, so the
+      // page is laid out once per frame rather than once per card.
       var rr = progRail.getBoundingClientRect();
       var fill = clamp((vh * 0.55 - rr.top) / Math.max(1, rr.height), 0, 1);
-      progRail.style.setProperty('--fill', fill.toFixed(4));
-      progItems.forEach(function (item) {
+      var reached = progItems.map(function (item) {
         var ir = item.getBoundingClientRect();
-        item.classList.toggle('is-reached', ir.top + ir.height / 2 < vh * 0.55);
+        return ir.top + ir.height / 2 < vh * 0.55;
       });
       updateCurrent();
+      setVar(progRail, '--fill', fill.toFixed(4));
+      progItems.forEach(function (item, i) {
+        if (item._reached !== reached[i]) {
+          item._reached = reached[i];
+          item.classList.toggle('is-reached', reached[i]);
+        }
+      });
     }
 
     if (!progOutro || !progMask || !progOutro.offsetHeight) {
@@ -2423,11 +2592,16 @@
       var go = event.target.closest('[data-go]');
       if (toggle) {
         var day = toggle.closest('[data-day]');
-        // The card turns straight away; one off to the side also glides
-        // to the middle while it turns.
-        flipDay(day);
-        if (progDays.indexOf(day) !== progCurrent) {
-          showItem(day);
+        // A card off to the side glides to the middle first and turns as
+        // it settles, so the move reads as one smooth motion.
+        var wait = progDays.indexOf(day) !== progCurrent ? showItem(day) : 0;
+        if (wait) {
+          window.clearTimeout(day._turn);
+          day._turn = window.setTimeout(function () {
+            flipDay(day);
+          }, wait * 0.6);
+        } else {
+          flipDay(day);
         }
       } else if (step) {
         stepDay(parseInt(step.getAttribute('data-step'), 10));
@@ -2451,7 +2625,7 @@
       }
       if (sideways && !event.ctrlKey && Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
         var r = progTrack.getBoundingClientRect();
-        if (r.top <= 1 && r.bottom >= window.innerHeight - 1) {
+        if (r.top <= 1 && r.bottom >= screenH() - 1) {
           var delta = event.deltaX * (event.deltaMode === 1 ? 32 : 1);
           window.scrollBy({ top: delta * (trackTravel() / Math.max(progDist, 1)), behavior: 'instant' });
           event.preventDefault();
@@ -2519,6 +2693,17 @@
       }
     });
 
+    // The stage clips the belt, which also makes it scrollable from code:
+    // focusing a card at the edge let the browser scroll it sideways in
+    // one jump, under the glide. It is kept at rest; the glide does the
+    // moving.
+    progStage.addEventListener('scroll', function () {
+      if (progStage.scrollLeft || progStage.scrollTop) {
+        progStage.scrollLeft = 0;
+        progStage.scrollTop = 0;
+      }
+    }, { passive: true });
+
     // Tabbing to a card brings it to the middle.
     prog.addEventListener('focusin', function (event) {
       var day = event.target.closest('[data-day]');
@@ -2546,6 +2731,8 @@
         if (!sideways || event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('.prog__controls')) {
           return;
         }
+        // No text selection as the mouse sweeps across the page.
+        event.preventDefault();
         down = true;
         dragged = false;
         startX = lastX = event.clientX;
@@ -2566,6 +2753,7 @@
         if (!dragged && Math.abs(dx) > 6) {
           dragged = true;
           progStage.classList.add('is-dragging');
+          doc.classList.add('is-grabbing');
           try {
             progStage.setPointerCapture(event.pointerId);
           } catch (e) { /* not captured: still works */ }
@@ -2587,6 +2775,7 @@
         }
         down = false;
         progStage.classList.remove('is-dragging');
+        doc.classList.remove('is-grabbing');
         if (!dragged) {
           return;
         }
@@ -2673,6 +2862,9 @@
     // shows a stale layout.
     var resizeQueued = false;
     window.addEventListener('resize', function () {
+      if (!realResize) {
+        return;
+      }
       progResizing = true;
       if (!resizeQueued) {
         resizeQueued = true;
@@ -2760,7 +2952,7 @@
     }
 
     function setMode() {
-      var narrow = !wideQuery.matches;
+      var narrow = !wideQuery.matches && !tabletQuery.matches;
       tools.classList.toggle('has-tabs', narrow);
       // The panel is the card's <section> (an <li> cannot be a tabpanel).
       cards.forEach(function (card, n) {
@@ -2826,6 +3018,7 @@
 
     setMode();
     listen(wideQuery, setMode);
+    listen(tabletQuery, setMode);
   }
 
 
@@ -2892,7 +3085,7 @@
         measure();
       }
       var r = next.getBoundingClientRect();
-      var vh = window.innerHeight;
+      var vh = screenH();
       // 0 as the block's top enters the bottom of the screen, 1 as the
       // block's bottom reaches the bottom of the screen.
       var travel = Math.max(1, r.height);
@@ -2910,8 +3103,10 @@
       }
     }, { passive: true });
     window.addEventListener('resize', function () {
-      base = null;
-      draw();
+      if (realResize) {
+        base = null;
+        draw();
+      }
     });
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () {
@@ -3071,7 +3266,7 @@
   }
 
   function readPlace() {
-    var vh = window.innerHeight;
+    var vh = screenH();
     var mid = vh / 2;
     // The programme: hold on to the day card being looked at.
     if (prog && progTrack && progNear) {
@@ -3121,7 +3316,7 @@
     if (!a || !document.contains(a.el)) {
       return;
     }
-    var vh = window.innerHeight;
+    var vh = screenH();
     var r = a.el.getBoundingClientRect();
     var top = r.top + window.scrollY;
     var y;
@@ -3160,6 +3355,9 @@
     // Registered after the programme's own resize handling, so this runs
     // last in each frame and has the final word on where the page sits.
     window.addEventListener('resize', function () {
+      if (!realResize) {
+        return;
+      }
       if (!placeFrozen) {
         placeFrozen = true;
       }
@@ -3469,6 +3667,7 @@
      ======================================================================== */
 
   function start() {
+    sizeSeen.h = screenH();
     initTools();
     initLoopPause();
     initMenu();

@@ -1243,6 +1243,19 @@ html:not(.js) .menu__link:hover::after {
   color: var(--c-white);
 }
 
+/* The progress bar along the top of the four stages. */
+.journey__bar {
+  background: rgb(14 17 15 / 72%);
+}
+
+.journey__bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #F2A516, var(--c-yellow-warm));
+  transform: scaleX(var(--p, 0));
+  transform-origin: 0 50%;
+}
+
 .scene {
   --in: 1;
   --out: 0;
@@ -2959,6 +2972,7 @@ html:not(.js) .menu__link:hover::after {
   border-radius: calc(24 * var(--u)) calc(24 * var(--u)) 0 0;
   box-shadow: 0 calc(-10 * var(--u)) calc(40 * var(--u)) calc(-10 * var(--u)) rgb(0 0 0 / 35%);
   color: var(--color-dark-green);
+  overflow-x: hidden;
   transform: translateY(100%);
   transition: transform 460ms var(--ease-in-out);
 }
@@ -3097,8 +3111,11 @@ html:not(.js) .menu__link:hover::after {
     no-repeat right center / calc(30 * var(--u)) calc(40 * var(--u)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 40'%3E%3Cpath d='M26 6L6 14M28 20H6M26 34L6 26' stroke='%23FDD114' stroke-width='3.4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
 }
 
-.sheet__add:hover {
-  transform: scale(1.03) rotate(-1deg);
+/* Hover darkens the button rather than growing it: growing pushed the
+   card's contents past its edge, so a scrollbar came and went and the
+   whole card shifted. */
+.sheet__add:hover::before {
+  background: #249A4B;
 }
 
 .sheet__add.is-added::before {
@@ -3223,6 +3240,31 @@ html:not(.js) .menu__link:hover::after {
 .brand:focus-visible,
 .corner-cta:focus-visible {
   box-shadow: inset 0 0 0 3px var(--c-focus-yellow), inset 0 0 0 6px var(--c-focus-ink);
+}
+
+/* Focus that follows a tap or click is not ringed (main.js adds
+   is-pointing on a press and takes it off at the next key). Typing
+   fields keep theirs. */
+.is-pointing :focus-visible:not(input, textarea, select),
+.is-pointing .tool__btn:has(input:focus-visible),
+.is-pointing .pieces__item:has(.piece:focus-visible),
+.is-pointing .ivswitch input:focus-visible + .ivswitch__track,
+.is-pointing .qnstep__check input:focus-visible + span {
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.is-pointing .menu-toggle:focus-visible .menu-toggle__box {
+  box-shadow: 0 calc(6 * var(--u)) calc(16 * var(--u)) calc(-6 * var(--u)) rgb(3 61 35 / 55%) !important;
+}
+
+/* Dragging the programme or a skill piece: the closed hand everywhere,
+   and no text gets selected on the way. */
+.is-grabbing,
+.is-grabbing * {
+  cursor: grabbing !important;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 
@@ -3682,6 +3724,23 @@ html:not(.js) .menu__link:hover::after {
   transform: rotateY(180deg);
 }
 
+/* Each face is also hidden outright once the card is edge on. Safari
+   ignores backface-visibility for a face whose picture has its own layer
+   (the drop shadow), so on iPhones the front showed through, mirrored. */
+.day__face--front,
+.day__face--back {
+  transition: visibility 0s linear 200ms;
+}
+
+.day__face--back,
+.day.is-flipped .day__face--front {
+  visibility: hidden;
+}
+
+.day.is-flipped .day__face--back {
+  visibility: visible;
+}
+
 .day.is-turning .day__flip {
   animation: day-lift 900ms var(--ease-out);
 }
@@ -3782,11 +3841,12 @@ html:not(.js) .menu__link:hover::after {
   background: var(--c);
 }
 
-.day:hover .day__chip svg {
+.day:hover .day__chip:not(.day__chip--done) svg {
   rotate: 180deg;
 }
 
-.day__chip--done {
+.day__chip--done,
+.day:hover .day__chip--done {
   color: #fff;
   background: #2E8B3E;
   box-shadow: none;
@@ -3961,6 +4021,11 @@ html:not(.js) .menu__link:hover::after {
 /* Certificate */
 .day--finish {
   cursor: default;
+}
+
+.day--finish .day__week {
+  color: #fff;
+  text-shadow: 0 1px 3px rgb(80 50 0 / 45%);
 }
 
 .day--finish .day__band {
@@ -4189,7 +4254,7 @@ html:not(.js) .menu__link:hover::after {
     font-size: calc(19 * var(--u));
   }
 
-  .js .prog__stage {
+  .js .prog__belt {
     cursor: grab;
   }
 
@@ -4398,6 +4463,16 @@ html:not(.js) .menu__link:hover::after {
 
 .tool__time span {
   rotate: -3deg;
+}
+
+/* A progress label is longer, so it is set a touch smaller; on the
+   strengths card the paint deepens so white words stay easy to read. */
+.tool.has-progress .tool__time {
+  font-size: calc(22 * var(--u));
+}
+
+.tool--strengths.has-progress .tool__time {
+  --t-time: #B4700A;
 }
 
 .tool__title {
@@ -6298,7 +6373,7 @@ html:not(.js) .menu__link:hover::after {
   overflow-clip-margin: 12rem;
 }
 .about   { contain-intrinsic-block-size: auto 219vw; }
-.journey { contain-intrinsic-block-size: auto 490vh; }
+.journey { contain-intrinsic-block-size: auto 400vh; }
 .explore { contain-intrinsic-block-size: auto 268vw; }
 .skills  { contain-intrinsic-block-size: auto 266vw; }
 .prog    { contain-intrinsic-block-size: auto 1700vw; }

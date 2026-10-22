@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-GB">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
   <!--
     =========================================================================
     MOVEMENT TO WORK: SKELMERSDALE JOBCENTRE PLUS
@@ -767,6 +769,9 @@
     <section class="journey" id="journey" aria-labelledby="journey-title">
       <h2 class="visually-hidden" id="journey-title">Your journey: four stages</h2>
 
+      <!-- How far through the four stages you are (main.js). -->
+      <div class="journey__bar" aria-hidden="true" data-journey-bar><span class="journey__bar-fill"></span></div>
+
       <ol class="journey__list">
 
         <li class="scene" data-scene>
@@ -1052,7 +1057,7 @@
 
             <ul class="panel__cards">
               <li>
-                <button class="word-card word-card--green" type="button" data-word-open="purpose" aria-controls="topic-purpose" aria-expanded="false">
+                <button class="word-card word-card--blue" type="button" data-word-open="purpose" aria-controls="topic-purpose" aria-expanded="false">
                   <span class="word-card__disc"><svg aria-hidden="true" focusable="false"><use href="#i-target-arrow" /></svg></span>
                   <span class="word-card__text">
                     <span class="word-card__title">Purpose</span>
@@ -1072,7 +1077,7 @@
                 </button>
               </li>
               <li>
-                <button class="word-card word-card--blue" type="button" data-word-open="eligibility" aria-controls="topic-eligibility" aria-expanded="false">
+                <button class="word-card word-card--green" type="button" data-word-open="eligibility" aria-controls="topic-eligibility" aria-expanded="false">
                   <span class="word-card__disc"><svg aria-hidden="true" focusable="false"><use href="#i-person-check" /></svg></span>
                   <span class="word-card__text">
                     <span class="word-card__title">Eligibility</span>
@@ -1086,7 +1091,7 @@
 
           <!-- Topics. Shown one at a time with JavaScript, all at once
                without it. -->
-          <article class="topic topic--green" id="topic-purpose" data-topic="purpose" aria-labelledby="topic-purpose-title" tabindex="-1">
+          <article class="topic topic--blue" id="topic-purpose" data-topic="purpose" aria-labelledby="topic-purpose-title" tabindex="-1">
             <header class="topic__head">
               <svg class="topic__icon" aria-hidden="true" focusable="false"><use href="#i-target-arrow" /></svg>
               <p class="topic__name">Purpose</p>
@@ -1106,7 +1111,7 @@
             </aside>
             <p class="topic__more">Also explore
               <button type="button" class="topic__chip topic__chip--yellow" data-word-open="mtw">Movement to Work</button>
-              <button type="button" class="topic__chip topic__chip--blue" data-word-open="eligibility">Eligibility</button>
+              <button type="button" class="topic__chip topic__chip--green" data-word-open="eligibility">Eligibility</button>
             </p>
           </article>
 
@@ -1129,12 +1134,12 @@
               <p><strong>Our goal for you</strong> To help you feel confident, prepared and ready for work.</p>
             </aside>
             <p class="topic__more">Also explore
-              <button type="button" class="topic__chip topic__chip--green" data-word-open="purpose">Purpose</button>
-              <button type="button" class="topic__chip topic__chip--blue" data-word-open="eligibility">Eligibility</button>
+              <button type="button" class="topic__chip topic__chip--blue" data-word-open="purpose">Purpose</button>
+              <button type="button" class="topic__chip topic__chip--green" data-word-open="eligibility">Eligibility</button>
             </p>
           </article>
 
-          <article class="topic topic--blue" id="topic-eligibility" data-topic="eligibility" aria-labelledby="topic-eligibility-title" tabindex="-1">
+          <article class="topic topic--green" id="topic-eligibility" data-topic="eligibility" aria-labelledby="topic-eligibility-title" tabindex="-1">
             <header class="topic__head">
               <svg class="topic__icon" aria-hidden="true" focusable="false"><use href="#i-person-check" /></svg>
               <p class="topic__name">Eligibility</p>
@@ -1153,7 +1158,7 @@
               <p><strong>Take your next step</strong> Build confidence, develop workplace skills and gain experience for your next step towards employment.</p>
             </aside>
             <p class="topic__more">Also explore
-              <button type="button" class="topic__chip topic__chip--green" data-word-open="purpose">Purpose</button>
+              <button type="button" class="topic__chip topic__chip--blue" data-word-open="purpose">Purpose</button>
               <button type="button" class="topic__chip topic__chip--yellow" data-word-open="mtw">Movement to Work</button>
             </p>
           </article>

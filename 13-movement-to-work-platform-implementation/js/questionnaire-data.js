@@ -188,7 +188,12 @@
         { id: 'c5', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel communicating professionally, for example by email or phone?' },
         { id: 'c6', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel solving problems at work?' },
         { id: 'c7', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel applying for jobs?' },
-        { id: 'c8', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel about starting a new role?' }
+        { id: 'c8', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel about starting a new role?' },
+        // One rating each for the strengths nothing else rated, so a finished
+        // profile has a confidence bar for every strength.
+        { id: 'c9', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel planning and organising your time and tasks?' },
+        { id: 'c10', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel adapting when plans change?' },
+        { id: 'c11', type: 'scale', scale: CONFIDENCE, text: 'How confident do you feel using computers and digital tools for work?' }
       ] },
 
     { key: 'ideal', name: 'Your ideal opportunity', icon: 'i-key',
