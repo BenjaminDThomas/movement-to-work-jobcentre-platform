@@ -39,7 +39,7 @@
    Scroll choreography runs whenever the pinned layout is in force, on a
    screen at least 30em tall (the same query as grid.css section 12). It
    follows the reader's own scrolling, so it also runs with reduced
-   motion; the pointer parallax and looping decoration do not.
+   motion; the looping decoration does not.
 
    Contents
      1. Setup and helpers
@@ -759,7 +759,6 @@
 
   }
 
-  var stage = document.querySelector('.intro__stage');
   var scrolled = null;
 
   /** The fixed corners tuck in once the hero is behind you. */
@@ -848,33 +847,6 @@
       resetChoreography();
       updateScrolled();
     }
-  }
-
-  /** The student drifts a little against the room behind her as the
-   *  pointer moves. Mouse and pen only, and only with motion allowed. */
-  function initParallax() {
-    if (!stage) {
-      return;
-    }
-    var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-    var queued = false;
-    var px = 0;
-    var py = 0;
-    window.addEventListener('pointermove', function (event) {
-      if (!fine.matches || !pinQuery.matches || reduceQuery.matches || event.pointerType === 'touch') {
-        return;
-      }
-      px = (event.clientX / window.innerWidth) * 2 - 1;
-      py = (event.clientY / window.innerHeight) * 2 - 1;
-      if (!queued) {
-        queued = true;
-        window.requestAnimationFrame(function () {
-          queued = false;
-          stage.style.setProperty('--px', px.toFixed(3));
-          stage.style.setProperty('--py', py.toFixed(3));
-        });
-      }
-    }, { passive: true });
   }
 
   /* --- Autoplay through the intro -------------------------------------
@@ -1144,7 +1116,6 @@
 
   function initChoreography() {
     splitTitles();
-    initParallax();
     initAutoplay();
     setMotion();
     listen(pinQuery, setMotion);
@@ -2354,7 +2325,7 @@
   var outroAuto = null;
   var outroDone = false;
   var outroLastY = window.scrollY;
-  var OUTRO_MS = 2900;
+  var OUTRO_MS = AUTO_MS;   // same pace as the MOVEMENT TO WORK hand-over
 
   function outroStart() {
     return progOutro.getBoundingClientRect().top + window.scrollY - screenH();
@@ -2398,20 +2369,29 @@
   }
 
   function playOutro() {
+    if (outroAuto) {
+      return true;
+    }
+    // Plays exactly like the MOVEMENT TO WORK hand-over: one fixed, eased
+    // glide at the same pace, which the reader's scrolling cannot speed up
+    // or push around until it has landed (their input is held while it
+    // plays). It starts the moment it is reached rather than first freezing
+    // the page until their scrolling settles, which felt like a stall.
     var from = window.scrollY;
     var to = outroEnd();
-    var span = Math.max(1, to - outroStart());
-    var ms = Math.max(900, OUTRO_MS * (to - from) / span);
+    var dist = to - from;
+    if (dist < 4) {
+      return false;
+    }
+    // The full hand-over (from where it normally starts) takes exactly as
+    // long as the MOVEMENT TO WORK one; starting further in takes
+    // proportionally less.
+    var span = Math.max(1, to - (outroStart() + screenH() * 0.3));
+    var ms = clamp(OUTRO_MS * dist / span, 900, OUTRO_MS);
     var start = null;
+    var mine = outroAuto = {};
+    pending = null;
     tween = null;
-    whenSettled(function () {
-      from = window.scrollY;
-      to = outroEnd();
-      ms = Math.max(900, OUTRO_MS * (to - from) / span);
-      mine = outroAuto = {};
-      window.requestAnimationFrame(step);
-    });
-    var mine = null;
     doc.classList.add('is-autoplaying');
     doc.classList.remove('is-ready-rewinding');
     function step(now) {
@@ -2426,12 +2406,19 @@
       if (t < 1) {
         window.requestAnimationFrame(step);
       } else {
+        // Sections below draw lazily, so the landing is checked once at
+        // the end (measuring it every frame forced a layout per frame).
+        var end = outroEnd();
+        if (Math.abs(end - window.scrollY) > 1) {
+          scrollNow(end);
+        }
         outroAuto = null;
         landed();
         doc.classList.remove('is-autoplaying');
         setOutroDone(true);
       }
     }
+    window.requestAnimationFrame(step);
     return true;
   }
 
@@ -2508,7 +2495,11 @@
     if (!outroAuto && Math.abs(y - outroLastY) > 1) {
       doc.classList.toggle('is-ready-rewinding', y < outroLastY);
     }
+    var goingDown = y > outroLastY + 1;
     outroLastY = y;
+    if (goingDown && !scrollLocked() && wantsOutro(1)) {
+      playOutro();
+    }
     window.clearTimeout(outroSettle);
     outroSettle = window.setTimeout(checkOutro, 180);
 

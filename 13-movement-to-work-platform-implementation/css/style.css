@@ -879,24 +879,11 @@ html:not(.js) .menu__link:hover::after {
   background: var(--color-dark-green);
 }
 
-.intro__photo {
-  transition: translate 900ms var(--ease-out);
-}
-
-/* Pointer parallax (main.js sets --px / --py from -1 to 1): she drifts
-   a little against the room behind her. */
-.intro__stage .intro__photo:not(.intro__figure) {
-  translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -4px);
-}
-
-/* Overscan, so the drift never uncovers the edge of the frame. */
-.intro__stage .intro__photo {
-  scale: 1.02;
-}
-
-.intro__stage .intro__figure {
-  translate: calc(var(--px, 0) * 8px) calc(var(--py, 0) * 5px);
-}
+/* The two hero layers stay locked together. There used to be a pointer
+   parallax here, but the background photo still contains the student
+   (it is not a clean plate) and the cut-out has gaps around the books,
+   so any movement between the layers showed a second copy of her
+   trailing the cursor. */
 
 /* Narrow: washed green behind the copy, lighter over the office half so
    her face and the room still read, as in the mobile frame. */
@@ -1181,10 +1168,11 @@ html:not(.js) .menu__link:hover::after {
   color: var(--color-dark-green);
 }
 
+/* The steps are a diagram, not controls: no hover response, so nothing
+   suggests they can be clicked (they used to tilt and grow on hover). */
 .step__disc {
   -webkit-mask: var(--brush-disc) center / 100% 100% no-repeat;
   mask: var(--brush-disc) center / 100% 100% no-repeat;
-  transition: transform 360ms var(--ease-spring);
 }
 
 .step--green .step__disc {
@@ -1195,10 +1183,6 @@ html:not(.js) .menu__link:hover::after {
 .step--yellow .step__disc {
   background: var(--color-yellow);
   color: var(--c-ink);
-}
-
-.step:hover .step__disc {
-  transform: rotate(-8deg) scale(1.08);
 }
 
 .step__label {
@@ -3237,9 +3221,36 @@ html:not(.js) .menu__link:hover::after {
     0 0 0 6px var(--c-focus-yellow);
 }
 
+/* The corners are curved SVG shapes inside a rectangular link box, so a
+   box ring drew a yellow-and-black rectangle (a "tab") behind the curve.
+   The ring is drawn round the shape's own outline instead. */
 .brand:focus-visible,
 .corner-cta:focus-visible {
-  box-shadow: inset 0 0 0 3px var(--c-focus-yellow), inset 0 0 0 6px var(--c-focus-ink);
+  box-shadow: none;
+}
+
+.brand:focus-visible .brand__under,
+.corner-cta:focus-visible .corner-cta__under {
+  stroke: var(--c-focus-ink);
+  stroke-width: 12;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.brand:focus-visible .brand__word,
+.corner-cta:focus-visible .corner-cta__text {
+  text-decoration: underline 3px;
+  text-underline-offset: 4px;
+}
+
+.is-pointing .brand:focus-visible .brand__under,
+.is-pointing .corner-cta:focus-visible .corner-cta__under {
+  stroke: none;
+}
+
+.is-pointing .brand:focus-visible .brand__word,
+.is-pointing .corner-cta:focus-visible .corner-cta__text {
+  text-decoration: none;
 }
 
 /* Focus that follows a tap or click is not ringed (main.js adds
@@ -3272,7 +3283,7 @@ html:not(.js) .menu__link:hover::after {
    16. REDUCED MOTION
    Respected without breaking the page: hover feedback and anything driven
    by the reader's own scrolling still moves, but nothing loops or plays
-   by itself, and the pointer parallax is off.
+   by itself.
    ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -3287,10 +3298,6 @@ html:not(.js) .menu__link:hover::after {
     animation: none !important;
   }
 
-  .intro__stage .intro__photo,
-  .intro__stage .intro__figure {
-    translate: none !important;
-  }
 }
 
 
@@ -6175,11 +6182,31 @@ html:not(.js) .menu__link:hover::after {
     box-shadow: inset 0 calc(-10 * var(--u)) calc(24 * var(--u)) rgb(30 80 40 / 6%);
   }
 
+  /* Tabs that are not open read as buttons, not labels: solid white,
+     a clear border in their own colour and a raised lip underneath that
+     presses in when tapped. Before, a faint 25% ring on 70% white made
+     them look like static captions next to the filled open tab. */
   .ready__tabs button {
-    color: #34443B;
-    background: rgb(255 255 255 / 70%);
-    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--t) 25%, transparent);
-    transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out), translate 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+    color: #26332B;
+    background: #fff;
+    box-shadow:
+      inset 0 0 0 2px color-mix(in srgb, var(--t) 55%, transparent),
+      0 calc(3 * var(--u)) 0 color-mix(in srgb, var(--t) 45%, transparent),
+      0 calc(6 * var(--u)) calc(10 * var(--u)) calc(-4 * var(--u)) rgb(30 30 60 / 22%);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out), translate 160ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  }
+
+  .ready__tabs button:not([aria-selected="true"]):hover {
+    background: color-mix(in srgb, var(--t) 8%, #fff);
+  }
+
+  .ready__tabs button:not([aria-selected="true"]):active {
+    translate: 0 calc(3 * var(--u));
+    box-shadow:
+      inset 0 0 0 2px color-mix(in srgb, var(--t) 70%, transparent),
+      0 0 0 color-mix(in srgb, var(--t) 45%, transparent);
   }
 
   .ready__tab-time {
@@ -6279,10 +6306,6 @@ html:not(.js) .menu__link:hover::after {
       0 0 0 1.5px rgb(255 255 255 / 70%),
       0 calc(2 * var(--u)) calc(3 * var(--u)) rgb(30 30 60 / 10%),
       0 calc(18 * var(--u)) calc(30 * var(--u)) calc(-14 * var(--u)) rgb(30 30 60 / 35%);
-  }
-
-  .ready__tabs button {
-    background: rgb(255 255 255 / 80%);
   }
 
   .ready__tagline,
