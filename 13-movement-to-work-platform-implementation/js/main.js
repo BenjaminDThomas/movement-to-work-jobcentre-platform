@@ -274,11 +274,12 @@
       return;
     }
 
-    // The page moves to the destination while the menu still covers it,
-    // then the menu closes (the circle shrinks back into the toggle) over
-    // the section you chose: one animation, then the section, no jump.
-    // (It used to fade, then lose the fade class while still on screen,
-    // which made the menu reappear and play its close a second time.)
+    navigateToTarget(target, id, true);
+  }
+
+  function navigateToTarget(target, id, closeOpenMenu) {
+    // Settle the layout before moving. When navigating from the menu, keep
+    // its overlay open through the jump and close it over the destination.
     stopAutoplay();
     // Measure the destination from the page as it will be once you arrive,
     // not as it is now. Part-way through the opening, the intro track and
@@ -315,7 +316,9 @@
         doc.classList.remove('is-drawing-all');
       });
     });
-    closeMenu(false);
+    if (closeOpenMenu) {
+      closeMenu(false);
+    }
 
     if (!target.hasAttribute('tabindex')) {
       target.setAttribute('tabindex', '-1');
@@ -324,6 +327,26 @@
     if (window.history && history.replaceState) {
       history.replaceState(null, '', '#' + id);
     }
+  }
+
+  function initJoinNavigation() {
+    document.addEventListener('click', function (event) {
+      if (event.defaultPrevented || !event.target.closest ||
+        event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+      var link = event.target.closest('a[href="#join"]');
+      if (!link || link.hasAttribute('download') ||
+        (link.target && link.target !== '_self')) {
+        return;
+      }
+      var target = document.getElementById('join');
+      if (!target) {
+        return;
+      }
+      event.preventDefault();
+      navigateToTarget(target, 'join', false);
+    });
   }
 
   /* --- Moving highlight -------------------------------------------------
@@ -3682,6 +3705,7 @@
   // never flashes the top before jumping back.
   var nav = window.performance && performance.getEntriesByType ?
     performance.getEntriesByType('navigation')[0] : null;
+  initJoinNavigation();
   if (location.hash === '#back' || (nav && nav.type === 'back_forward')) {
     start();
   } else {
