@@ -1,1 +1,3 @@
 node_modules/
+# Local Cloudflare Wrangler cache (created by `wrangler dev` / `wrangler deploy`)
+.wrangler/

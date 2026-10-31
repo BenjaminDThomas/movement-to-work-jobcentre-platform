@@ -33,8 +33,8 @@
                     profile.min.js and css/tools.min.css) are fetched the
                     first time one is wanted, not with the page
 
-   The page loads js/main.min.js, built from this file by `npm run build`
-   (see build.mjs); edit this file, then rebuild.
+   The page loads the checked-in js/main.min.js static file directly.
+   Deployment does not run a build step.
 
    Scroll choreography runs whenever the pinned layout is in force, on a
    screen at least 30em tall (the same query as grid.css section 12). It
@@ -1108,6 +1108,23 @@
         event.preventDefault();
       }
     });
+
+    // Scrolling that sends no usable wheel, swipe or key event still
+    // starts it: a slow trackpad scroll (steps under 2px, ignored above),
+    // a flick's momentum, or a drag of the scrollbar. Before, these moved
+    // the page part-way into the hand-over and left it stuck there, half
+    // played. Held for a moment after load, so restoring your place does
+    // not set it off.
+    var lastY = window.scrollY;
+    var armedAt = performance.now() + 800;
+    window.addEventListener('scroll', function () {
+      var y = window.scrollY;
+      var down = y > lastY + 1;
+      lastY = y;
+      if (down && performance.now() > armedAt && !scrollLocked() && wantsAutoplay(1)) {
+        playIntro(1);
+      }
+    }, { passive: true });
   }
 
   /** Wrap each word of a scene title so it can rise in on its own. */
@@ -2349,6 +2366,7 @@
   var outroDone = false;
   var outroLastY = window.scrollY;
   var OUTRO_MS = AUTO_MS;   // same pace as the MOVEMENT TO WORK hand-over
+  var OUTRO_FROM = 0.24;    // screens past the last card where it starts
 
   function outroStart() {
     return progOutro.getBoundingClientRect().top + window.scrollY - screenH();
@@ -2386,9 +2404,11 @@
     }
     // A little room past the last card first, so the certificate can be
     // looked at without the next swipe carrying the page away; the hand-
-    // over starts where the green field begins to show.
+    // over starts just before the green field begins to show (it fades in
+    // from a quarter of a screen in). It used to start at 0.3, so stopping
+    // between the two left the field faintly showing and the page stuck.
     var y = window.scrollY;
-    return y >= outroStart() + screenH() * 0.3 - 4 && y < outroEnd() - 4;
+    return y >= outroStart() + screenH() * OUTRO_FROM - 4 && y < outroEnd() - 4;
   }
 
   function playOutro() {
@@ -2409,7 +2429,7 @@
     // The full hand-over (from where it normally starts) takes exactly as
     // long as the MOVEMENT TO WORK one; starting further in takes
     // proportionally less.
-    var span = Math.max(1, to - (outroStart() + screenH() * 0.3));
+    var span = Math.max(1, to - (outroStart() + screenH() * OUTRO_FROM));
     var ms = clamp(OUTRO_MS * dist / span, 900, OUTRO_MS);
     var start = null;
     var mine = outroAuto = {};

@@ -228,6 +228,10 @@ button {
   /* Height of one screen. svh where supported, so mobile browser chrome
      never pushes a pinned stage under the address bar. */
   --screen: 100vh;
+
+  /* The page unit under its own name, so the hero can cap it by the
+     screen height (see below) without affecting the rest of the page. */
+  --u-root: var(--u);
 }
 
 @supports (height: 100svh) {
@@ -241,6 +245,64 @@ button {
 @media (orientation: landscape) and (max-height: 33.99em) {
   :root {
     --u: clamp(0.75px, calc(100vh / 640), 1.2px);
+  }
+}
+
+/* Phone and tablet hero while it is pinned (main.js plays the hand-over
+   on the first scroll, and the stage clips at one screen), so anything
+   below the bottom edge could never be reached. The unit was set by the
+   width alone, so wide-but-short windows (a resized browser, a tablet on
+   its side, a short laptop) cut off the buttons and chips and put the
+   menu button over them.
+
+   The hero, and the fixed logo, Join corner and menu button that frame
+   it, now also cap the unit by the height, so the whole composition
+   scales together and always fits. The rest of the page keeps the width
+   unit (--u-root). About 700 units: the stacked hero is about 600 tall
+   and the menu button needs about 100 below it; 740 leaves room for text
+   that stops shrinking at its pixel floor. */
+@media (min-height: 30em) and (not ((min-width: 56em) and (min-aspect-ratio: 5/4) and (min-height: 34em))) {
+  :root {
+    --u-fit: min(var(--u-root), calc(var(--screen) / 740));
+  }
+
+  .intro,
+  .site-header,
+  .menu-toggle {
+    --u: var(--u-fit);
+  }
+
+  /* On tall screens (a tablet held upright, a tall window) the scale is
+     limited by the width, which left a third of the screen empty under
+     the buttons. Just under half of any spare height goes above the
+     content, so it sits in the frame rather than clinging to the top. */
+  .intro .hero__frame {
+    padding-top: calc(76 * var(--u) + max(0px, (var(--screen) - 724 * var(--u)) * 0.45));
+  }
+
+  @media (min-width: 48em) {
+    .intro .hero__frame {
+      padding-top: calc(78 * var(--u) + max(0px, (var(--screen) - 724 * var(--u)) * 0.45));
+    }
+  }
+}
+
+/* Screens only 480-543px tall (a short browser window, a phone or small
+   tablet on its side): even scaled to fit, the three chips under the
+   buttons do not fit, so they are left out. They repeat what the badge
+   and the copy above already say. */
+@media (min-height: 30em) and (max-height: 33.99em) {
+  .hero .hero__chips {
+    display: none;
+  }
+
+  /* On a phone-width screen this short, "See how it works" runs under the
+     menu button. It only leads to About, which the next scroll shows
+     anyway, so it is left out here too. */
+  @media (max-width: 47.99em) {
+    .hero .hero__actions .link-sketch {
+      display: none;
+    }
   }
 }
 
@@ -800,6 +862,18 @@ html:not(.js) .menu-toggle {
   gap: calc(5 * var(--u));
   min-height: 44px;
   padding: 0 calc(4 * var(--u));
+}
+
+/* The narrowest phones (under 360px): a tighter button and gap, so
+   "See how it works" and its arrow are not cut off at the right edge. */
+@media (max-width: 22.49em) {
+  .hero__actions {
+    gap: calc(10 * var(--u));
+  }
+
+  .hero__actions .btn-brush {
+    padding: 0 calc(15 * var(--u));
+  }
 }
 
 .hero__chips {
@@ -3029,11 +3103,17 @@ html:not(.js) .menu-toggle {
     margin-top: calc(40 * var(--u));
   }
 
+  /* The badge sits beside the "What you'll get" tag, above the list. It
+     used to sit at the far right, where the tilted list rises the most
+     (more on wider screens), so the list slid over it and cut off
+     "job-ready". It is placed from the left now, and the list starts
+     below it. */
   .hero__badge--wide {
     display: block;
     position: absolute;
-    right: calc(4 * var(--u));
-    top: calc(-16 * var(--u));
+    z-index: 2;
+    left: min(calc(168 * var(--u)), calc(100% - 74 * var(--u)));
+    top: calc(-22 * var(--u));
     width: calc(70 * var(--u));
   }
 
@@ -3046,7 +3126,8 @@ html:not(.js) .menu-toggle {
     display: flex;
     flex-direction: column;
     gap: calc(11 * var(--u));
-    margin-top: calc(16 * var(--u));
+    max-width: calc(380 * var(--u));
+    margin-top: calc(48 * var(--u));
   }
 
   .perk {

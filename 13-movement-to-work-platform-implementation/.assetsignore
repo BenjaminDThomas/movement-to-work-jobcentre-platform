@@ -1,0 +1,6 @@
+# Files in this folder that must not be served as part of the site when it
+# is deployed with Wrangler (Cloudflare Workers static assets).
+.wrangler
+.gitignore
+.assetsignore
+node_modules

@@ -920,7 +920,7 @@ html:not(.js) .menu__link:hover::after {
 
 .hero__lead {
   font-weight: 700;
-  font-size: calc(16 * var(--u));
+  font-size: max(14px, calc(16 * var(--u)));
   line-height: 1.22;
   color: var(--c-white);
 }
@@ -1002,7 +1002,7 @@ html:not(.js) .menu__link:hover::after {
   border-radius: 999px;
   color: var(--c-white);
   font-weight: 700;
-  font-size: max(10.5px, calc(10 * var(--u)));
+  font-size: max(11.5px, calc(10 * var(--u)));
   line-height: 1;
   white-space: nowrap;
 }
@@ -1412,27 +1412,38 @@ html:not(.js) .menu__link:hover::after {
     font-size: calc(118 * var(--u));
   }
 
+  /* The wide frame is a 1292 x 728 composition scaled to the window, so on
+     a small laptop or a narrow desktop window (about 900-1200px wide) its
+     smaller text fell to 8-11px. Those sizes now have readable floors. */
   .hero__lead {
-    font-size: calc(20.5 * var(--u));
+    font-size: max(15px, calc(20.5 * var(--u)));
   }
 
   .hero__body {
-    font-size: calc(15.6 * var(--u));
+    font-size: max(13px, calc(15.6 * var(--u)));
     line-height: 1.4;
     background: none;
     border-radius: 0;
   }
 
   .btn-brush {
-    font-size: calc(15 * var(--u));
+    font-size: max(13.5px, calc(15 * var(--u)));
   }
 
   .link-sketch {
-    font-size: calc(14 * var(--u));
+    font-size: max(13px, calc(14 * var(--u)));
   }
 
   .chip {
-    font-size: calc(12 * var(--u));
+    font-size: max(11.5px, calc(12 * var(--u)));
+  }
+
+  .perk__name {
+    font-size: max(12.5px, calc(15.5 * var(--u)));
+  }
+
+  .perk__desc {
+    font-size: max(11.5px, calc(14 * var(--u)));
   }
 
 
@@ -3366,8 +3377,8 @@ html:not(.js) .menu__link:hover::after {
   .hero__title-main { font-size: calc(44 * var(--u)); }
   .hero__title-script { font-size: calc(54 * var(--u)); }
   .perks__tag { font-size: calc(17 * var(--u)); }
-  .perk__name { font-size: calc(10.5 * var(--u)); }
-  .perk__desc { font-size: calc(9.5 * var(--u)); }
+  .perk__name { font-size: max(12px, calc(10.5 * var(--u))); }
+  .perk__desc { font-size: max(11px, calc(9.5 * var(--u))); }
 }
 
 
